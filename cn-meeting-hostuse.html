@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Circle Networks — Meeting Host</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --pink:       #F55036;
+  --pink-light: #fff1ee;
+  --pink-dim:   rgba(245,80,54,0.08);
+  --navy:       #f1f5f9;
+  --navy-mid:   #ffffff;
+  --navy-light: #f8fafc;
+  --mid:        #6b7280;
+  --text:       #1f2937;
+  --text-dim:   #6b7280;
+  --border:     #e2e8f0;
+  --done-bg:    #f8fafc;
+  --sidebar-w:  280px;
+  --transition: 0.22s cubic-bezier(0.4,0,0.2,1);
+}
+
+html, body {
+  height: 100%;
+  font-family: 'DM Sans', sans-serif;
+  background: var(--navy);
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.6;
+  overflow: hidden;
+}
+
+/* ── LAYOUT ── */
+.shell { display: flex; height: 100vh; }
+
+/* ── SIDEBAR ── */
+.sidebar {
+  width: var(--sidebar-w);
+  background: var(--navy-mid);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.sidebar-head {
+  padding: 18px 20px 14px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.cn-logo {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.01em;
+  margin-bottom: 3px;
+}
+
+.cn-logo span { color: var(--pink); }
+
+.host-label {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--mid);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* Progress bar */
+.progress-wrap {
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.progress-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10.5px;
+  color: var(--mid);
+  margin-bottom: 6px;
+}
+
+.progress-label strong { color: var(--pink); }
+
+.progress-track {
+  height: 4px;
+  background: #e5e7eb;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--pink);
+  border-radius: 2px;
+  transition: width 0.4s cubic-bezier(0.4,0,0.2,1);
+  width: 0%;
+}
+
+/* Steps list */
+.steps-list {
+  overflow-y: auto;
+  flex: 1;
+  padding: 8px 0;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+.step-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: background var(--transition);
+  position: relative;
+  border-left: 3px solid transparent;
+}
+
+.step-item:hover { background: #f8fafc; }
+.step-item.active {
+  background: var(--pink-dim);
+  border-left-color: var(--pink);
+}
+.step-item.done {
+  opacity: 0.5;
+}
+.step-item.done .step-dot { background: #d1d5db; }
+.step-item.done .step-dot::after { content: '✓'; color: white; font-size: 9px; display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; }
+
+.step-dot {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #e5e7eb;
+  border: 1.5px solid #d1d5db;
+  flex-shrink: 0;
+  margin-top: 1px;
+  transition: all var(--transition);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--mid);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'DM Mono', monospace;
+}
+
+.step-item.active .step-dot {
+  background: var(--pink);
+  border-color: var(--pink);
+  color: white;
+}
+
+.step-meta { flex: 1; min-width: 0; }
+
+.step-title {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.3;
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.step-item.active .step-title { color: var(--pink); }
+.step-item.done .step-title { text-decoration: line-through; }
+
+.step-time {
+  font-size: 10px;
+  color: var(--mid);
+  font-family: 'DM Mono', monospace;
+}
+
+/* Clock */
+.clock-wrap {
+  padding: 12px 20px;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.clock {
+  font-family: 'DM Mono', monospace;
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--text);
+  letter-spacing: 0.04em;
+}
+
+.clock-label { font-size: 10px; color: var(--mid); }
+
+/* ── MAIN CONTENT ── */
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Top bar */
+.topbar {
+  padding: 14px 28px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  background: var(--navy-mid);
+}
+
+.topbar-left { display: flex; align-items: center; gap: 12px; }
+
+.step-badge {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--pink);
+  background: var(--pink-dim);
+  padding: 3px 10px;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-family: 'DM Mono', monospace;
+}
+
+.topbar-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.02em;
+}
+
+.topbar-time {
+  font-family: 'DM Mono', monospace;
+  font-size: 13px;
+  color: var(--pink);
+  font-weight: 500;
+  background: var(--pink-dim);
+  padding: 4px 12px;
+  border-radius: 6px;
+  border: 1px solid rgba(245,80,54,0.25);
+}
+
+/* Content area */
+.content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 28px 32px 100px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+/* Script sections */
+.script-section {
+  display: none;
+  animation: fadeUp 0.3s ease forwards;
+}
+
+.script-section.active { display: block; }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Script card */
+.script-card {
+  background: var(--navy-light);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 22px 26px;
+  margin-bottom: 16px;
+}
+
+.script-card-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--mid);
+  margin-bottom: 10px;
+}
+
+.script-card-label.pink { color: var(--pink); }
+
+.script-body {
+  font-size: 15px;
+  line-height: 1.75;
+  color: var(--text);
+}
+
+.script-body p { margin-bottom: 10px; }
+.script-body p:last-child { margin-bottom: 0; }
+
+/* Placeholder styling */
+.ph {
+  color: var(--pink);
+  font-weight: 600;
+  background: var(--pink-dim);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-style: normal;
+}
+
+/* Emphasis */
+.em { font-weight: 700; color: #111827; }
+
+/* After talk box */
+.after-box {
+  background: rgba(245,80,54,0.06);
+  border: 1px solid rgba(245,80,54,0.2);
+  border-radius: 10px;
+  padding: 18px 22px;
+  margin-top: 16px;
+}
+
+.after-box-label {
+  font-size: 9.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--pink);
+  margin-bottom: 10px;
+}
+
+.after-box .script-body { font-size: 14px; }
+
+/* Tips grid */
+.tips-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.tip-card {
+  background: var(--navy-light);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 18px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.tip-num {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--pink);
+  background: var(--pink-dim);
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.tip-content {}
+.tip-head { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+.tip-body { font-size: 12px; color: var(--text-dim); line-height: 1.55; }
+
+/* Stats row */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.stat-card {
+  background: var(--navy-light);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+  text-align: center;
+}
+
+.stat-num {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--pink);
+  letter-spacing: -0.03em;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.stat-label { font-size: 11px; color: var(--text-dim); }
+
+/* Values grid */
+.values-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.value-card {
+  background: var(--navy-light);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.value-icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
+.value-head { font-size: 12.5px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+.value-body { font-size: 11.5px; color: var(--text-dim); }
+
+/* Breakout visual */
+.breakout-hero {
+  background: linear-gradient(135deg, var(--pink-light) 0%, rgba(245,80,54,0.06) 100%);
+  border: 1px solid rgba(245,80,54,0.2);
+  border-radius: 12px;
+  padding: 32px 28px;
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.breakout-num {
+  font-size: 80px;
+  font-weight: 700;
+  color: rgba(245,80,54,0.08);
+  line-height: 1;
+  font-family: 'DM Mono', monospace;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.breakout-hero-inner { position: relative; }
+
+.breakout-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.02em;
+  margin-bottom: 6px;
+}
+
+.breakout-sub { font-size: 13px; color: var(--text-dim); }
+
+.breakout-badge {
+  display: inline-block;
+  margin-top: 14px;
+  background: var(--pink);
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 18px;
+  border-radius: 20px;
+}
+
+/* ── BOTTOM ACTION BAR ── */
+.action-bar {
+  position: fixed;
+  bottom: 0;
+  left: var(--sidebar-w);
+  right: 0;
+  background: var(--navy-mid);
+  border-top: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 10;
+  backdrop-filter: blur(8px);
+}
+
+.action-info { font-size: 12.5px; color: var(--text-dim); }
+.action-info strong { color: var(--text); }
+
+.action-btns { display: flex; gap: 10px; }
+
+.btn {
+  padding: 9px 20px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  font-family: 'DM Sans', sans-serif;
+  transition: all var(--transition);
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.btn-ghost {
+  background: transparent;
+  border: 1.5px solid var(--border);
+  color: var(--text-dim);
+}
+
+.btn-ghost:hover { border-color: var(--mid); color: var(--text); }
+
+.btn-primary {
+  background: var(--pink);
+  color: white;
+}
+
+.btn-primary:hover { background: #d94026; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(245,80,54,0.3); }
+
+.btn-done {
+  background: #f3f4f6;
+  color: var(--text-dim);
+  border: 1.5px solid var(--border);
+}
+
+.btn-done:hover { background: #e5e7eb; }
+
+/* Done overlay on completed section */
+.done-banner {
+  display: none;
+  align-items: center;
+  gap: 10px;
+  background: #f9fafb;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 18px;
+  margin-bottom: 16px;
+  font-size: 13px;
+  color: var(--mid);
+}
+
+.done-banner.visible { display: flex; }
+.done-banner .tick { color: var(--pink); font-size: 18px; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <div class="cn-logo">Circle <span>Networks</span></div>
+      <div class="host-label">Meeting Host Script</div>
+    </div>
+
+    <div class="progress-wrap">
+      <div class="progress-label">
+        <span>Progress</span>
+        <strong id="progress-text">0 of 10 done</strong>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progress-fill"></div>
+      </div>
+    </div>
+
+    <div class="steps-list" id="steps-list">
+      <!-- Populated by JS -->
+    </div>
+
+    <div class="clock-wrap">
+      <div>
+        <div class="clock" id="clock">00:00</div>
+        <div class="clock-label">Current time</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <div class="topbar">
+      <div class="topbar-left">
+        <div class="step-badge" id="top-badge">Step 1 of 10</div>
+        <div class="topbar-title" id="top-title">Welcome</div>
+      </div>
+      <div class="topbar-time" id="top-time">10:00</div>
+    </div>
+
+    <div class="content" id="content">
+
+      <!-- ── SECTION 0: WELCOME ── -->
+      <div class="script-section active" id="section-0">
+        <div class="done-banner" id="done-0">
+          <span class="tick">✓</span>
+          <span>This section is marked as done. Click any step in the sidebar to revisit it.</span>
+        </div>
+        <div class="script-card">
+          <div class="script-card-label pink">Say this</div>
+          <div class="script-body">
+            <p>Hello and welcome everyone to Circle Networks. Thank you for being here today.</p>
+            <p>This isn't <span class="em">my</span> meeting — it's <span class="em">ours</span>. The format is designed so we all leave with something genuinely useful, whether that's a referral, a new supplier, a collaborator, or just a conversation that opens a door.</p>
+            <p>My name is <span class="ph">[YOUR NAME]</span> and I host this group because <span class="ph">[YOUR REASON — ONE SENTENCE]</span>.</p>
+            <p>We're here for referrals, yes — but also for peer support, new suppliers, and the kind of community you don't find anywhere else. That's what Circle Networks is about.</p>
+            <p>We have <span class="ph">[NUMBER]</span> speakers joining us today, and plenty of time to connect in the breakouts. Let's get going.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── SECTION 1: HOW TODAY WORKS ── -->
+      <div class="script-section" id="section-1">
+        <div class="done-banner" id="done-1">
+          <span class="tick">✓</span>
+          <span>This section is marked as done. Click any step in the sidebar to revisit it.</span>
+        </div>
+        <div class="script-card">
+          <div class="script-card-label pink">Say this</div>
+          <div class="script-body">
+            <p>Before we dive in, a quick word on how today is structured so you know what to expect.</p>
+            <p>We send everyone's contact details out by email right after the meeting — so there's no need to worry about swapping details during the session. Stay present, enjoy the conversations.</p>
+            <p>Today we have <span class="em">three breakout sessions</span>, each lasting 16 minutes. In a group of four, you each get 4 minutes. In a group of three, it's closer to 5 — keep an eye on the clock either way.</p>
+            <p>Sat between the breakouts, we have <span class="em">two 7-minute speaker sessions</span> — a mix of insight and education relevant to growing your business.</p>
+            <p><span class="ph">[CREW NAME]</span> is managing Zoom and the breakout rooms today. They'll send you in when it's time.</p>
+          </div>
+        </div>
+        <div style="background:var(--pink-dim);border:1px solid rgba(245,80,54,0.2);border-radius:10px;padding:16px 20px;margin-top:14px;">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--pink);margin-bottom:10px;">Today's speakers</div>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <div style="display:flex;align-items:center;gap:12px;">
+              <div style="font-size:18px;">🍌</div>
+              <div>
+                <div style="font-size:13px;font-weight:700;color:var(--text);">Gareth Williams — Memory Makers</div>
+                <div style="font-size:12.5px;color:var(--text-dim);margin-top:1px;">A social enterprise helping care homes preserve residents' life stories through guided conversations. You may know Gareth from Banana Marketing — today he's talking about something close to his heart.</div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;">
+              <div style="font-size:18px;">🖨️</div>
+              <div>
+                <div style="font-size:13px;font-weight:700;color:var(--text);">David Hyams — Talking Print</div>
+                <div style="font-size:12.5px;color:var(--text-dim);margin-top:1px;">MD at the UK's leading sound and vision print specialists, serving B2B and B2C clients.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── SECTION 2: BREAKOUT TIPS ── -->
+      <div class="script-section" id="section-2">
+        <div class="done-banner" id="done-2">
+          <span class="tick">✓</span>
+          <span>This section is marked as done. Click any step in the sidebar to revisit it.</span>
+        </div>
+        <div class="script-card">
+          <div class="script-card-label pink">Say this</div>
+          <div class="script-body">
+            <p>A few quick tips before we head into the first breakout.</p>
+          </div>
+        </div>
+        <div class="tips-grid">
+          <div class="tip-card">
+            <div class="tip-num">01</div>
+            <div class="tip-content">
+              <div class="tip-head">Introduce yourself first</div>
+              <div class="tip-body">Start with something personal — where you're based, what you're excited about right now. Relationships start with people, not pitches.</div>
+            </div>
+          </div>
+          <div class="tip-card">
+            <div class="tip-num">02</div>
+            <div class="tip-content">
+              <div class="tip-head">Then talk about your business</div>
+              <div class="tip-body">Keep it clear. What do you do, who do you do it for, and what makes you the right person to call?</div>
+            </div>
+          </div>
+          <div class="tip-card">
+            <div class="tip-num">03</div>
+            <div class="tip-content">
+              <div class="tip-head">Finish with your ask</div>
+              <div class="tip-body">Tell the room exactly how they can help — an introduction, a conversation, a referral. The more specific the ask, the more likely it lands.</div>
+            </div>
+          </div>
+          <div class="tip-card">
+            <div class="tip-num">04</div>
+            <div class="tip-content">
+              <div class="tip-head">Watch the clock</div>
+              <div class="tip-body">There's a timer in the top right of each breakout room. Reminder messages appear as time runs down. Make sure everyone gets their turn.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── SECTION 3: FIRST BREAKOUT ── -->
+      <div class="script-section" id="section-3">
+        <div class="done-banner" id="done-3">
+          <span class="tick">✓</span>
+          <span>This section is marked as done. Click any step in the sidebar to revisit it.</span>
+        </div>
+        <div class="breakout-hero">
+          <div class="breakout-title">First Breakout Session</div>
+          <div class="breakout-sub">16 minutes · 4 mins per person in a 4, or 5 mins in a 3</div>
+          <div class="breakout-badge">01 of 03</div>
+        </div>
+        <div class="script-card">
+          <div class="script-card-label pink">Say this</div>
+          <div class="script-body">
+            <p>Right, let's go. <span class="ph">[CREW NAME]</span>, please send everyone into the first breakout rooms.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── SECTION 4: SPEAKER 1 ── -->
+      <div class="script-section" id="section-4">
+        <div class="done-banner" id="done-4">
+          <span class="tick">✓</span>
+          <span>This section is marked as done. Click any step in the sidebar to revisit it.</span>
+        </div>
+
+        <!-- Speaker profile card -->
+        <div style="background:var(--navy-light);border:1px solid var(--border);border-radius:12px;padding:18px 22px;margin-bottom:16px;display:flex;gap:20px;align-items:flex-start;">
+          <div style="width:48px;height:48px;border-radius:50%;background:var(--pink-dim);border:2px solid var(--pink);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">🍌</div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:2px;">Gareth Williams</div>
+            <div style="font-size:12px;color:var(--pink);font-weight:600;margin-bottom:6px;">Founder · Banana Marketing &amp; Memory Makers · Conwy, UK</div>
+            <div style="font-size:12px;color:var(--text-dim);line-height:1.55;">Many of you know Gareth from Banana Marketing, his short-form video business. Today he's speaking about his other venture, <strong style="color:var(--text);">Memory Makers</strong>, a social enterprise that helps care homes preserve residents' life stories through a guided conversation app. Founded after Gareth ran a creative writing session at a dementia group in Nantwich and realised he was capturing people's legacies.</div>
+          </div>
+          <div style="text-align:right;flex-shrink:0;">
+            <div style="font-size:10px;color:var(--mid);margin-bottom:4px;">His ask</div>
+            <div style="font-size:11.5px;color:var(--text);font-weight:600;max-width:160px;line-height:1.4;">Time-poor SME owners who need consistent short-form video and killer testimonials</div>
+          </div>
+        </div>
+
+        <div class="script-card">
+          <div class="script-card-label pink">Say this — introduction</div>
+          <div class="script-body">
+            <p>Welcome back everyone.</p>
+            <p>Now, many of you will know our first speaker from his work with Banana Marketing. But today <span class="em">Gareth Williams</span> is here to talk about something completely different — his social enterprise, <span class="em">Memory Makers</span>.</p>
+            <p>Memory Makers helps care homes preserve the life stories of their residents through a simple app built around guided conversations. Gareth founded it after running a creative writing session at a dementia group in Nantwich and realising he was capturing something really special — people's legacies. Over to you, Gareth.</p>
+          </div>
+        </div>
+        <div class="after-box">
+          <div class="after-box-label">After the talk — say this</div>
+          <div class="script-body">
+            <p>Thank you, Gareth. If you work with, know someone in, or supply to care homes — or if you just think this is a mission worth supporting — Gareth is absolutely worth a conversation. His details will be in the post-meeting email.</p>
+            <p>Let's head into breakout two.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── SECTION 5: SECOND BREAKOUT ── -->
+      <div class="script-section" id="section-5">
+        <div class="done-banner" id="done-5">
+          <span class="tick">✓</span>
+          <span>This section is marked as done. Click any step in the sidebar to revisit it.</span>
+        </div>
+        <div class="breakout-hero">
+          <div class="breakout-title">Second Breakout Session</div>
+          <div class="breakout-sub">16 minutes · Different rooms from the first session</div>
+          <div class="breakout-badge">02 of 03</div>
+        </div>
+        <div class="script-card">
+          <div class="script-card-label pink">Say this</div>
+          <div class="script-body">
+            <p><span class="ph">[CREW NAME]</span>, please send everyone into the second breakout rooms.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── SECTION 6: SPEAKER 2 ── -->
+      <div class="script-section" id="section-6">
+        <div class="done-banner" id="done-6">
+          <span class="tick">✓</span>
+          <span>This section is marked as done. Click any step in the sidebar to revisit it.</span>
+        </div>
+
+        <!-- Speaker profile card -->
+        <div style="background:var(--navy-light);border:1px solid var(--border);border-radius:12px;padding:18px 22px;margin-bottom:16px;display:flex;gap:20px;align-items:flex-start;">
+          <div style="width:48px;height:48px;border-radius:50%;background:var(--pink-dim);border:2px solid var(--pink);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">🖨️</div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:2px;">David Hyams</div>
+            <div style="font-size:12px;color:var(--pink);font-weight:600;margin-bottom:6px;">MD · Talking Print · London, UK</div>
+            <div style="font-size:12px;color:var(--text-dim);line-height:1.55;">David runs Talking Print, the UK's leading sound and vision print specialists — combining print with audio and video technology for B2B and B2C clients. Introduced by Kate Greenhalgh.</div>
+          </div>
+          <div style="text-align:right;flex-shrink:0;">
+            <div style="font-size:10px;color:var(--mid);margin-bottom:4px;">His ask</div>
+            <div style="font-size:11.5px;color:var(--text);font-weight:600;max-width:160px;line-height:1.4;">Meet like-minded people</div>
+          </div>
+        </div>
+
+        <div class="script-card">
+          <div class="script-card-label pink">Say this — introduction</div>
+          <div class="script-body">
+            <p>Welcome back everyone.</p>
+            <p>Our second speaker is <span class="em">David Hyams</span>, MD at Talking Print — the UK's leading sound and vision print specialists. Over to you, David.</p>
+          </div>
+        </div>
+        <div class="after-box">
+          <div class="after-box-label">After the talk — say this</div>
+          <div class="script-body">
+            <p>Thank you, David. If you'd like to connect with David, his details will be in the post-meeting email — well worth a conversation if print is anywhere in your world.</p>
+            <p>Right, let's do our final breakout.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── SECTION 7: CIRCLE NETWORKS BENEFITS ── -->
+      <div class="script-section" id="section-7">
+        <div class="done-banner" id="done-7">
+          <span class="tick">✓</span>
+          <span>This section is marked as done. Click any step in the sidebar to revisit it.</span>
+        </div>
+        <div class="script-card">
+          <div class="script-card-label pink">Say this</div>
+          <div class="script-body">
+            <p>Before the last breakout — a quick reminder of what your membership gives you beyond today's meeting.</p>
+          </div>
+        </div>
+        <div class="stats-row">
+          <div class="stat-card">
+            <div class="stat-num">90+</div>
+            <div class="stat-label">Events every month</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num">£50</div>
+            <div class="stat-label">+VAT/month, no minimum term</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num">UK &amp; 🌍</div>
+            <div class="stat-label">In-person events including Dubai</div>
+          </div>
+        </div>
+        <div class="values-grid">
+          <div class="value-card">
+            <div class="value-icon">🦬</div>
+            <div>
+              <div class="value-head">Be More Buffalo</div>
+              <div class="value-body">We face challenges together, not alone.</div>
+            </div>
+          </div>
+          <div class="value-card">
+            <div class="value-icon">🤝</div>
+            <div>
+              <div class="value-head">Pay It Forward</div>
+              <div class="value-body">Give first. The return comes naturally.</div>
+            </div>
+          </div>
+          <div class="value-card">
+            <div class="value-icon">❤️</div>
+            <div>
+              <div class="value-head">Friendship Fuels Business</div>
+              <div class="value-body">Real relationships lead to real results.</div>
+            </div>
+          </div>
+          <div class="value-card">
+            <div class="value-icon">📅</div>
+            <div>
+              <div class="value-head">Circle Networks Live</div>
+              <div class="value-body">Check circlenetworks.co.uk for upcoming LIVE events.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── SECTION 8: THIRD BREAKOUT ── -->
+      <div class="script-section" id="section-8">
+        <div class="done-banner" id="done-8">
+          <span class="tick">✓</span>
+          <span>This section is marked as done. Click any step in the sidebar to revisit it.</span>
+        </div>
+        <div class="breakout-hero">
+          <div class="breakout-title">Third Breakout Session</div>
+          <div class="breakout-sub">16 minutes · Last chance to make a new connection today</div>
+          <div class="breakout-badge">03 of 03</div>
+        </div>
+        <div class="script-card">
+          <div class="script-card-label pink">Say this</div>
+          <div class="script-body">
+            <p>Last one — make it count. <span class="ph">[CREW NAME]</span>, please send everyone into the final breakout rooms.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── SECTION 9: WRAP UP ── -->
+      <div class="script-section" id="section-9">
+        <div class="done-banner" id="done-9">
+          <span class="tick">✓</span>
+          <span>All done. Great meeting.</span>
+        </div>
+        <div class="script-card">
+          <div class="script-card-label pink">Say this</div>
+          <div class="script-body">
+            <p>Welcome back everyone — and that's a wrap on the breakouts.</p>
+            <p>We now have over 90 networking events running every month across the UK and internationally — and this group is part of what makes that possible. Thank you for investing your time here today.</p>
+            <p>If today's time slot works for you, raise your hand and I'll make sure you're on the list for next time.</p>
+            <p>Membership covers every event at <span class="em">£50+VAT per month with no minimum term</span>. Full details on the Circle Networks website.</p>
+            <p>Contact details for everyone in today's session are on their way to your inbox now.</p>
+            <p>Remember — <span class="em">Friendship Fuels Business</span>. Take care of yourselves and each other, and I look forward to seeing you again very soon.</p>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+
+    <!-- ACTION BAR -->
+    <div class="action-bar">
+      <div class="action-info" id="action-info">
+        <strong>Welcome</strong> · Step 1 of 10
+      </div>
+      <div class="action-btns">
+        <button class="btn btn-ghost" id="btn-prev" onclick="prevStep()">← Back</button>
+        <button class="btn btn-primary" id="btn-next" onclick="nextStep()">Mark done &amp; next →</button>
+      </div>
+    </div>
+
+  </div><!-- /main -->
+</div><!-- /shell -->
+
+<script>
+const steps = [
+  { title: "Welcome",              time: "10:00", duration: "5 min"  },
+  { title: "How Today Works",      time: "10:00", duration: "3 min"  },
+  { title: "Breakout Tips",        time: "10:03", duration: "2 min"  },
+  { title: "First Breakout",       time: "10:05", duration: "16 min" },
+  { title: "Speaker 1",            time: "10:28", duration: "7 min"  },
+  { title: "Second Breakout",      time: "10:35", duration: "16 min" },
+  { title: "Speaker 2",            time: "10:51", duration: "7 min"  },
+  { title: "CN Benefits",          time: "11:00", duration: "2 min"  },
+  { title: "Third Breakout",       time: "11:02", duration: "16 min" },
+  { title: "Wrap Up",              time: "11:22", duration: "5 min"  },
+];
+
+let current = 0;
+let done = new Set();
+
+function buildSidebar() {
+  const list = document.getElementById('steps-list');
+  list.innerHTML = '';
+  steps.forEach((s, i) => {
+    const el = document.createElement('div');
+    el.className = 'step-item' + (i === current ? ' active' : '') + (done.has(i) ? ' done' : '');
+    el.id = 'step-item-' + i;
+    el.onclick = () => goTo(i);
+    el.innerHTML = `
+      <div class="step-dot">${done.has(i) ? '' : i + 1}</div>
+      <div class="step-meta">
+        <div class="step-title">${s.title}</div>
+        <div class="step-time">${s.time} · ${s.duration}</div>
+      </div>`;
+    list.appendChild(el);
+  });
+}
+
+function updateProgress() {
+  const pct = (done.size / steps.length) * 100;
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-text').textContent = done.size + ' of ' + steps.length + ' done';
+}
+
+function updateTopbar() {
+  const s = steps[current];
+  document.getElementById('top-badge').textContent = 'Step ' + (current + 1) + ' of ' + steps.length;
+  document.getElementById('top-title').textContent = s.title;
+  document.getElementById('top-time').textContent = s.time;
+  document.getElementById('action-info').innerHTML = '<strong>' + s.title + '</strong> · Step ' + (current + 1) + ' of ' + steps.length;
+}
+
+function showSection(idx) {
+  document.querySelectorAll('.script-section').forEach((el, i) => {
+    el.classList.toggle('active', i === idx);
+  });
+  // Show done banner if step is done
+  steps.forEach((_, i) => {
+    const banner = document.getElementById('done-' + i);
+    if (banner) banner.classList.toggle('visible', done.has(i));
+  });
+  // Scroll content to top
+  document.getElementById('content').scrollTop = 0;
+}
+
+function updateButtons() {
+  document.getElementById('btn-prev').style.opacity = current === 0 ? '0.3' : '1';
+  document.getElementById('btn-prev').disabled = current === 0;
+  const isLast = current === steps.length - 1;
+  const nextBtn = document.getElementById('btn-next');
+  if (isLast && done.has(current)) {
+    nextBtn.textContent = '✓ Meeting complete';
+    nextBtn.className = 'btn btn-done';
+    nextBtn.onclick = null;
+  } else if (isLast) {
+    nextBtn.innerHTML = 'Mark as done ✓';
+    nextBtn.className = 'btn btn-primary';
+    nextBtn.onclick = () => { done.add(current); refresh(); };
+  } else {
+    nextBtn.innerHTML = 'Mark done &amp; next →';
+    nextBtn.className = 'btn btn-primary';
+    nextBtn.onclick = nextStep;
+  }
+}
+
+function goTo(idx) {
+  current = idx;
+  refresh();
+  // Scroll sidebar item into view
+  const el = document.getElementById('step-item-' + idx);
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function nextStep() {
+  done.add(current);
+  if (current < steps.length - 1) {
+    current++;
+  }
+  refresh();
+}
+
+function prevStep() {
+  if (current > 0) {
+    current--;
+    refresh();
+  }
+}
+
+function refresh() {
+  buildSidebar();
+  updateProgress();
+  updateTopbar();
+  showSection(current);
+  updateButtons();
+}
+
+// Live clock
+function updateClock() {
+  const now = new Date();
+  const h = String(now.getHours()).padStart(2, '0');
+  const m = String(now.getMinutes()).padStart(2, '0');
+  document.getElementById('clock').textContent = h + ':' + m;
+}
+
+updateClock();
+setInterval(updateClock, 10000);
+
+// Init
+refresh();
+</script>
+</body>
+</html>
