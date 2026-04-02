@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Someli Analytics Dashboard – Wireframe</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:       #F0F0F0;
+  --white:    #FFFFFF;
+  --box:      #E2E2E2;
+  --box2:     #D4D4D4;
+  --stroke:   #BBBBBB;
+  --stroke2:  #999999;
+  --text:     #222222;
+  --text2:    #555555;
+  --label:    #888888;
+  --active:   #333333;
+  --fill:     #CCCCCC;
+  --fill2:    #AAAAAA;
+  --red:      #333333;
+  --mono:     'DM Mono', monospace;
+}
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 12px;
+  line-height: 1.5;
+  min-height: 100vh;
+}
+button { font-family: inherit; cursor: pointer; border: none; background: none; }
+
+/* ── WIREFRAME ANNOTATION ── */
+.wf-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--label);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 2px;
+}
+.wf-badge {
+  font-family: var(--mono);
+  font-size: 9px;
+  background: var(--fill2);
+  color: var(--white);
+  padding: 1px 5px;
+  border-radius: 3px;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+
+/* ── TOP NAV ── */
+.topnav {
+  position: sticky; top: 0; z-index: 200;
+  background: var(--white);
+  border-bottom: 2px solid var(--stroke);
+  height: 52px;
+  display: flex; align-items: center;
+  padding: 0 24px; gap: 0;
+}
+.logo-wf {
+  display: flex; align-items: center; gap: 8px;
+  margin-right: 32px; flex-shrink: 0;
+}
+.logo-box {
+  width: 28px; height: 28px;
+  background: var(--fill2);
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--mono); font-size: 10px; font-weight: 500; color: #fff;
+}
+.logo-text-wf {
+  width: 68px; height: 14px;
+  background: var(--fill);
+  border-radius: 3px;
+}
+.nav-links { display: flex; align-items: center; gap: 4px; flex: 1; }
+.nav-link-wf {
+  padding: 5px 12px; border-radius: 4px;
+  font-size: 12px; font-weight: 500; color: var(--label);
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+.nav-link-wf.active {
+  color: var(--active);
+  background: var(--box);
+  border-color: var(--stroke);
+  font-weight: 600;
+}
+.nav-right { display: flex; align-items: center; gap: 10px; margin-left: auto; }
+.notif-wf {
+  width: 34px; height: 34px; border-radius: 6px;
+  background: var(--box); border: 1px solid var(--stroke);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; color: var(--label);
+}
+.user-wf {
+  display: flex; align-items: center; gap: 8px;
+  padding: 4px 10px 4px 4px;
+  border-radius: 20px; background: var(--box);
+  border: 1px solid var(--stroke);
+}
+.avatar-wf {
+  width: 26px; height: 26px; border-radius: 50%;
+  background: var(--fill2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px; font-weight: 600; color: #fff;
+  font-family: var(--mono);
+}
+.user-name-wf {
+  width: 52px; height: 10px;
+  background: var(--fill); border-radius: 3px;
+}
+
+/* ── PLATFORM BAR ── */
+.platbar {
+  background: var(--white); border-bottom: 1px solid var(--stroke);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 24px; height: 44px; gap: 16px;
+}
+.plat-tabs { display: flex; align-items: center; gap: 4px; }
+.ptab {
+  display: flex; align-items: center; gap: 6px;
+  padding: 5px 12px; border-radius: 4px;
+  font-size: 11px; font-weight: 500; color: var(--label);
+  border: 1px solid transparent; white-space: nowrap;
+}
+.ptab.active {
+  background: var(--box); color: var(--active);
+  border-color: var(--stroke); font-weight: 600;
+}
+.plat-icon-wf {
+  width: 16px; height: 16px; border-radius: 3px;
+  background: var(--fill); display: inline-block;
+}
+.date-group { display: flex; align-items: center; gap: 6px; }
+.date-box {
+  font-size: 11px; color: var(--label);
+  background: var(--box); border: 1px solid var(--stroke);
+  border-radius: 4px; padding: 5px 10px;
+  font-family: var(--mono);
+}
+.period-tabs {
+  display: flex; background: var(--box);
+  border: 1px solid var(--stroke); border-radius: 4px;
+  padding: 2px; gap: 2px;
+}
+.period-btn {
+  padding: 4px 10px; border-radius: 3px;
+  font-size: 11px; font-weight: 500; color: var(--label);
+}
+.period-btn.active {
+  background: var(--active); color: #fff; font-weight: 600;
+}
+
+/* ── VIEW TABS ── */
+.view-tabs {
+  background: var(--white); border-bottom: 1px solid var(--stroke);
+  display: flex; align-items: center; padding: 0 24px; overflow-x: auto;
+}
+.vtab {
+  padding: 12px 16px; font-size: 11px; font-weight: 500;
+  color: var(--label); border-bottom: 2px solid transparent;
+  white-space: nowrap; cursor: pointer;
+}
+.vtab.active { color: var(--active); font-weight: 700; border-bottom-color: var(--active); }
+
+/* ── LAYOUT ── */
+.main { display: flex; align-items: flex-start; padding: 20px 24px; gap: 20px; }
+.content { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 14px; }
+.sidebar { width: 300px; flex-shrink: 0; }
+
+/* ── BOX PRIMITIVES ── */
+.wf-box {
+  background: var(--white); border: 1px solid var(--stroke);
+  border-radius: 8px;
+}
+.wf-box-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 16px; border-bottom: 1px solid var(--box);
+}
+.wf-box-head-title {
+  font-size: 12px; font-weight: 600; color: var(--active);
+}
+.wf-box-head-action {
+  font-size: 10px; font-weight: 500; color: var(--label);
+  background: var(--box); border: 1px solid var(--stroke);
+  border-radius: 4px; padding: 3px 8px; font-family: var(--mono);
+}
+.wf-box-body { padding: 14px 16px; }
+.wf-placeholder {
+  background: var(--box); border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--mono); font-size: 9px; color: var(--label);
+  letter-spacing: 0.3px;
+}
+
+/* ── PLATFORM CARDS ── */
+.plat-cards { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; }
+.pcard {
+  background: var(--white); border: 1px solid var(--stroke);
+  border-radius: 8px; padding: 14px;
+}
+.pcard.active { border: 2px solid var(--active); }
+.pcard-icon-wf {
+  width: 40px; height: 40px; border-radius: 8px;
+  background: var(--box); margin-bottom: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--mono); font-size: 8px; color: var(--label);
+}
+.pcard-line { height: 8px; background: var(--box2); border-radius: 3px; margin-bottom: 6px; }
+.pcard-line.bold { height: 20px; background: var(--fill); margin-bottom: 6px; }
+.pcard-line.sm { height: 8px; width: 70%; background: var(--box); }
+
+/* ── STAT ROW ── */
+.stat-row { display: grid; grid-template-columns: repeat(6,1fr); gap: 8px; }
+.sblock {
+  background: var(--white); border: 1px solid var(--stroke);
+  border-radius: 8px; padding: 12px 14px;
+}
+.sblock-icon-wf { width: 20px; height: 20px; background: var(--box); border-radius: 4px; margin-bottom: 6px; }
+.sblock-line { height: 8px; background: var(--box2); border-radius: 3px; margin-bottom: 5px; width: 60%; }
+.sblock-val-wf { height: 20px; background: var(--fill); border-radius: 3px; margin-bottom: 5px; width: 80%; }
+.sblock-delta-wf { height: 14px; width: 65px; background: var(--box); border-radius: 10px; }
+
+/* ── CHART GRID ── */
+.chart-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.chart-area { height: 90px; }
+
+/* ── SIDEBAR ── */
+.post-item-wf {
+  display: flex; gap: 10px; padding: 12px 16px;
+  border-bottom: 1px solid var(--box); align-items: flex-start;
+}
+.post-item-wf:last-child { border-bottom: none; }
+.post-thumb-wf {
+  width: 52px; height: 52px; border-radius: 6px;
+  background: var(--box2); flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--mono); font-size: 8px; color: var(--label);
+}
+.post-info-wf { flex: 1; }
+.post-stat-row { display: flex; gap: 8px; margin-bottom: 6px; }
+.post-stat-wf { flex: 1; }
+.post-stat-line { height: 7px; background: var(--box2); border-radius: 3px; margin-bottom: 3px; }
+.post-stat-val { height: 12px; background: var(--fill); border-radius: 3px; width: 70%; }
+.post-date-wf { height: 16px; width: 110px; background: var(--box); border-radius: 4px; margin-bottom: 6px; }
+.republish-wf {
+  height: 20px; width: 70px; background: var(--fill2); border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--mono); font-size: 8px; color: #fff; font-weight: 500;
+}
+
+/* ── DEMO BARS ── */
+.li-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.demo-bars { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
+.demo-bar-row { display: flex; align-items: center; gap: 8px; }
+.demo-bar-label-wf { width: 90px; height: 8px; background: var(--box2); border-radius: 3px; flex-shrink: 0; }
+.demo-bar-track { flex: 1; height: 6px; background: var(--box); border-radius: 3px; overflow: hidden; }
+.demo-bar-fill-wf { height: 100%; background: var(--fill2); border-radius: 3px; }
+.demo-bar-pct-wf { width: 28px; height: 8px; background: var(--box); border-radius: 3px; }
+
+/* ── LEADERBOARD ── */
+.advocacy-grid { display: grid; grid-template-columns: 1fr 260px; gap: 14px; }
+.lb-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 16px; border-bottom: 1px solid var(--box);
+}
+.lb-row:last-child { border-bottom: none; }
+.lb-rank-wf { width: 20px; height: 16px; background: var(--box); border-radius: 3px; font-family:var(--mono); font-size:10px; color:var(--label); display:flex;align-items:center;justify-content:center; }
+.lb-av-wf { width: 28px; height: 28px; border-radius: 50%; background: var(--fill); flex-shrink: 0; }
+.lb-col { flex: 1; }
+.lb-name-wf { height: 10px; width: 100px; background: var(--fill); border-radius: 3px; margin-bottom: 4px; }
+.lb-role-wf { height: 7px; width: 70px; background: var(--box2); border-radius: 3px; margin-bottom: 5px; }
+.lb-bar-track { height: 4px; background: var(--box); border-radius: 2px; }
+.lb-bar-fill-wf { height: 100%; background: var(--fill2); border-radius: 2px; }
+.lb-score-wf { width: 40px; height: 14px; background: var(--fill); border-radius: 3px; }
+.adv-stats { display: flex; flex-direction: column; gap: 10px; }
+.adv-stat-wf { background: var(--white); border: 1px solid var(--stroke); border-radius: 8px; padding: 14px; }
+.adv-stat-label-wf { height: 8px; width: 80px; background: var(--box2); border-radius: 3px; margin-bottom: 6px; }
+.adv-stat-val-wf { height: 24px; width: 80px; background: var(--fill); border-radius: 3px; margin-bottom: 6px; }
+.adv-stat-sub-wf { height: 8px; width: 100px; background: var(--box); border-radius: 3px; }
+
+/* ── TABLE ── */
+.post-table-wrap { background: var(--white); border: 1px solid var(--stroke); border-radius: 8px; overflow: hidden; }
+table { width: 100%; border-collapse: collapse; }
+th {
+  font-size: 10px; font-weight: 600; color: var(--label);
+  text-align: left; padding: 9px 14px;
+  background: var(--box); border-bottom: 1px solid var(--stroke);
+  font-family: var(--mono); text-transform: uppercase; letter-spacing: 0.3px;
+}
+td { padding: 9px 14px; border-bottom: 1px solid var(--box); vertical-align: middle; }
+tr:last-child td { border-bottom: none; }
+.td-pill { height: 18px; width: 60px; background: var(--fill); border-radius: 4px; display: inline-block; }
+.td-text { height: 8px; background: var(--box2); border-radius: 3px; display: inline-block; }
+.td-badge { height: 16px; width: 50px; background: var(--box); border-radius: 4px; display: inline-block; }
+.td-num { height: 12px; width: 36px; background: var(--fill); border-radius: 3px; display: inline-block; }
+
+/* ── UPGRADE ── */
+.upgrade-wrap { background: var(--white); border: 1px solid var(--stroke); border-radius: 8px; padding: 32px 24px; text-align: center; }
+.upgrade-icon-wf { width: 48px; height: 48px; background: var(--fill); border-radius: 12px; margin: 0 auto 14px; }
+.upgrade-title-wf { height: 18px; width: 280px; background: var(--fill); border-radius: 4px; margin: 0 auto 8px; }
+.upgrade-sub-wf { height: 10px; width: 360px; background: var(--box2); border-radius: 3px; margin: 0 auto 6px; }
+.upgrade-cta-wf { height: 34px; width: 110px; background: var(--fill2); border-radius: 6px; margin: 16px auto; display: flex; align-items: center; justify-content: center; font-family: var(--mono); font-size: 9px; color: #fff; }
+.plan-cards { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; max-width: 600px; margin: 0 auto; }
+.plan-card-wf { background: var(--box); border: 1px solid var(--stroke); border-radius: 8px; padding: 14px; }
+.plan-card-wf.featured { border: 2px solid var(--active); background: var(--white); }
+.plan-name-wf { height: 10px; width: 70px; background: var(--fill2); border-radius: 3px; margin-bottom: 8px; }
+.plan-price-wf { height: 20px; width: 60px; background: var(--fill); border-radius: 3px; margin-bottom: 12px; }
+.plan-feat-wf { height: 8px; background: var(--box2); border-radius: 3px; margin-bottom: 6px; }
+.plan-feat-wf:last-child { margin-bottom: 0; }
+
+/* ── ORGANIC ── */
+.op-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+.op-split-wf { background: var(--white); border: 1px solid var(--stroke); border-radius: 8px; padding: 18px; border-left: 4px solid var(--fill2); }
+.op-label-wf { height: 8px; width: 80px; background: var(--box2); border-radius: 3px; margin-bottom: 6px; }
+.op-val-wf { height: 26px; width: 90px; background: var(--fill); border-radius: 3px; margin-bottom: 6px; }
+.op-pct-wf { height: 8px; width: 110px; background: var(--box); border-radius: 3px; }
+.op-bar-wrap { background: var(--white); border: 1px solid var(--stroke); border-radius: 8px; padding: 18px; }
+.op-bar-track { height: 20px; background: var(--box); border-radius: 10px; overflow: hidden; display: flex; margin: 12px 0; }
+.op-bar-a { height: 100%; background: var(--fill2); width: 76%; }
+.op-bar-b { height: 100%; background: var(--fill); }
+.op-legend { display: flex; gap: 20px; }
+.op-leg-wf { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--label); }
+.op-dot { width: 10px; height: 10px; border-radius: 3px; }
+
+/* ── LOCKED STAT ROW ── */
+.locked-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+.locked-sblock { background: var(--white); border: 1px solid var(--stroke); border-radius: 8px; padding: 12px 14px; position: relative; }
+.locked-overlay-wf {
+  position: absolute; inset: 0; border-radius: 8px;
+  background: rgba(240,240,240,0.85);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--mono); font-size: 9px; color: var(--label);
+  letter-spacing: 0.5px;
+}
+
+/* ── FILTER BAR ── */
+.filter-group { display: flex; gap: 6px; }
+.filter-btn-wf {
+  font-size: 10px; font-weight: 500; color: var(--label);
+  background: var(--box); border: 1px solid var(--stroke);
+  border-radius: 4px; padding: 4px 9px; font-family: var(--mono);
+}
+.filter-btn-wf.active { background: var(--white); color: var(--active); border-color: var(--stroke2); }
+
+/* ── VIEWS ── */
+.view { display: none; }
+.view.active { display: block; }
+.view-inner { display: flex; flex-direction: column; gap: 14px; }
+
+/* ── ANNOTATION STRIP ── */
+.annotation {
+  background: #FFFDE7; border: 1px solid #F0E68C;
+  border-radius: 4px; padding: 6px 12px;
+  font-family: var(--mono); font-size: 9px; color: #7A6800;
+  letter-spacing: 0.3px; margin-bottom: 14px;
+  display: flex; align-items: center; gap: 8px;
+}
+.annotation::before { content: 'ⓘ'; font-size: 12px; }
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="topnav">
+  <div class="logo-wf">
+    <div class="logo-box">LOGO</div>
+    <div class="logo-text-wf"></div>
+  </div>
+  <div class="nav-links">
+    <span class="nav-link-wf">Nav item</span>
+    <span class="nav-link-wf">Nav item</span>
+    <span class="nav-link-wf">Nav item</span>
+    <span class="nav-link-wf">Nav item</span>
+    <span class="nav-link-wf active">Analytics <span class="wf-badge">ACTIVE</span></span>
+    <span class="nav-link-wf">Nav item</span>
+  </div>
+  <div class="nav-right">
+    <div class="notif-wf">🔔</div>
+    <div class="user-wf">
+      <div class="avatar-wf">USR</div>
+      <div class="user-name-wf"></div>
+    </div>
+  </div>
+</nav>
+
+<!-- PLATFORM BAR -->
+<div class="platbar">
+  <div class="plat-tabs">
+    <button class="ptab active">All Platforms <span class="wf-badge">SELECTED</span></button>
+    <button class="ptab"><div class="plat-icon-wf"></div> Facebook</button>
+    <button class="ptab"><div class="plat-icon-wf"></div> LinkedIn</button>
+    <button class="ptab"><div class="plat-icon-wf"></div> Instagram</button>
+    <button class="ptab"><div class="plat-icon-wf"></div> TikTok</button>
+  </div>
+  <div class="date-group">
+    <div class="date-box">[ date range picker ]</div>
+    <div class="period-tabs">
+      <button class="period-btn">Monthly</button>
+      <button class="period-btn active">Weekly</button>
+      <button class="period-btn">Yearly</button>
+      <button class="period-btn">All</button>
+    </div>
+  </div>
+</div>
+
+<!-- VIEW TABS -->
+<div class="view-tabs">
+  <button class="vtab active" onclick="setView('overview',this)">Overview</button>
+  <button class="vtab" onclick="setView('linkedin',this)">LinkedIn Deep Dive</button>
+  <button class="vtab" onclick="setView('posts',this)">All Posts</button>
+  <button class="vtab" onclick="setView('organic',this)">Organic vs Paid</button>
+  <button class="vtab" onclick="setView('advocacy',this)">Employee Advocacy</button>
+  <button class="vtab" onclick="setView('locked',this)">🔒 Upgrade</button>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <div style="flex:1;min-width:0;">
+
+    <!-- OVERVIEW -->
+    <div class="view active view-inner" id="view-overview">
+
+      <div class="annotation">Platform cards — 4 columns. Each card shows platform icon, follower count, delta vs last period. Active card highlighted with border.</div>
+
+      <div class="plat-cards">
+        <div class="pcard active">
+          <div class="pcard-icon-wf">ICON</div>
+          <div class="wf-label">Followers</div>
+          <div class="pcard-line bold"></div>
+          <div class="pcard-line sm"></div>
+        </div>
+        <div class="pcard">
+          <div class="pcard-icon-wf">ICON</div>
+          <div class="wf-label">Followers</div>
+          <div class="pcard-line bold"></div>
+          <div class="pcard-line sm"></div>
+        </div>
+        <div class="pcard">
+          <div class="pcard-icon-wf">ICON</div>
+          <div class="wf-label">Followers</div>
+          <div class="pcard-line bold"></div>
+          <div class="pcard-line sm"></div>
+        </div>
+        <div class="pcard">
+          <div class="pcard-icon-wf">ICON</div>
+          <div class="wf-label">Followers</div>
+          <div class="pcard-line bold"></div>
+          <div class="pcard-line sm"></div>
+        </div>
+      </div>
+
+      <div class="annotation">Stats row — 6 stat blocks. Each shows icon, label, value, delta badge. Delta badge: green/up, red/down, grey/neutral.</div>
+
+      <div class="stat-row">
+        <div class="sblock">
+          <div class="sblock-icon-wf"></div>
+          <div class="sblock-line"></div>
+          <div class="sblock-val-wf"></div>
+          <div class="sblock-delta-wf"></div>
+        </div>
+        <div class="sblock">
+          <div class="sblock-icon-wf"></div>
+          <div class="sblock-line"></div>
+          <div class="sblock-val-wf"></div>
+          <div class="sblock-delta-wf"></div>
+        </div>
+        <div class="sblock">
+          <div class="sblock-icon-wf"></div>
+          <div class="sblock-line"></div>
+          <div class="sblock-val-wf"></div>
+          <div class="sblock-delta-wf"></div>
+        </div>
+        <div class="sblock">
+          <div class="sblock-icon-wf"></div>
+          <div class="sblock-line"></div>
+          <div class="sblock-val-wf"></div>
+          <div class="sblock-delta-wf"></div>
+        </div>
+        <div class="sblock">
+          <div class="sblock-icon-wf"></div>
+          <div class="sblock-line"></div>
+          <div class="sblock-val-wf"></div>
+          <div class="sblock-delta-wf"></div>
+        </div>
+        <div class="sblock">
+          <div class="sblock-icon-wf"></div>
+          <div class="sblock-line"></div>
+          <div class="sblock-val-wf"></div>
+          <div class="sblock-delta-wf"></div>
+        </div>
+      </div>
+
+      <div class="annotation">Chart grid — 2×2. Each panel: title, subtitle, export action, legend chips, line chart area. Charts are multi-line with platform colour coding.</div>
+
+      <div class="chart-grid">
+        <div class="wf-box">
+          <div class="wf-box-head">
+            <div>
+              <div class="wf-box-head-title">Chart Title</div>
+              <div style="height:7px;width:120px;background:var(--box2);border-radius:3px;margin-top:4px;"></div>
+            </div>
+            <div class="wf-box-head-action">[ Export ]</div>
+          </div>
+          <div class="wf-box-body">
+            <div style="display:flex;gap:10px;margin-bottom:8px;">
+              <div style="display:flex;align-items:center;gap:5px;"><div style="width:8px;height:8px;border-radius:50%;background:var(--fill2)"></div><span style="font-size:10px;color:var(--label)">Platform A</span></div>
+              <div style="display:flex;align-items:center;gap:5px;"><div style="width:8px;height:8px;border-radius:50%;background:var(--fill)"></div><span style="font-size:10px;color:var(--label)">Platform B</span></div>
+              <div style="display:flex;align-items:center;gap:5px;"><div style="width:8px;height:8px;border-radius:50%;background:var(--box2)"></div><span style="font-size:10px;color:var(--label)">Platform C</span></div>
+            </div>
+            <div class="wf-placeholder chart-area">[ LINE CHART — multi-series ]</div>
+          </div>
+        </div>
+        <div class="wf-box">
+          <div class="wf-box-head">
+            <div>
+              <div class="wf-box-head-title">Chart Title</div>
+              <div style="height:7px;width:120px;background:var(--box2);border-radius:3px;margin-top:4px;"></div>
+            </div>
+            <div class="wf-box-head-action">[ Export ]</div>
+          </div>
+          <div class="wf-box-body">
+            <div class="wf-placeholder chart-area">[ LINE CHART — single series ]</div>
+          </div>
+        </div>
+        <div class="wf-box">
+          <div class="wf-box-head">
+            <div>
+              <div class="wf-box-head-title">Chart Title</div>
+              <div style="height:7px;width:120px;background:var(--box2);border-radius:3px;margin-top:4px;"></div>
+            </div>
+            <div class="wf-box-head-action">[ Export ]</div>
+          </div>
+          <div class="wf-box-body">
+            <div class="wf-placeholder chart-area">[ LINE CHART — single series ]</div>
+          </div>
+        </div>
+        <div class="wf-box">
+          <div class="wf-box-head">
+            <div>
+              <div class="wf-box-head-title">Chart Title</div>
+              <div style="height:7px;width:120px;background:var(--box2);border-radius:3px;margin-top:4px;"></div>
+            </div>
+            <div class="wf-box-head-action">[ Export ]</div>
+          </div>
+          <div class="wf-box-body">
+            <div class="wf-placeholder chart-area">[ LINE CHART — single series ]</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LINKEDIN DEEP DIVE -->
+    <div class="view view-inner" id="view-linkedin">
+      <div class="annotation">LinkedIn only — 4 headline stat blocks, then 2×2 grid of audience demographic bar charts: Industry, Seniority, Company Size, Geography.</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;">
+        <div class="sblock">
+          <div class="sblock-line"></div>
+          <div class="sblock-val-wf"></div>
+          <div class="sblock-delta-wf"></div>
+        </div>
+        <div class="sblock">
+          <div class="sblock-line"></div>
+          <div class="sblock-val-wf"></div>
+          <div class="sblock-delta-wf"></div>
+        </div>
+        <div class="sblock">
+          <div class="sblock-line"></div>
+          <div class="sblock-val-wf"></div>
+          <div class="sblock-delta-wf"></div>
+        </div>
+        <div class="sblock">
+          <div class="sblock-line"></div>
+          <div class="sblock-val-wf"></div>
+          <div class="sblock-delta-wf"></div>
+        </div>
+      </div>
+      <div class="li-grid">
+        <div class="wf-box" style="padding:14px">
+          <div class="wf-box-head-title" style="margin-bottom:4px;">Audience by Industry</div>
+          <div class="demo-bars">
+            <div class="demo-bar-row"><div class="demo-bar-label-wf"></div><div class="demo-bar-track"><div class="demo-bar-fill-wf" style="width:68%"></div></div><div class="demo-bar-pct-wf"></div></div>
+            <div class="demo-bar-row"><div class="demo-bar-label-wf"></div><div class="demo-bar-track"><div class="demo-bar-fill-wf" style="width:44%"></div></div><div class="demo-bar-pct-wf"></div></div>
+            <div class="demo-bar-row"><div class="demo-bar-label-wf"></div><div class="demo-bar-track"><div class="demo-bar-fill-wf" style="width:38%"></div></div><div class="demo-bar-pct-wf"></div></div>
+            <div class="demo-bar-row"><div class="demo-bar-label-wf"></div><div class="demo-bar-track"><div class="demo-bar-fill-wf" style="width:22%"></div></div><div class="demo-bar-pct-wf"></div></div>
+          </div>
+        </div>
+        <div class="wf-box" style="padding:14px">
+          <div class="wf-box-head-title" style="margin-bottom:4px;">Audience by Seniority</div>
+          <div class="demo-bars">
+            <div class="demo-bar-row"><div class="demo-bar-label-wf"></div><div class="demo-bar-track"><div class="demo-bar-fill-wf" style="width:52%"></div></div><div class="demo-bar-pct-wf"></div></div>
+            <div class="demo-bar-row"><div class="demo-bar-label-wf"></div><div class="demo-bar-track"><div class="demo-bar-fill-wf" style="width:35%"></div></div><div class="demo-bar-pct-wf"></div></div>
+            <div class="demo-bar-row"><div class="demo-bar-label-wf"></div><div class="demo-bar-track"><div class="demo-bar-fill-wf" style="width:28%"></div></div><div class="demo-bar-pct-wf"></div></div>
+            <div class="demo-bar-row"><div class="demo-bar-label-wf"></div><div class="demo-bar-track"><div class="demo-bar-fill-wf" style="width:18%"></div></div><div class="demo-bar-pct-wf"></div></div>
+          </div>
+        </div>
+        <div class="wf-box" style="padding:14px">
+          <div class="wf-box-head-title" style="margin-bottom:4px;">Audience by Company Size</div>
+          <div class="demo-bars">
+            <div class="demo-bar-row"><div class="demo-bar-label-wf"></div><div class="demo-bar-track"><div class="demo-bar-fill-wf" style="width:42%"></div></div><div class="demo-bar-pct-wf"></div></div>
+            <div class="demo-bar-row"><div class="demo-bar-label-wf"></div><div class="demo-bar-track"><div class="demo-bar-fill-wf" style="width:31%"></div></div><div class="demo-bar-pct-wf"></div></div>
+            <div class="demo-bar-row"><div class="demo-bar-label-wf"></div><div class="demo-bar-track"><div class="demo-bar-fill-wf" style="width:24%"></div></div><div class="demo-bar-pct-wf"></div></div>
+          </div>
+        </div>
+        <div class="wf-box" style="padding:14px">
+          <div class="wf-box-head-title" style="margin-bottom:4px;">Top Geographies</div>
+          <div class="demo-bars">
+            <div class="demo-bar-row"><div class="demo-bar-label-wf"></div><div class="demo-bar-track"><div class="demo-bar-fill-wf" style="width:58%"></div></div><div class="demo-bar-pct-wf"></div></div>
+            <div class="demo-bar-row"><div class="demo-bar-label-wf"></div><div class="demo-bar-track"><div class="demo-bar-fill-wf" style="width:34%"></div></div><div class="demo-bar-pct-wf"></div></div>
+            <div class="demo-bar-row"><div class="demo-bar-label-wf"></div><div class="demo-bar-track"><div class="demo-bar-fill-wf" style="width:22%"></div></div><div class="demo-bar-pct-wf"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ALL POSTS TABLE -->
+    <div class="view view-inner" id="view-posts">
+      <div class="annotation">All posts from all connected platforms. Filterable by platform and source (Someli-posted vs native). Sortable columns. Shows platform, content preview, date, source tag, and key metrics.</div>
+      <div class="post-table-wrap">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--box);">
+          <div style="font-size:12px;font-weight:600;">All Posts</div>
+          <div class="filter-group">
+            <button class="filter-btn-wf active">All</button>
+            <button class="filter-btn-wf">Someli</button>
+            <button class="filter-btn-wf">Native</button>
+            <button class="filter-btn-wf">FB</button>
+            <button class="filter-btn-wf">LI</button>
+            <button class="filter-btn-wf">IG</button>
+          </div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Platform</th>
+              <th>Post content</th>
+              <th>Date</th>
+              <th>Source</th>
+              <th>Likes</th>
+              <th>Views</th>
+              <th>Comments</th>
+              <th>Eng. Rate</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td><div class="td-pill"></div></td><td><div class="td-text" style="width:180px"></div></td><td><div class="td-text" style="width:50px"></div></td><td><div class="td-badge"></div></td><td><div class="td-num"></div></td><td><div class="td-num"></div></td><td><div class="td-num"></div></td><td><div class="td-num"></div></td></tr>
+            <tr><td><div class="td-pill"></div></td><td><div class="td-text" style="width:160px"></div></td><td><div class="td-text" style="width:50px"></div></td><td><div class="td-badge"></div></td><td><div class="td-num"></div></td><td><div class="td-num"></div></td><td><div class="td-num"></div></td><td><div class="td-num"></div></td></tr>
+            <tr><td><div class="td-pill"></div></td><td><div class="td-text" style="width:200px"></div></td><td><div class="td-text" style="width:50px"></div></td><td><div class="td-badge"></div></td><td><div class="td-num"></div></td><td><div class="td-num"></div></td><td><div class="td-num"></div></td><td><div class="td-num"></div></td></tr>
+            <tr><td><div class="td-pill"></div></td><td><div class="td-text" style="width:140px"></div></td><td><div class="td-text" style="width:50px"></div></td><td><div class="td-badge"></div></td><td><div class="td-num"></div></td><td><div class="td-num"></div></td><td><div class="td-num"></div></td><td><div class="td-num"></div></td></tr>
+            <tr><td><div class="td-pill"></div></td><td><div class="td-text" style="width:170px"></div></td><td><div class="td-text" style="width:50px"></div></td><td><div class="td-badge"></div></td><td><div class="td-num"></div></td><td><div class="td-num"></div></td><td><div class="td-num"></div></td><td><div class="td-num"></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ORGANIC vs PAID -->
+    <div class="view view-inner" id="view-organic">
+      <div class="annotation">Two headline figures (organic reach vs paid reach), a combined bar showing the split, then two line charts showing organic and paid engagement over time.</div>
+      <div class="op-grid">
+        <div class="op-split-wf">
+          <div class="op-label-wf"></div>
+          <div class="op-val-wf"></div>
+          <div class="op-pct-wf"></div>
+        </div>
+        <div class="op-split-wf">
+          <div class="op-label-wf"></div>
+          <div class="op-val-wf"></div>
+          <div class="op-pct-wf"></div>
+        </div>
+      </div>
+      <div class="op-bar-wrap">
+        <div style="font-size:12px;font-weight:600;margin-bottom:4px;">Reach Breakdown</div>
+        <div class="op-bar-track">
+          <div class="op-bar-a"></div>
+          <div class="op-bar-b"></div>
+        </div>
+        <div class="op-legend">
+          <div class="op-leg-wf"><div class="op-dot" style="background:var(--fill2)"></div>Organic %</div>
+          <div class="op-leg-wf"><div class="op-dot" style="background:var(--fill)"></div>Paid / Boosted %</div>
+        </div>
+      </div>
+      <div class="chart-grid">
+        <div class="wf-box">
+          <div class="wf-box-head"><div class="wf-box-head-title">Organic Engagement</div></div>
+          <div class="wf-box-body"><div class="wf-placeholder chart-area">[ LINE CHART ]</div></div>
+        </div>
+        <div class="wf-box">
+          <div class="wf-box-head"><div class="wf-box-head-title">Paid Engagement</div></div>
+          <div class="wf-box-body"><div class="wf-placeholder chart-area">[ LINE CHART ]</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ADVOCACY -->
+    <div class="view view-inner" id="view-advocacy">
+      <div class="annotation">Left: ranked leaderboard of employees by reach delivered. Right: 4 summary stat blocks (team reach, posts shared, participation rate, avg reach per employee).</div>
+      <div class="advocacy-grid">
+        <div class="wf-box">
+          <div class="wf-box-head">
+            <div class="wf-box-head-title">Employee Leaderboard</div>
+            <div style="height:8px;width:100px;background:var(--box2);border-radius:3px;"></div>
+          </div>
+          <div class="lb-row"><div class="lb-rank-wf">1</div><div class="lb-av-wf"></div><div class="lb-col"><div class="lb-name-wf"></div><div class="lb-role-wf"></div><div class="lb-bar-track"><div class="lb-bar-fill-wf" style="width:92%"></div></div></div><div class="lb-score-wf"></div></div>
+          <div class="lb-row"><div class="lb-rank-wf">2</div><div class="lb-av-wf"></div><div class="lb-col"><div class="lb-name-wf"></div><div class="lb-role-wf"></div><div class="lb-bar-track"><div class="lb-bar-fill-wf" style="width:76%"></div></div></div><div class="lb-score-wf"></div></div>
+          <div class="lb-row"><div class="lb-rank-wf">3</div><div class="lb-av-wf"></div><div class="lb-col"><div class="lb-name-wf"></div><div class="lb-role-wf"></div><div class="lb-bar-track"><div class="lb-bar-fill-wf" style="width:62%"></div></div></div><div class="lb-score-wf"></div></div>
+          <div class="lb-row"><div class="lb-rank-wf">4</div><div class="lb-av-wf"></div><div class="lb-col"><div class="lb-name-wf"></div><div class="lb-role-wf"></div><div class="lb-bar-track"><div class="lb-bar-fill-wf" style="width:46%"></div></div></div><div class="lb-score-wf"></div></div>
+          <div class="lb-row"><div class="lb-rank-wf">5</div><div class="lb-av-wf"></div><div class="lb-col"><div class="lb-name-wf"></div><div class="lb-role-wf"></div><div class="lb-bar-track"><div class="lb-bar-fill-wf" style="width:34%"></div></div></div><div class="lb-score-wf"></div></div>
+        </div>
+        <div class="adv-stats">
+          <div class="adv-stat-wf"><div class="adv-stat-label-wf"></div><div class="adv-stat-val-wf"></div><div class="adv-stat-sub-wf"></div></div>
+          <div class="adv-stat-wf"><div class="adv-stat-label-wf"></div><div class="adv-stat-val-wf"></div><div class="adv-stat-sub-wf"></div></div>
+          <div class="adv-stat-wf"><div class="adv-stat-label-wf"></div><div class="adv-stat-val-wf"></div><div class="adv-stat-sub-wf"></div></div>
+          <div class="adv-stat-wf"><div class="adv-stat-label-wf"></div><div class="adv-stat-val-wf"></div><div class="adv-stat-sub-wf"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- UPGRADE / LOCKED -->
+    <div class="view view-inner" id="view-locked">
+      <div class="annotation">Shown to users on lower tier plans. Partial stat row visible, rest blurred/locked. CTA to upgrade with 3 plan comparison cards.</div>
+      <div class="locked-grid">
+        <div class="locked-sblock"><div class="sblock-line"></div><div class="sblock-val-wf"></div><div class="sblock-delta-wf"></div></div>
+        <div class="locked-sblock"><div class="sblock-line"></div><div class="sblock-val-wf"></div><div class="sblock-delta-wf"></div></div>
+        <div class="locked-sblock"><div class="locked-overlay-wf">🔒 LOCKED — UPGRADE REQUIRED</div><div class="sblock-line"></div><div class="sblock-val-wf"></div></div>
+        <div class="locked-sblock"><div class="locked-overlay-wf">🔒 LOCKED — UPGRADE REQUIRED</div><div class="sblock-line"></div><div class="sblock-val-wf"></div></div>
+      </div>
+      <div class="upgrade-wrap">
+        <div class="upgrade-icon-wf"></div>
+        <div class="upgrade-title-wf"></div>
+        <div class="upgrade-sub-wf"></div>
+        <div class="upgrade-sub-wf" style="width:300px;margin-top:5px;"></div>
+        <div class="upgrade-cta-wf">[ CTA BUTTON ]</div>
+        <div class="plan-cards">
+          <div class="plan-card-wf">
+            <div class="plan-name-wf"></div>
+            <div class="plan-price-wf"></div>
+            <div class="plan-feat-wf"></div>
+            <div class="plan-feat-wf"></div>
+            <div class="plan-feat-wf" style="opacity:0.4"></div>
+            <div class="plan-feat-wf" style="opacity:0.4"></div>
+          </div>
+          <div class="plan-card-wf featured">
+            <div class="plan-name-wf"></div>
+            <div class="plan-price-wf"></div>
+            <div class="plan-feat-wf"></div>
+            <div class="plan-feat-wf"></div>
+            <div class="plan-feat-wf"></div>
+            <div class="plan-feat-wf" style="opacity:0.4"></div>
+          </div>
+          <div class="plan-card-wf">
+            <div class="plan-name-wf"></div>
+            <div class="plan-price-wf"></div>
+            <div class="plan-feat-wf"></div>
+            <div class="plan-feat-wf"></div>
+            <div class="plan-feat-wf"></div>
+            <div class="plan-feat-wf"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content col -->
+
+  <!-- SIDEBAR -->
+  <div class="sidebar" id="sidebar">
+    <div class="wf-box">
+      <div class="wf-box-head">
+        <div class="wf-box-head-title">Top Posts</div>
+        <div class="wf-box-head-action">[ Sort by ]</div>
+      </div>
+      <div class="post-item-wf">
+        <div class="post-thumb-wf">IMG</div>
+        <div class="post-info-wf">
+          <div class="post-stat-row">
+            <div class="post-stat-wf"><div class="post-stat-line"></div><div class="post-stat-val"></div></div>
+            <div class="post-stat-wf"><div class="post-stat-line"></div><div class="post-stat-val"></div></div>
+            <div class="post-stat-wf"><div class="post-stat-line"></div><div class="post-stat-val"></div></div>
+          </div>
+          <div class="post-date-wf"></div>
+          <div class="republish-wf">Republish</div>
+        </div>
+      </div>
+      <div class="post-item-wf">
+        <div class="post-thumb-wf">IMG</div>
+        <div class="post-info-wf">
+          <div class="post-stat-row">
+            <div class="post-stat-wf"><div class="post-stat-line"></div><div class="post-stat-val"></div></div>
+            <div class="post-stat-wf"><div class="post-stat-line"></div><div class="post-stat-val"></div></div>
+            <div class="post-stat-wf"><div class="post-stat-line"></div><div class="post-stat-val"></div></div>
+          </div>
+          <div class="post-date-wf"></div>
+          <div class="republish-wf">Republish</div>
+        </div>
+      </div>
+      <div class="post-item-wf">
+        <div class="post-thumb-wf">IMG</div>
+        <div class="post-info-wf">
+          <div class="post-stat-row">
+            <div class="post-stat-wf"><div class="post-stat-line"></div><div class="post-stat-val"></div></div>
+            <div class="post-stat-wf"><div class="post-stat-line"></div><div class="post-stat-val"></div></div>
+            <div class="post-stat-wf"><div class="post-stat-line"></div><div class="post-stat-val"></div></div>
+          </div>
+          <div class="post-date-wf"></div>
+          <div class="republish-wf">Republish</div>
+        </div>
+      </div>
+      <div class="post-item-wf">
+        <div class="post-thumb-wf">IMG</div>
+        <div class="post-info-wf">
+          <div class="post-stat-row">
+            <div class="post-stat-wf"><div class="post-stat-line"></div><div class="post-stat-val"></div></div>
+            <div class="post-stat-wf"><div class="post-stat-line"></div><div class="post-stat-val"></div></div>
+            <div class="post-stat-wf"><div class="post-stat-line"></div><div class="post-stat-val"></div></div>
+          </div>
+          <div class="post-date-wf"></div>
+          <div class="republish-wf">Republish</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function setView(id, btn) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.vtab').forEach(t => t.classList.remove('active'));
+  document.getElementById('view-' + id).classList.add('active');
+  btn.classList.add('active');
+  const sidebar = document.getElementById('sidebar');
+  sidebar.style.display = (id === 'posts' || id === 'advocacy' || id === 'organic') ? 'none' : '';
+}
+</script>
+</body>
+</html>
