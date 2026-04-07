@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Accommodation Tab — Ashton Lodge Mock-up</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f4f5f7; color: #1a1a2e; font-size: 13px; padding: 32px; }
+  .page { max-width: 1100px; }
+
+  .event-card { background: #fff; border-radius: 14px; box-shadow: 0 1px 4px rgba(0,0,0,.08); overflow: hidden; }
+
+  .event-header { padding: 20px 24px 16px; border-bottom: 1px solid #f0f0f0; display: flex; align-items: flex-start; justify-content: space-between; }
+  .event-title { font-size: 20px; font-weight: 700; color: #1a1a2e; margin-bottom: 6px; }
+  .venue-row { display: flex; align-items: center; gap: 6px; margin-top: 4px; }
+  .venue-icon { width: 22px; height: 22px; background: #eef2ff; border-radius: 5px; display: flex; align-items: center; justify-content: center; color: #4f46e5; }
+  .venue-icon svg { width: 13px; height: 13px; }
+  .venue-label-small { font-size: 10px; color: #9ca3af; text-transform: uppercase; letter-spacing: .4px; }
+  .venue-name { font-size: 13px; font-weight: 600; color: #374151; }
+  .header-right { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+  .event-date { font-size: 13px; font-weight: 700; color: #1a1a2e; }
+  .badges { display: flex; gap: 6px; }
+  .badge { padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+  .badge.wedding { background: #fff3e0; color: #e65100; }
+  .badge.confirmed { background: #dcfce7; color: #16a34a; }
+
+  .action-btns { display: flex; gap: 8px; padding: 10px 24px; background: #fafafa; border-bottom: 1px solid #f0f0f0; justify-content: flex-end; }
+  .action-btn { display: flex; align-items: center; gap: 5px; padding: 6px 12px; border: 1px solid #e8eaed; border-radius: 8px; font-size: 12px; font-weight: 500; color: #374151; background: #fff; cursor: pointer; }
+  .action-btn:hover { border-color: #4f46e5; color: #4f46e5; }
+
+  .primary-tabs { display: flex; padding: 0 24px; border-bottom: 2px solid #e8eaed; overflow-x: auto; }
+  .p-tab { padding: 12px 14px; font-size: 13px; font-weight: 500; color: #6b7280; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; white-space: nowrap; }
+  .p-tab.active { color: #4f46e5; border-bottom-color: #4f46e5; font-weight: 600; }
+
+  .tab-content { padding: 24px; }
+
+  /* Summary bar */
+  .summary-bar { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+  .stat-card { background: #f9fafb; border: 1px solid #e8eaed; border-radius: 10px; padding: 10px 14px; display: flex; flex-direction: column; min-width: 105px; }
+  .stat-num { font-size: 22px; font-weight: 700; color: #4f46e5; }
+  .stat-num.amber { color: #f59e0b; }
+  .stat-num.green { color: #16a34a; }
+  .stat-num.red { color: #dc2626; }
+  .stat-lbl { font-size: 11px; color: #9ca3af; margin-top: 2px; line-height: 1.3; }
+
+  /* Info banner */
+  .info-banner { background: #eef2ff; border-radius: 10px; padding: 11px 14px; font-size: 12px; color: #4338ca; display: flex; align-items: flex-start; gap: 10px; margin-bottom: 20px; line-height: 1.5; }
+  .info-banner svg { width: 15px; height: 15px; flex-shrink: 0; margin-top: 1px; }
+
+  /* Unallocated strip */
+  .unallocated-wrap { background: #fffbeb; border: 1px solid #fde68a; border-radius: 10px; padding: 12px 16px; margin-bottom: 22px; }
+  .unallocated-title { font-size: 11px; font-weight: 700; color: #92400e; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: .3px; }
+  .unallocated-list { display: flex; flex-wrap: wrap; gap: 7px; }
+  .unallocated-chip { background: #fff; border: 1px solid #fcd34d; border-radius: 8px; padding: 5px 11px; font-size: 12px; font-weight: 600; color: #1a1a2e; display: flex; align-items: center; gap: 5px; cursor: pointer; transition: border-color .15s; }
+  .unallocated-chip:hover { border-color: #4f46e5; color: #4f46e5; }
+  .uc-dot { width: 6px; height: 6px; border-radius: 50%; background: #f59e0b; }
+  .uc-hint { font-size: 10px; color: #9ca3af; font-weight: 400; }
+
+  /* Section heading */
+  .section-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: #9ca3af; margin-bottom: 12px; }
+
+  /* Room grid */
+  .rooms-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 14px; }
+
+  .room-card { border: 1px solid #e8eaed; border-radius: 12px; overflow: hidden; background: #fff; }
+  .room-card.occupied { border-color: #bbf7d0; }
+  .room-card.partial { border-color: #fde68a; }
+
+  .room-header { padding: 11px 14px; border-bottom: 1px solid #f0f0f0; background: #f9fafb; display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+  .room-card.occupied .room-header { background: #f0fdf4; }
+  .room-card.partial .room-header { background: #fffbeb; }
+
+  .room-name { font-size: 13px; font-weight: 700; color: #1a1a2e; }
+  .room-desc { font-size: 11px; color: #6b7280; margin-top: 2px; line-height: 1.4; }
+  .room-num { font-size: 10px; color: #9ca3af; margin-top: 2px; }
+
+  .room-occ { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0; }
+  .occ-dots { display: flex; gap: 3px; }
+  .occ-dot { width: 8px; height: 8px; border-radius: 50%; background: #e8eaed; }
+  .occ-dot.adult { background: #4f46e5; }
+  .occ-dot.child { background: #a5b4fc; }
+  .occ-dot.cot { background: #e0e7ff; border: 1px solid #a5b4fc; }
+  .occ-label { font-size: 10px; color: #9ca3af; }
+
+  .room-body { padding: 12px 14px; }
+
+  .room-empty { font-size: 12px; color: #9ca3af; text-align: center; padding: 10px 0 6px; }
+  .add-btn { width: 100%; padding: 7px; border: 1px dashed #c7d2fe; border-radius: 8px; background: #fff; font-size: 12px; color: #4f46e5; cursor: pointer; font-weight: 500; margin-top: 8px; font-family: inherit; }
+  .add-btn:hover { background: #eef2ff; }
+
+  /* Guest row */
+  .rg { display: flex; align-items: flex-start; gap: 9px; padding: 8px 0; border-bottom: 1px solid #f3f4f6; }
+  .rg:last-of-type { border-bottom: none; }
+  .rg-av { width: 28px; height: 28px; border-radius: 50%; background: #eef2ff; color: #4f46e5; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .rg-av.child { background: #ede9fe; color: #7c3aed; font-size: 9px; }
+  .rg-info { flex: 1; min-width: 0; }
+  .rg-name { font-size: 13px; font-weight: 600; color: #1a1a2e; }
+  .rg-meta { font-size: 11px; color: #9ca3af; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .rg-tags { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 4px; }
+  .tag { font-size: 10px; padding: 2px 7px; border-radius: 8px; font-weight: 600; }
+  .tag.role { background: #e0e7ff; color: #4f46e5; }
+  .tag.bfast { background: #dcfce7; color: #16a34a; }
+  .tag.diet { background: #fee2e2; color: #dc2626; }
+  .tag.warn { background: #fef3c7; color: #92400e; }
+  .tag.child { background: #ede9fe; color: #7c3aed; }
+  .rg-btns { display: flex; gap: 4px; flex-shrink: 0; margin-top: 2px; }
+  .rg-btn { font-size: 10px; color: #4f46e5; cursor: pointer; padding: 2px 7px; border: 1px solid #c7d2fe; border-radius: 5px; background: #eef2ff; font-weight: 500; font-family: inherit; white-space: nowrap; }
+  .rg-btn:hover { background: #e0e7ff; }
+  .rg-btn.rem { color: #dc2626; border-color: #fecaca; background: #fef2f2; }
+  .rg-btn.rem:hover { background: #fee2e2; }
+
+  /* Breakfast bar */
+  .bfast-bar { background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 10px; padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; margin-top: 22px; }
+  .bfast-left { display: flex; align-items: center; gap: 12px; }
+  .bfast-icon { width: 36px; height: 36px; background: #dcfce7; border-radius: 9px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .bfast-title { font-size: 13px; font-weight: 700; color: #065f46; }
+  .bfast-sub { font-size: 11px; color: #6b7280; margin-top: 2px; }
+  .bfast-num { font-size: 32px; font-weight: 700; color: #16a34a; }
+
+  /* Modal */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 100; align-items: center; justify-content: center; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: #fff; border-radius: 14px; width: 560px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,.2); }
+  .modal-hdr { padding: 18px 22px 14px; border-bottom: 1px solid #e8eaed; display: flex; align-items: flex-start; justify-content: space-between; position: sticky; top: 0; background: #fff; z-index: 1; }
+  .modal-title { font-size: 15px; font-weight: 700; color: #1a1a2e; }
+  .modal-sub { font-size: 11px; color: #9ca3af; margin-top: 2px; }
+  .modal-x { width: 26px; height: 26px; border-radius: 6px; border: 1px solid #e8eaed; background: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #6b7280; flex-shrink: 0; font-family: inherit; }
+  .modal-x:hover { background: #f3f4f6; }
+  .modal-bdy { padding: 18px 22px; }
+  .modal-ftr { padding: 14px 22px; border-top: 1px solid #e8eaed; display: flex; justify-content: flex-end; gap: 8px; position: sticky; bottom: 0; background: #fff; }
+
+  .fs { margin-bottom: 18px; }
+  .fs-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: #4f46e5; margin-bottom: 10px; padding-bottom: 5px; border-bottom: 1px solid #e8eaed; }
+  .fg { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .fi { display: flex; flex-direction: column; gap: 3px; }
+  .fi.full { grid-column: 1 / -1; }
+  .fl { font-size: 11px; font-weight: 600; color: #374151; }
+  .fv { border: 1px solid #e8eaed; border-radius: 6px; padding: 6px 9px; font-size: 12px; color: #1a1a2e; background: #fafafa; outline: none; font-family: inherit; }
+  .fv:focus { border-color: #4f46e5; background: #fff; box-shadow: 0 0 0 3px rgba(79,70,229,.08); }
+  .fv[readonly] { background: #f3f4f6; color: #6b7280; cursor: not-allowed; }
+  select.fv { width: 100%; cursor: pointer; }
+  .fhint { font-size: 10px; color: #9ca3af; margin-top: 2px; line-height: 1.4; }
+  .fhint.question { color: #d97706; font-weight: 600; }
+
+  .btn { padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; font-family: inherit; }
+  .btn-primary { background: #4f46e5; color: #fff; }
+  .btn-primary:hover { background: #4338ca; }
+  .btn-outline { background: #fff; border: 1px solid #e8eaed; color: #374151; }
+  .btn-outline:hover { border-color: #4f46e5; color: #4f46e5; }
+</style>
+</head>
+<body>
+<div class="page">
+<div class="event-card">
+
+  <!-- Header -->
+  <div class="event-header">
+    <div>
+      <div class="event-title">Daniel &amp; Emma Richardson Wedding</div>
+      <div class="venue-row">
+        <div class="venue-icon"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg></div>
+        <div>
+          <div class="venue-label-small">Venue</div>
+          <div class="venue-name">Ashton Lodge Country House</div>
+        </div>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="event-date">Saturday, 12 September 2026</div>
+      <div class="badges">
+        <span class="badge wedding">Wedding</span>
+        <span class="badge confirmed">Confirmed</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div class="action-btns">
+    <button class="action-btn">
+      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Download PDF
+    </button>
+    <button class="action-btn">
+      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+      Kitchen / Chef PDF
+    </button>
+  </div>
+
+  <!-- Tabs -->
+  <div class="primary-tabs">
+    <div class="p-tab">Event details</div>
+    <div class="p-tab">Itinerary</div>
+    <div class="p-tab">Products &amp; Finances</div>
+    <div class="p-tab">Guests</div>
+    <div class="p-tab active">Accommodation</div>
+    <div class="p-tab">Table plan</div>
+    <div class="p-tab">Notes</div>
+    <div class="p-tab">Suppliers</div>
+    <div class="p-tab">Event Planner</div>
+    <div class="p-tab">Reminders</div>
+  </div>
+
+  <div class="tab-content">
+
+    <!-- Summary bar -->
+    <div style="display:flex;flex-wrap:nowrap;gap:0;margin-bottom:20px;background:#f9fafb;border:1px solid #e8eaed;border-radius:10px;overflow:hidden;">
+      <div style="padding:8px 10px;display:flex;flex-direction:column;border-right:1px solid #e8eaed;flex:1;min-width:0;">
+        <span style="font-size:18px;font-weight:700;color:#1a1a2e;line-height:1.2;">7</span>
+        <span style="font-size:10px;color:#9ca3af;margin-top:1px;line-height:1.3;">Rooms at venue</span>
+      </div>
+      <div style="padding:8px 10px;display:flex;flex-direction:column;border-right:1px solid #e8eaed;flex:1;min-width:0;">
+        <span style="font-size:18px;font-weight:700;color:#1a1a2e;line-height:1.2;">17</span>
+        <span style="font-size:10px;color:#9ca3af;margin-top:1px;line-height:1.3;">Max guests</span>
+      </div>
+      <div style="padding:8px 10px;display:flex;flex-direction:column;border-right:1px solid #e8eaed;flex:1;min-width:0;">
+        <span style="font-size:18px;font-weight:700;color:#16a34a;line-height:1.2;">5</span>
+        <span style="font-size:10px;color:#9ca3af;margin-top:1px;line-height:1.3;">Rooms allocated</span>
+      </div>
+      <div style="padding:8px 10px;display:flex;flex-direction:column;border-right:1px solid #e8eaed;flex:1;min-width:0;">
+        <span style="font-size:18px;font-weight:700;color:#f59e0b;line-height:1.2;">2</span>
+        <span style="font-size:10px;color:#9ca3af;margin-top:1px;line-height:1.3;">Rooms available</span>
+      </div>
+      <div style="padding:8px 10px;display:flex;flex-direction:column;border-right:1px solid #e8eaed;flex:1;min-width:0;">
+        <span style="font-size:18px;font-weight:700;color:#1a1a2e;line-height:1.2;">11</span>
+        <span style="font-size:10px;color:#9ca3af;margin-top:1px;line-height:1.3;">Guests staying</span>
+      </div>
+      <div style="padding:8px 10px;display:flex;flex-direction:column;border-right:1px solid #e8eaed;flex:1;min-width:0;">
+        <span style="font-size:18px;font-weight:700;color:#dc2626;line-height:1.2;">2</span>
+        <span style="font-size:10px;color:#9ca3af;margin-top:1px;line-height:1.3;">Not yet allocated</span>
+      </div>
+      <div style="padding:8px 10px;display:flex;flex-direction:column;border-right:1px solid #e8eaed;flex:1;min-width:0;">
+        <span style="font-size:18px;font-weight:700;color:#16a34a;line-height:1.2;">11</span>
+        <span style="font-size:10px;color:#9ca3af;margin-top:1px;line-height:1.3;">Breakfasts</span>
+      </div>
+      <div style="padding:8px 10px;display:flex;flex-direction:column;flex:1;min-width:0;">
+        <span style="font-size:18px;font-weight:700;color:#f59e0b;line-height:1.2;">3</span>
+        <span style="font-size:10px;color:#9ca3af;margin-top:1px;line-height:1.3;">Details incomplete</span>
+      </div>
+    </div>
+
+    <!-- Info banner -->
+    <div class="info-banner">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      Rooms shown are configured for Ashton Lodge Country House — First Floor only, 7 bedrooms, max 17 guests. Breakfast is included with every room. Guests flagged as requiring overnight accommodation in the Guests tab appear below as unallocated. The breakfast count at the bottom feeds automatically to the Chef Sheet.
+    </div>
+
+    <!-- Unallocated guests -->
+    <div class="unallocated-wrap">
+      <div class="unallocated-title">
+        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        2 guests flagged for overnight accommodation in the Guests tab — not yet allocated to a room
+      </div>
+      <div class="unallocated-list">
+        <div class="unallocated-chip" onclick="openModal('James Clarke','james.clarke@email.com')">
+          <div class="uc-dot"></div>
+          James Clarke
+          <span class="uc-hint">+ Assign room</span>
+        </div>
+        <div class="unallocated-chip" onclick="openModal('Sophie Clarke','sophie.clarke@email.com')">
+          <div class="uc-dot"></div>
+          Sophie Clarke
+          <span class="uc-hint">+ Assign room</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Rooms -->
+    <div class="section-label">Rooms — Ashton Lodge Country House, First Floor</div>
+    <div class="rooms-grid">
+
+      <!-- Room 1: Honeymoon Suite #303 -->
+      <div class="room-card occupied">
+        <div class="room-header">
+          <div>
+            <div class="room-name">Honeymoon Suite</div>
+            <div class="room-desc">King-size Bed &middot; En-suite Bath &amp; Shower</div>
+            <div class="room-num">Room #303 &middot; Max 2 adults + travel cot</div>
+          </div>
+          <div class="room-occ">
+            <div class="occ-dots">
+              <div class="occ-dot adult" title="Adult"></div>
+              <div class="occ-dot adult" title="Adult"></div>
+            </div>
+            <div class="occ-label">2/2</div>
+          </div>
+        </div>
+        <div class="room-body">
+          <div class="rg">
+            <div class="rg-av">DE</div>
+            <div class="rg-info">
+              <div class="rg-name">Daniel Richardson</div>
+              <div class="rg-meta">daniel@email.com &middot; 07700 900100</div>
+              <div class="rg-tags">
+                
+              </div>
+            </div>
+            <div class="rg-btns">
+              <button class="rg-btn" onclick="openModal('Daniel Richardson','daniel@email.com')">Edit</button>
+              <button class="rg-btn rem">Remove</button>
+            </div>
+          </div>
+          <div class="rg">
+            <div class="rg-av">ER</div>
+            <div class="rg-info">
+              <div class="rg-name">Emma Richardson</div>
+              <div class="rg-meta">emma@email.com &middot; 07700 900101</div>
+              <div class="rg-tags">
+                
+              </div>
+            </div>
+            <div class="rg-btns">
+              <button class="rg-btn" onclick="openModal('Emma Richardson','emma@email.com')">Edit</button>
+              <button class="rg-btn rem">Remove</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Room 2: Feature Room #302 -->
+      <div class="room-card occupied">
+        <div class="room-header">
+          <div>
+            <div class="room-name">Feature Room</div>
+            <div class="room-desc">King-size Bed &amp; Double Bed &middot; En-suite Bath &amp; Shower</div>
+            <div class="room-num">Room #302 &middot; Max 2 adults, 2 children &lt;12, travel cot</div>
+          </div>
+          <div class="room-occ">
+            <div class="occ-dots">
+              <div class="occ-dot adult"></div>
+              <div class="occ-dot adult"></div>
+              <div class="occ-dot child"></div>
+              <div class="occ-dot child"></div>
+            </div>
+            <div class="occ-label">4/4</div>
+          </div>
+        </div>
+        <div class="room-body">
+          <div class="rg">
+            <div class="rg-av">TR</div>
+            <div class="rg-info">
+              <div class="rg-name">Thomas Richardson</div>
+              <div class="rg-meta">t.richardson@email.com &middot; 07700 900102</div>
+              <div class="rg-tags">
+                
+                
+              </div>
+            </div>
+            <div class="rg-btns">
+              <button class="rg-btn" onclick="openModal('Thomas Richardson','t.richardson@email.com')">Edit</button>
+              <button class="rg-btn rem">Remove</button>
+            </div>
+          </div>
+          <div class="rg">
+            <div class="rg-av">MR</div>
+            <div class="rg-info">
+              <div class="rg-name">Margaret Richardson</div>
+              <div class="rg-meta">m.richardson@email.com</div>
+              <div class="rg-tags">
+                
+                
+                <span class="tag warn">Mobile missing</span>
+              </div>
+            </div>
+            <div class="rg-btns">
+              <button class="rg-btn" onclick="openModal('Margaret Richardson','m.richardson@email.com')">Edit</button>
+              <button class="rg-btn rem">Remove</button>
+            </div>
+          </div>
+          <div class="rg">
+            <div class="rg-av child">OB</div>
+            <div class="rg-info">
+              <div class="rg-name">Olivia Richardson</div>
+              <div class="rg-meta">Age 8 &middot; Child</div>
+              <div class="rg-tags">
+                <span class="tag child">Child &lt;12</span>
+                
+              </div>
+            </div>
+            <div class="rg-btns">
+              <button class="rg-btn" onclick="openModal('Olivia Richardson','')">Edit</button>
+              <button class="rg-btn rem">Remove</button>
+            </div>
+          </div>
+          <div class="rg">
+            <div class="rg-av child">JR</div>
+            <div class="rg-info">
+              <div class="rg-name">Jack Richardson</div>
+              <div class="rg-meta">Age 5 &middot; Child</div>
+              <div class="rg-tags">
+                <span class="tag child">Child &lt;12</span>
+                
+              </div>
+            </div>
+            <div class="rg-btns">
+              <button class="rg-btn" onclick="openModal('Jack Richardson','')">Edit</button>
+              <button class="rg-btn rem">Remove</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Room 3: Superior Double #301 -->
+      <div class="room-card occupied">
+        <div class="room-header">
+          <div>
+            <div class="room-name">Superior Double</div>
+            <div class="room-desc">Double Bed &middot; En-suite Shower</div>
+            <div class="room-num">Room #301 &middot; Max 2 adults + travel cot</div>
+          </div>
+          <div class="room-occ">
+            <div class="occ-dots">
+              <div class="occ-dot adult"></div>
+              <div class="occ-dot adult"></div>
+            </div>
+            <div class="occ-label">2/2</div>
+          </div>
+        </div>
+        <div class="room-body">
+          <div class="rg">
+            <div class="rg-av">PW</div>
+            <div class="rg-info">
+              <div class="rg-name">Peter Wilson</div>
+              <div class="rg-meta">p.wilson@email.com &middot; 07700 900103</div>
+              <div class="rg-tags">
+                
+                
+              </div>
+            </div>
+            <div class="rg-btns">
+              <button class="rg-btn" onclick="openModal('Peter Wilson','p.wilson@email.com')">Edit</button>
+              <button class="rg-btn rem">Remove</button>
+            </div>
+          </div>
+          <div class="rg">
+            <div class="rg-av">CW</div>
+            <div class="rg-info">
+              <div class="rg-name">Carol Wilson</div>
+              <div class="rg-meta">c.wilson@email.com &middot; 07700 900104</div>
+              <div class="rg-tags">
+                
+                
+                <span class="tag diet">Dairy free</span>
+              </div>
+            </div>
+            <div class="rg-btns">
+              <button class="rg-btn" onclick="openModal('Carol Wilson','c.wilson@email.com')">Edit</button>
+              <button class="rg-btn rem">Remove</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Room 4: Single Room #300 -->
+      <div class="room-card partial">
+        <div class="room-header">
+          <div>
+            <div class="room-name">Single Room</div>
+            <div class="room-desc">Single Bed &middot; En-suite Shower</div>
+            <div class="room-num">Room #300 &middot; Max 1 adult</div>
+          </div>
+          <div class="room-occ">
+            <div class="occ-dots">
+              <div class="occ-dot adult"></div>
+            </div>
+            <div class="occ-label">1/1</div>
+          </div>
+        </div>
+        <div class="room-body">
+          <div class="rg">
+            <div class="rg-av">BT</div>
+            <div class="rg-info">
+              <div class="rg-name">Ben Turner</div>
+              <div class="rg-meta">ben.turner@email.com</div>
+              <div class="rg-tags">
+                
+                
+                <span class="tag warn">Mobile &amp; emergency contact missing</span>
+              </div>
+            </div>
+            <div class="rg-btns">
+              <button class="rg-btn" onclick="openModal('Ben Turner','ben.turner@email.com')">Edit</button>
+              <button class="rg-btn rem">Remove</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Room 5: Superior Double #299 -->
+      <div class="room-card occupied">
+        <div class="room-header">
+          <div>
+            <div class="room-name">Superior Double</div>
+            <div class="room-desc">King-size + small double &middot; En-suite Bath &amp; Shower</div>
+            <div class="room-num">Room #299 &middot; Max 2 adults, 2 children &lt;12, travel cot</div>
+          </div>
+          <div class="room-occ">
+            <div class="occ-dots">
+              <div class="occ-dot adult"></div>
+              <div class="occ-dot adult"></div>
+            </div>
+            <div class="occ-label">2/4</div>
+          </div>
+        </div>
+        <div class="room-body">
+          <div class="rg">
+            <div class="rg-av">HM</div>
+            <div class="rg-info">
+              <div class="rg-name">Hannah Morris</div>
+              <div class="rg-meta">h.morris@email.com &middot; 07700 900105</div>
+              <div class="rg-tags">
+                
+                
+              </div>
+            </div>
+            <div class="rg-btns">
+              <button class="rg-btn" onclick="openModal('Hannah Morris','h.morris@email.com')">Edit</button>
+              <button class="rg-btn rem">Remove</button>
+            </div>
+          </div>
+          <div class="rg">
+            <div class="rg-av">LM</div>
+            <div class="rg-info">
+              <div class="rg-name">Laura Morris</div>
+              <div class="rg-meta">l.morris@email.com &middot; 07700 900106</div>
+              <div class="rg-tags">
+                
+                
+              </div>
+            </div>
+            <div class="rg-btns">
+              <button class="rg-btn" onclick="openModal('Laura Morris','l.morris@email.com')">Edit</button>
+              <button class="rg-btn rem">Remove</button>
+            </div>
+          </div>
+          <button class="add-btn" onclick="openModal('','')">+ Add guest to this room</button>
+        </div>
+      </div>
+
+      <!-- Room 6: Superior Double #298 (empty) -->
+      <div class="room-card">
+        <div class="room-header">
+          <div>
+            <div class="room-name">Superior Double</div>
+            <div class="room-desc">King-size Bed &middot; En-suite Shower &middot; Step into room &amp; bathroom</div>
+            <div class="room-num">Room #298 &middot; Max 2 adults</div>
+          </div>
+          <div class="room-occ">
+            <div class="occ-dots">
+              <div class="occ-dot"></div>
+              <div class="occ-dot"></div>
+            </div>
+            <div class="occ-label">0/2</div>
+          </div>
+        </div>
+        <div class="room-body">
+          <div class="room-empty">No guests allocated to this room</div>
+          <button class="add-btn" onclick="openModal('','')">+ Add guest to this room</button>
+        </div>
+      </div>
+
+      <!-- Room 7: Superior Double #297 (empty) -->
+      <div class="room-card">
+        <div class="room-header">
+          <div>
+            <div class="room-name">Superior Double</div>
+            <div class="room-desc">King-size Bed &middot; En-suite Bath &amp; Shower</div>
+            <div class="room-num">Room #297 &middot; Max 2 adults</div>
+          </div>
+          <div class="room-occ">
+            <div class="occ-dots">
+              <div class="occ-dot"></div>
+              <div class="occ-dot"></div>
+            </div>
+            <div class="occ-label">0/2</div>
+          </div>
+        </div>
+        <div class="room-body">
+          <div class="room-empty">No guests allocated to this room</div>
+          <button class="add-btn" onclick="openModal('','')">+ Add guest to this room</button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Breakfast bar -->
+    <div class="bfast-bar">
+      <div class="bfast-left">
+        <div class="bfast-icon">
+          <svg width="18" height="18" fill="none" stroke="#16a34a" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 010 8h-1"/><path d="M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
+        </div>
+        <div>
+          <div class="bfast-title">Breakfasts required — fed to the Chef Sheet automatically</div>
+          <div class="bfast-sub">Derived from room occupancy &middot; Updates as guests are allocated and removed &middot; Breakfast included with all Ashton Lodge rooms</div>
+        </div>
+      </div>
+      <div class="bfast-num">11</div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="modal-hdr">
+      <div>
+        <div class="modal-title" id="mTitle">Allocate Guest to Room</div>
+        <div class="modal-sub" id="mSub">Ashton Lodge Country House</div>
+      </div>
+      <button class="modal-x" onclick="closeModal()">&#10005;</button>
+    </div>
+    <div class="modal-bdy">
+
+      <div class="fs">
+        <div class="fs-title">Select Guest</div>
+        <div class="fg">
+          <div class="fi full">
+            <label class="fl">Guest flagged for accommodation</label>
+            <select class="fv" id="mGuestSelect" onchange="selectGuest(this.value)">
+              <option value="">Select a guest…</option>
+              <option value="james">James Clarke</option>
+              <option value="sophie">Sophie Clarke</option>
+            </select>
+            <p class="fhint" style="margin-top:5px;">Only guests flagged for overnight accommodation in the Guests tab who have not yet been allocated to a room are shown here.</p>
+          </div>
+        </div>
+      </div>
+
+      <div id="mGuestDetails" style="display:none;">
+        <div class="fs">
+          <div class="fs-title">Guest Details — from Guests Tab</div>
+          <div class="fg">
+            <div class="fi">
+              <label class="fl">First name</label>
+              <input class="fv" id="mFirst" readonly>
+            </div>
+            <div class="fi">
+              <label class="fl">Last name</label>
+              <input class="fv" id="mLast" readonly>
+            </div>
+            <div class="fi">
+              <label class="fl">Email</label>
+              <input class="fv" id="mEmail" readonly>
+            </div>
+            <div class="fi">
+              <label class="fl">Guest type</label>
+              <input class="fv" id="mType" readonly>
+            </div>
+          </div>
+          <p class="fhint" style="margin-top:6px;">To change name or email update the record in the Guests tab.</p>
+        </div>
+      </div>
+
+      <div class="fs">
+        <div class="fs-title">Room Allocation</div>
+        <div class="fg">
+          <div class="fi full">
+            <label class="fl">Assign to room</label>
+            <select class="fv">
+              <option value="">Select a room…</option>
+              <option>Honeymoon Suite #303 — 2/2 full</option>
+              <option>Feature Room #302 — 4/4 full</option>
+              <option>Superior Double #301 — 2/2 full</option>
+              <option>Single Room #300 — 1/1 full</option>
+              <option selected>Superior Double #299 — 2/4 spaces available</option>
+              <option>Superior Double #298 — 0/2 available</option>
+              <option>Superior Double #297 — 0/2 available</option>
+            </select>
+          </div>
+          <div class="fi full">
+            <label class="fl">Relationship / Role</label>
+            <input class="fv" placeholder="e.g. Bride's Brother, Friend of groom, Groomsman…">
+          </div>
+        </div>
+      </div>
+
+      <div class="fs">
+        <div class="fs-title">Contact Details for Stay</div>
+        <div class="fg">
+          <div class="fi full">
+            <label class="fl">Mobile</label>
+            <input class="fv" placeholder="07700 000000">
+          </div>
+          <div class="fi">
+            <label class="fl">Emergency contact name</label>
+            <input class="fv" placeholder="Full name">
+          </div>
+          <div class="fi">
+            <label class="fl">Emergency contact number</label>
+            <input class="fv" placeholder="07700 000000">
+          </div>
+        </div>
+      </div>
+
+      <div class="fs">
+        <div class="fs-title">Breakfast</div>
+        <div class="fg">
+          <div class="fi full">
+            <label class="fl">Breakfast included</label>
+            <select class="fv">
+              <option selected>Yes — included with room</option>
+              <option>No — not required</option>
+            </select>
+            <p class="fhint question" style="margin-top:6px;">&#9888; Question for Richard: are there different breakfast types available at Ashton Lodge (e.g. Full English, Continental, vegan) or is it a single standard breakfast for all guests?</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="fs">
+        <div class="fs-title">Dietary Requirements</div>
+        <div class="fg">
+          <div class="fi full">
+            <label class="fl">Requirements on record</label>
+            <input class="fv" readonly value="None recorded">
+            <p class="fhint">Pulled from the Dietary Requirements tab. Update the dietary record there to make changes.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div class="modal-ftr">
+      <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary">Save allocation</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Guests flagged for accommodation but not yet allocated — in a real build this comes from the Guests tab
+  const unallocated = {
+    james:  { first: 'James',  last: 'Clarke',  email: 'james.clarke@email.com',  type: 'Adult' },
+    sophie: { first: 'Sophie', last: 'Clarke',  email: 'sophie.clarke@email.com', type: 'Adult' }
+  };
+
+  function openModal(name, email) {
+    // Reset
+    document.getElementById('mGuestSelect').value = '';
+    document.getElementById('mGuestDetails').style.display = 'none';
+    document.getElementById('mTitle').textContent = name ? 'Edit: ' + name : 'Add Guest to Room';
+    // If editing existing guest, show their details directly
+    if (name) {
+      var parts = name.split(' ');
+      document.getElementById('mFirst').value  = parts[0] || '';
+      document.getElementById('mLast').value   = parts.slice(1).join(' ') || '';
+      document.getElementById('mEmail').value  = email || '';
+      document.getElementById('mType').value   = 'Adult';
+      document.getElementById('mGuestDetails').style.display = 'block';
+      document.getElementById('mGuestSelect').closest('.fs').style.display = 'none';
+    } else {
+      document.getElementById('mGuestSelect').closest('.fs').style.display = 'block';
+    }
+    document.getElementById('modal').classList.add('open');
+  }
+
+  function selectGuest(val) {
+    var details = document.getElementById('mGuestDetails');
+    if (!val) { details.style.display = 'none'; return; }
+    var g = unallocated[val];
+    if (!g) { details.style.display = 'none'; return; }
+    document.getElementById('mFirst').value = g.first;
+    document.getElementById('mLast').value  = g.last;
+    document.getElementById('mEmail').value = g.email;
+    document.getElementById('mType').value  = g.type;
+    details.style.display = 'block';
+  }
+
+  function closeModal() {
+    document.getElementById('modal').classList.remove('open');
+  }
+</script>
+</body>
+</html>
