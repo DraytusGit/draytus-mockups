@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sales Journey — Current State</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f4f5f7; color: #1a1a2e; font-size: 13px; padding: 32px; }
+  .page { max-width: 960px; margin: 0 auto; }
+
+  /* ── HEADER ── */
+  .page-header { margin-bottom: 28px; display: flex; align-items: flex-start; justify-content: space-between; }
+  .page-title { font-size: 20px; font-weight: 700; color: #1a1a2e; }
+  .page-sub { font-size: 12px; color: #9ca3af; margin-top: 3px; }
+  .toolbar { display: flex; gap: 8px; }
+  .btn { padding: 7px 14px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: inherit; }
+  .btn-outline { background: #fff; border: 1px solid #e8eaed; color: #374151; }
+  .btn-outline:hover { border-color: #4f46e5; color: #4f46e5; }
+  .btn-danger { background: #fff; border: 1px solid #fecaca; color: #dc2626; }
+  .btn-danger:hover { background: #fef2f2; }
+
+  .save-indicator { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #9ca3af; align-self: flex-end; }
+  .save-dot { width: 7px; height: 7px; border-radius: 50%; background: #9ca3af; transition: background .3s; }
+  .save-dot.saved { background: #16a34a; }
+
+  /* ── LEGEND ── */
+  .legend { display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
+  .leg { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #6b7280; }
+  .leg-box { width: 14px; height: 14px; border-radius: 3px; }
+  .leg-box.normal  { background: #fff; border: 1.5px solid #c7d2fe; }
+  .leg-box.gap     { background: #fef9c3; border: 1.5px solid #facc15; }
+  .leg-box.holding { background: #f5f3ff; border: 1.5px solid #8b5cf6; }
+  .leg-box.stage   { background: #f0fdf4; border: 1.5px solid #86efac; }
+
+  /* ── SECTION LABEL ── */
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: #9ca3af; margin: 24px 0 10px; display: flex; align-items: center; gap: 8px; }
+  .section-label::after { content: ''; flex: 1; height: 1px; background: #e8eaed; }
+
+  /* ── FLOW ROW ── */
+  .flow-row { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 8px; }
+
+  /* ── NODE ── */
+  .node {
+    width: 260px; flex-shrink: 0; background: #fff; border: 1.5px solid #c7d2fe;
+    border-radius: 10px; padding: 11px 14px;
+  }
+  .node.gap     { background: #fef9c3; border-color: #facc15; }
+  .node.holding { background: #f5f3ff; border-color: #8b5cf6; }
+  .node.stage   { background: #f0fdf4; border-color: #86efac; }
+  .node.branch  { background: #fff7ed; border-color: #fdba74; border-style: dashed; }
+
+  .node-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .4px; color: #9ca3af; margin-bottom: 4px; }
+  .node-label.gap     { color: #a16207; }
+  .node-label.holding { color: #6d28d9; }
+  .node-label.stage   { color: #15803d; }
+  .node-title { font-size: 13px; font-weight: 600; color: #1a1a2e; line-height: 1.4; }
+  .node-note  { font-size: 11px; color: #6b7280; margin-top: 3px; line-height: 1.4; }
+
+  /* ── CONNECTOR ── */
+  .connector { display: flex; flex-direction: column; align-items: center; padding: 4px 0; width: 260px; flex-shrink: 0; }
+  .conn-line { width: 2px; height: 16px; background: #c7d2fe; }
+  .conn-arrow { width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 7px solid #c7d2fe; }
+  .conn-label { font-size: 10px; color: #9ca3af; margin-bottom: 2px; }
+
+  /* ── ANNOTATION BOX ── */
+  .annotation { flex: 1; }
+  .ann-area {
+    width: 100%; border: 1px dashed #c7d2fe; border-radius: 8px; padding: 9px 11px;
+    font-size: 12px; color: #374151; background: #fafafa; outline: none;
+    font-family: inherit; resize: none; height: 58px; line-height: 1.5;
+    transition: border-color .15s, background .15s;
+  }
+  .ann-area:focus { border-color: #4f46e5; border-style: solid; background: #fff; box-shadow: 0 0 0 3px rgba(79,70,229,.07); }
+  .ann-area::placeholder { color: #c4c9d4; font-style: italic; }
+  .ann-area.filled { border-color: #a5b4fc; border-style: solid; background: #fff; }
+
+  /* For branch rows */
+  .branch-wrap { display: flex; gap: 14px; width: 260px; flex-shrink: 0; }
+  .branch-node { flex: 1; background: #fff7ed; border: 1.5px dashed #fdba74; border-radius: 10px; padding: 10px 12px; text-align: center; }
+  .branch-node .node-title { font-size: 12px; }
+
+  @media print {
+    body { background: #fff; padding: 20px; }
+    .toolbar { display: none; }
+    .save-indicator { display: none; }
+    .ann-area { border: 1px solid #ccc !important; border-style: solid !important; height: auto; min-height: 40px; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="page-header">
+    <div>
+      <div class="page-title">Sales Journey — Current State</div>
+      <div class="page-sub">Flow from WordPress quote builder through to confirmed event &nbsp;·&nbsp; Annotate in real time</div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
+      <div class="toolbar">
+        <button class="btn btn-outline" onclick="window.print()">Print / PDF</button>
+        <button class="btn btn-danger" onclick="clearAll()">Clear notes</button>
+      </div>
+      <div class="save-indicator">
+        <div class="save-dot" id="saveDot"></div>
+        <span id="saveStatus">Auto-save ready</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="legend">
+    <div class="leg"><div class="leg-box normal"></div> Step</div>
+    <div class="leg"><div class="leg-box gap"></div> Gap / question</div>
+    <div class="leg"><div class="leg-box holding"></div> Holding state</div>
+    <div class="leg"><div class="leg-box stage"></div> Board stage</div>
+  </div>
+
+  <!-- ═══════════════════════════════════ WORDPRESS ═══════════ -->
+  <div class="section-label">WordPress &nbsp;—&nbsp; Visitor journey</div>
+
+  <div class="flow-row">
+    <div class="node">
+      <div class="node-label">Start</div>
+      <div class="node-title">Visitor on venue website</div>
+      <div class="node-note">One of up to 5 venue WordPress sites</div>
+    </div>
+    <div class="annotation">
+      <textarea class="ann-area" data-key="n1" placeholder="Notes…"></textarea>
+    </div>
+  </div>
+
+  <div class="flow-row"><div class="connector"><div class="conn-line"></div><div class="conn-arrow"></div></div></div>
+
+  <div class="flow-row">
+    <div class="node">
+      <div class="node-label">Step</div>
+      <div class="node-title">Completes Quote Builder</div>
+      <div class="node-note">Selects guest numbers, food and drink options</div>
+    </div>
+    <div class="annotation">
+      <textarea class="ann-area" data-key="n2" placeholder="Notes…"></textarea>
+    </div>
+  </div>
+
+  <div class="flow-row"><div class="connector"><div class="conn-line"></div><div class="conn-arrow"></div></div></div>
+
+  <div class="flow-row">
+    <div class="node">
+      <div class="node-label">Step</div>
+      <div class="node-title">Selects up to 3 preferred dates</div>
+      <div class="node-note">From the availability calendar on the website</div>
+    </div>
+    <div class="annotation">
+      <textarea class="ann-area" data-key="n3" placeholder="Notes…"></textarea>
+    </div>
+  </div>
+
+  <div class="flow-row"><div class="connector"><div class="conn-line"></div><div class="conn-arrow"></div></div></div>
+
+  <div class="flow-row">
+    <div class="node">
+      <div class="node-label">Step</div>
+      <div class="node-title">Optionally emails quote to themselves</div>
+      <div class="node-note">Quote lands in portal regardless</div>
+    </div>
+    <div class="annotation">
+      <textarea class="ann-area" data-key="n4" placeholder="Notes…"></textarea>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════ PORTAL — QUOTES ═════ -->
+  <div class="section-label">Portal &nbsp;—&nbsp; Quote to event</div>
+
+  <div class="flow-row">
+    <div class="node">
+      <div class="node-label">Step</div>
+      <div class="node-title">Quote appears in portal Quotes list</div>
+      <div class="node-note">Staff must open it manually — no notification triggered</div>
+    </div>
+    <div class="annotation">
+      <textarea class="ann-area" data-key="n5" placeholder="Notes…"></textarea>
+    </div>
+  </div>
+
+  <div class="flow-row"><div class="connector"><div class="conn-line"></div><div class="conn-arrow"></div></div></div>
+
+  <div class="flow-row">
+    <div class="node">
+      <div class="node-label">Step</div>
+      <div class="node-title">Staff opens quote in portal</div>
+    </div>
+    <div class="annotation">
+      <textarea class="ann-area" data-key="n6" placeholder="Notes…"></textarea>
+    </div>
+  </div>
+
+  <div class="flow-row"><div class="connector"><div class="conn-line"></div><div class="conn-arrow"></div></div></div>
+
+  <div class="flow-row">
+    <div class="node">
+      <div class="node-label">Step</div>
+      <div class="node-title">Selects one date from the three</div>
+      <div class="node-note">On the quote page before creating the event</div>
+    </div>
+    <div class="annotation">
+      <textarea class="ann-area" data-key="n7" placeholder="Notes…"></textarea>
+    </div>
+  </div>
+
+  <div class="flow-row"><div class="connector"><div class="conn-line"></div><div class="conn-arrow"></div></div></div>
+
+  <div class="flow-row">
+    <div class="node gap">
+      <div class="node-label gap">Gap</div>
+      <div class="node-title">Other 1 or 2 dates discarded</div>
+      <div class="node-note">No follow-up path for the unused dates</div>
+    </div>
+    <div class="annotation">
+      <textarea class="ann-area" data-key="n8" placeholder="Notes…"></textarea>
+    </div>
+  </div>
+
+  <div class="flow-row"><div class="connector"><div class="conn-line"></div><div class="conn-arrow"></div></div></div>
+
+  <div class="flow-row">
+    <div class="node">
+      <div class="node-label">Step</div>
+      <div class="node-title">Staff clicks Create Event</div>
+    </div>
+    <div class="annotation">
+      <textarea class="ann-area" data-key="n9" placeholder="Notes…"></textarea>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════ PORTAL — BOARD ══════ -->
+  <div class="section-label">Portal &nbsp;—&nbsp; Board management</div>
+
+  <div class="flow-row">
+    <div class="node holding">
+      <div class="node-label holding">Holding state</div>
+      <div class="node-title">Event created — Not on Board</div>
+      <div class="node-note">Default state. Currently 276 events sitting here.</div>
+    </div>
+    <div class="annotation">
+      <textarea class="ann-area" data-key="n10" placeholder="Notes…"></textarea>
+    </div>
+  </div>
+
+  <div class="flow-row"><div class="connector"><div class="conn-line"></div><div class="conn-arrow"></div></div></div>
+
+  <div class="flow-row">
+    <div class="node gap">
+      <div class="node-label gap">Gap</div>
+      <div class="node-title">Staff action required to put on board</div>
+      <div class="node-note">Toggle in event details, or drag card onto board. No prompt or process to drive this.</div>
+    </div>
+    <div class="annotation">
+      <textarea class="ann-area" data-key="n11" placeholder="Notes…"></textarea>
+    </div>
+  </div>
+
+  <div class="flow-row"><div class="connector"><div class="conn-line"></div><div class="conn-arrow"></div></div></div>
+
+  <div class="flow-row">
+    <div class="node stage">
+      <div class="node-label stage">Board stage</div>
+      <div class="node-title">Opportunity</div>
+      <div class="node-note">Event now visible on the sales board</div>
+    </div>
+    <div class="annotation">
+      <textarea class="ann-area" data-key="n12" placeholder="Notes…"></textarea>
+    </div>
+  </div>
+
+  <div class="flow-row"><div class="connector"><div class="conn-line"></div><div class="conn-arrow"></div></div></div>
+
+  <div class="flow-row">
+    <div class="node stage">
+      <div class="node-label stage">Board stage</div>
+      <div class="node-title">Provisional</div>
+    </div>
+    <div class="annotation">
+      <textarea class="ann-area" data-key="n13" placeholder="Notes…"></textarea>
+    </div>
+  </div>
+
+  <div class="flow-row"><div class="connector"><div class="conn-line"></div><div class="conn-arrow"></div></div></div>
+
+  <div class="flow-row">
+    <div class="node stage">
+      <div class="node-label stage">Board stage</div>
+      <div class="node-title">Confirmed</div>
+      <div class="node-note">Date is locked. Event moves into operations.</div>
+    </div>
+    <div class="annotation">
+      <textarea class="ann-area" data-key="n14" placeholder="Notes…"></textarea>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════ OVERALL NOTES ═══════ -->
+  <div class="section-label" style="margin-top:32px;">Overall meeting notes</div>
+  <textarea class="ann-area" data-key="overall" placeholder="General notes from the conversation…" style="height:100px;width:100%;"></textarea>
+
+</div>
+
+<script>
+  const KEY = 'tvg_sales_flow_notes';
+  let saveTimer;
+
+  function setStatus(msg, state) {
+    document.getElementById('saveStatus').textContent = msg;
+    document.getElementById('saveDot').className = 'save-dot ' + (state || '');
+  }
+
+  function save() {
+    const data = {};
+    document.querySelectorAll('[data-key]').forEach(el => { data[el.dataset.key] = el.value; });
+    try {
+      localStorage.setItem(KEY, JSON.stringify(data));
+      setStatus('Saved', 'saved');
+    } catch(e) { setStatus('Could not save', ''); }
+  }
+
+  function load() {
+    try {
+      const raw = localStorage.getItem(KEY);
+      if (!raw) return;
+      const data = JSON.parse(raw);
+      document.querySelectorAll('[data-key]').forEach(el => {
+        if (data[el.dataset.key]) {
+          el.value = data[el.dataset.key];
+          el.classList.add('filled');
+        }
+      });
+      setStatus('Notes restored', 'saved');
+    } catch(e) {}
+  }
+
+  function clearAll() {
+    if (!confirm('Clear all notes? This cannot be undone.')) return;
+    localStorage.removeItem(KEY);
+    document.querySelectorAll('[data-key]').forEach(el => {
+      el.value = '';
+      el.classList.remove('filled');
+    });
+    setStatus('Cleared', '');
+  }
+
+  document.querySelectorAll('[data-key]').forEach(el => {
+    el.addEventListener('input', () => {
+      el.classList.toggle('filled', el.value.trim().length > 0);
+      setStatus('Saving…', 'saving');
+      clearTimeout(saveTimer);
+      saveTimer = setTimeout(save, 800);
+    });
+  });
+
+  load();
+</script>
+</body>
+</html>
