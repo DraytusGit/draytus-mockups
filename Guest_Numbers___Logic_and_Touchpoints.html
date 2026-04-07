@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guest Numbers — Logic & Touchpoints</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f4f5f7; color: #1a1a2e; font-size: 13px; padding: 32px; }
+  .page { max-width: 960px; margin: 0 auto; }
+
+  /* ── HEADER ── */
+  .page-header { margin-bottom: 28px; display: flex; align-items: flex-start; justify-content: space-between; }
+  .page-title { font-size: 20px; font-weight: 700; color: #1a1a2e; }
+  .page-sub { font-size: 12px; color: #9ca3af; margin-top: 3px; max-width: 560px; line-height: 1.5; }
+  .toolbar { display: flex; gap: 8px; }
+  .btn { padding: 7px 14px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: inherit; }
+  .btn-outline { background: #fff; border: 1px solid #e8eaed; color: #374151; }
+  .btn-outline:hover { border-color: #4f46e5; color: #4f46e5; }
+  .btn-danger { background: #fff; border: 1px solid #fecaca; color: #dc2626; }
+  .btn-danger:hover { background: #fef2f2; }
+  .save-indicator { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #9ca3af; align-self: flex-end; }
+  .save-dot { width: 7px; height: 7px; border-radius: 50%; background: #9ca3af; transition: background .3s; }
+  .save-dot.saved { background: #16a34a; }
+  .save-dot.saving { background: #f59e0b; }
+
+  /* ── LEGEND ── */
+  .legend { display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
+  .leg { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #6b7280; }
+  .leg-box { width: 14px; height: 14px; border-radius: 3px; }
+  .leg-box.agreed  { background: #fff; border: 1.5px solid #c7d2fe; }
+  .leg-box.open    { background: #fef9c3; border: 1.5px solid #facc15; }
+  .leg-box.changed { background: #f0fdf4; border: 1.5px solid #86efac; }
+  .leg-box.risk    { background: #fff1f2; border: 1.5px solid #fca5a5; }
+
+  /* ── SECTION LABEL ── */
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: #9ca3af; margin: 28px 0 12px; display: flex; align-items: center; gap: 8px; }
+  .section-label::after { content: ''; flex: 1; height: 1px; background: #e8eaed; }
+
+  /* ── ROW ── */
+  .flow-row { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 10px; }
+
+  /* ── NODE ── */
+  .node {
+    width: 260px; flex-shrink: 0; background: #fff; border: 1.5px solid #c7d2fe;
+    border-radius: 10px; padding: 12px 14px;
+  }
+  .node.open    { background: #fef9c3; border-color: #facc15; }
+  .node.changed { background: #f0fdf4; border-color: #86efac; }
+  .node.risk    { background: #fff1f2; border-color: #fca5a5; }
+
+  .node-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .4px; color: #9ca3af; margin-bottom: 4px; }
+  .node-label.open    { color: #a16207; }
+  .node-label.changed { color: #15803d; }
+  .node-label.risk    { color: #b91c1c; }
+
+  .node-title { font-size: 13px; font-weight: 600; color: #1a1a2e; line-height: 1.4; }
+  .node-note  { font-size: 11px; color: #6b7280; margin-top: 4px; line-height: 1.5; }
+  .node-note li { margin-left: 14px; margin-top: 2px; }
+
+  /* ── CONNECTOR ── */
+  .connector { width: 260px; flex-shrink: 0; display: flex; flex-direction: column; align-items: center; padding: 3px 0; }
+  .conn-line  { width: 2px; height: 14px; background: #c7d2fe; }
+  .conn-arrow { width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 7px solid #c7d2fe; }
+
+  /* ── AGE BAND TABLE ── */
+  .age-table { width: 260px; flex-shrink: 0; border-radius: 10px; overflow: hidden; border: 1px solid #e8eaed; }
+  .age-table table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .age-table .th td { background: #1a1a2e; color: #fff; font-weight: 700; padding: 7px 11px; font-size: 11px; }
+  .age-table tr.even td { background: #fff; }
+  .age-table tr.odd  td { background: #f9fafb; }
+  .age-table td { padding: 7px 11px; border-bottom: 1px solid #f0f0f0; color: #374151; vertical-align: top; }
+  .age-table td:first-child { font-weight: 700; color: #1a1a2e; width: 40%; }
+
+  /* ── ANNOTATION ── */
+  .annotation { flex: 1; }
+  .ann-area {
+    width: 100%; border: 1px dashed #c7d2fe; border-radius: 8px; padding: 9px 11px;
+    font-size: 12px; color: #374151; background: #fafafa; outline: none;
+    font-family: inherit; resize: none; height: 62px; line-height: 1.5;
+    transition: border-color .15s, background .15s;
+  }
+  .ann-area:focus { border-color: #4f46e5; border-style: solid; background: #fff; box-shadow: 0 0 0 3px rgba(79,70,229,.07); }
+  .ann-area::placeholder { color: #c4c9d4; font-style: italic; }
+  .ann-area.filled { border-color: #a5b4fc; border-style: solid; background: #fff; }
+  .ann-area.tall { height: 90px; }
+
+  @media print {
+    body { background: #fff; padding: 20px; }
+    .toolbar { display: none; }
+    .save-indicator { display: none; }
+    .ann-area { border: 1px solid #ccc !important; border-style: solid !important; height: auto; min-height: 40px; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="page-header">
+    <div>
+      <div class="page-title">Guest Numbers — Logic &amp; Touchpoints</div>
+      <div class="page-sub">Working document to confirm how guest counts are derived, defined, and shared across the TVG portal. Outcome to be published to Confluence as the definitive reference.</div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
+      <div class="toolbar">
+        <button class="btn btn-outline" onclick="window.print()">Print / PDF</button>
+        <button class="btn btn-danger" onclick="clearAll()">Clear notes</button>
+      </div>
+      <div class="save-indicator">
+        <div class="save-dot" id="saveDot"></div>
+        <span id="saveStatus">Auto-save ready</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="legend">
+    <div class="leg"><div class="leg-box agreed"></div> Agreed / current state</div>
+    <div class="leg"><div class="leg-box changed"></div> Changed — Guest Tab now owns this</div>
+    <div class="leg"><div class="leg-box open"></div> Open question for Richard</div>
+    <div class="leg"><div class="leg-box risk"></div> Risk / mismatch concern</div>
+  </div>
+
+  <!-- ═══════════════════════ OLD VS NEW ══════════════════════ -->
+  <div class="section-label">1 &nbsp;—&nbsp; Old approach vs new approach</div>
+
+  <div class="flow-row">
+    <div class="node risk">
+      <div class="node-label risk">Retiring — old approach</div>
+      <div class="node-title">Guest counts derived from products</div>
+      <div class="node-note">
+        <ul>
+          <li>Day guests = Wedding Breakfast menu quantity</li>
+          <li>Evening guests = Evening Food quantity minus Day guests</li>
+          <li>Children = Children's Menu quantity</li>
+        </ul>
+        <div style="margin-top:6px;">Breaks when food quantities exceed actual headcount — e.g. 100 guests plus 20 extra cheese boards = 120 on the line, not 120 guests.</div>
+      </div>
+    </div>
+    <div class="annotation">
+      <textarea class="ann-area" data-key="old" placeholder="Notes…"></textarea>
+    </div>
+  </div>
+
+  <div class="flow-row"><div class="connector"><div class="conn-line"></div><div class="conn-arrow"></div></div></div>
+
+  <div class="flow-row">
+    <div class="node changed">
+      <div class="node-label changed">New — agreed approach</div>
+      <div class="node-title">Guest Tab is the source of truth</div>
+      <div class="node-note">Guest Tab holds definitive headcount. Products record quantities of food and drink items only — they are no longer the source of headcount data. The two are intentionally decoupled.</div>
+    </div>
+    <div class="annotation">
+      <textarea class="ann-area" data-key="new" placeholder="Notes…"></textarea>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════ AGE BANDS ═══════════════════════ -->
+  <div class="section-label">2 &nbsp;—&nbsp; Age bands and guest classification</div>
+
+  <div class="flow-row">
+    <div class="age-table">
+      <table>
+        <tr class="th"><td>Band</td><td>Age range</td></tr>
+        <tr class="even"><td>Adult</td><td>18 and over</td></tr>
+        <tr class="odd"><td>Teen</td><td>13 to 17</td></tr>
+        <tr class="even"><td>Child</td><td>3 to 12</td></tr>
+        <tr class="odd"><td>Baby</td><td>Under 3</td></tr>
+      </table>
+    </div>
+    <div class="annotation">
+      <textarea class="ann-area tall" data-key="agebands" placeholder="Notes — confirm or adjust age ranges…"></textarea>
+    </div>
+  </div>
+
+  <div class="flow-row" style="margin-top:10px;">
+    <div class="node open">
+      <div class="node-label open">Open question</div>
+      <div class="node-title">When does a child count as a guest?</div>
+      <div class="node-note">A Baby (under 3) almost certainly does not count toward venue capacity or food quantities. But does a Child (3–12) count toward capacity? Do Teens eat an adult menu and therefore count as a full guest for food purposes? Does a Baby need recording at all, or only if a high chair is required?</div>
+    </div>
+    <div class="annotation">
+      <textarea class="ann-area tall" data-key="childguest" placeholder="Richard's answer…"></textarea>
+    </div>
+  </div>
+
+  <div class="flow-row" style="margin-top:6px;">
+    <div class="node open">
+      <div class="node-label open">Open question</div>
+      <div class="node-title">Do Children count toward minimum spend?</div>
+      <div class="node-note">Children's menus are priced differently. Does a Child count as a full guest unit for minimum spend calculations, or at a reduced rate, or not at all?</div>
+    </div>
+    <div class="annotation">
+      <textarea class="ann-area" data-key="childspend" placeholder="Richard's answer…"></textarea>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════ GUEST TAB ════════════════════════ -->
+  <div class="section-label">3 &nbsp;—&nbsp; Guest Tab — what it holds</div>
+
+  <div class="flow-row">
+    <div class="node changed">
+      <div class="node-label changed">Source of truth</div>
+      <div class="node-title">Guest Tab stores per-guest records</div>
+      <div class="node-note">
+        <ul>
+          <li>Guest name and email</li>
+          <li>Guest type: Day / Evening / Day &amp; Evening</li>
+          <li>Age band: Adult, Teen, Child, Baby</li>
+          <li>Dietary requirements and allergens</li>
+          <li>Flag for accommodation required</li>
+        </ul>
+      </div>
+    </div>
+    <div class="annotation">
+      <textarea class="ann-area tall" data-key="guesttab" placeholder="Notes…"></textarea>
+    </div>
+  </div>
+
+  <div class="flow-row" style="margin-top:6px;">
+    <div class="node open">
+      <div class="node-label open">Open question</div>
+      <div class="node-title">Evening guest count — total or additional?</div>
+      <div class="node-note">If 80 day guests stay for the evening and 40 additional evening guests arrive, is the Evening guest count 120 (total evening attendance) or 40 (additional only)? This affects the Chef Sheet, reporting, and capacity checks.</div>
+    </div>
+    <div class="annotation">
+      <textarea class="ann-area" data-key="eveningcount" placeholder="Richard's answer…"></textarea>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════ DOWNSTREAM AREAS ════════════════ -->
+  <div class="section-label">4 &nbsp;—&nbsp; Downstream areas that consume guest numbers</div>
+
+  <!-- Event Details -->
+  <div class="flow-row">
+    <div class="node changed">
+      <div class="node-label changed">Needs updating</div>
+      <div class="node-title">Event Details page</div>
+      <div class="node-note">Currently shows Day and Evening guest counts derived from products. Should be updated to pull from the Guest Tab once that is the source of truth.</div>
+    </div>
+    <div class="annotation">
+      <textarea class="ann-area" data-key="eventdetails" placeholder="Notes…"></textarea>
+    </div>
+  </div>
+
+  <!-- Financial Report -->
+  <div class="flow-row" style="margin-top:8px;">
+    <div class="node risk">
+      <div class="node-label risk">Currently product-derived — risk</div>
+      <div class="node-title">Financial Position Report</div>
+      <div class="node-note">Day Guests, Children, and Evening Guests columns currently calculated from product quantities. Amy has flagged the evening guest column shows only additional guests, not total. Agreed to hold any changes until this logic document is finalised.</div>
+    </div>
+    <div class="annotation">
+      <textarea class="ann-area" data-key="report" placeholder="Notes…"></textarea>
+    </div>
+  </div>
+
+  <!-- Chef Sheet -->
+  <div class="flow-row" style="margin-top:8px;">
+    <div class="node open">
+      <div class="node-label open">Needs clarification</div>
+      <div class="node-title">Chef Sheet</div>
+      <div class="node-note">Currently driven by product quantities. The redesigned mock-up references guest numbers per course. Two sources of data are now potentially in play: product quantities (how much food to cook) and Guest Tab counts (how many people are attending). These are not the same number. What does the Chef Sheet show from each?</div>
+    </div>
+    <div class="annotation">
+      <textarea class="ann-area tall" data-key="chefsheet" placeholder="Richard's answer — what should the chef see for guest numbers vs food quantities?"></textarea>
+    </div>
+  </div>
+
+  <!-- Dietary -->
+  <div class="flow-row" style="margin-top:8px;">
+    <div class="node changed">
+      <div class="node-label changed">Guest Tab feeds this</div>
+      <div class="node-title">Dietary Requirements Tab</div>
+      <div class="node-note">Allergen and dietary data entered against a guest record in the Guest Tab. Flows automatically to the Chef Sheet allergen display per course. No manual re-entry at the kitchen stage.</div>
+    </div>
+    <div class="annotation">
+      <textarea class="ann-area" data-key="dietary" placeholder="Notes…"></textarea>
+    </div>
+  </div>
+
+  <!-- Accommodation -->
+  <div class="flow-row" style="margin-top:8px;">
+    <div class="node changed">
+      <div class="node-label changed">Guest Tab feeds this</div>
+      <div class="node-title">Accommodation Tab</div>
+      <div class="node-note">Guests flagged for accommodation in the Guest Tab appear in the Accommodation Tab as unallocated. Staff assign them to rooms from there. Breakfast count derives from occupied room occupancy.</div>
+    </div>
+    <div class="annotation">
+      <textarea class="ann-area" data-key="accommodation" placeholder="Notes…"></textarea>
+    </div>
+  </div>
+
+  <!-- Table Plan -->
+  <div class="flow-row" style="margin-top:8px;">
+    <div class="node open">
+      <div class="node-label open">Needs confirming</div>
+      <div class="node-title">Table Plan</div>
+      <div class="node-note">Logically, guests assigned to tables should come from the Guest Tab record. Is this already the case, or is the Table Plan currently operating independently of the Guest Tab?</div>
+    </div>
+    <div class="annotation">
+      <textarea class="ann-area" data-key="tableplan" placeholder="Richard's answer…"></textarea>
+    </div>
+  </div>
+
+  <!-- WordPress -->
+  <div class="flow-row" style="margin-top:8px;">
+    <div class="node">
+      <div class="node-label">Note</div>
+      <div class="node-title">WordPress Quote Builder</div>
+      <div class="node-note">Visitor inputs Day and Evening guest numbers to generate a quote. These are stored against the Quote record. When staff create an event from the quote, these numbers are carried through — but they are not automatically added to the Guest Tab. The Guest Tab is populated separately.</div>
+    </div>
+    <div class="annotation">
+      <textarea class="ann-area" data-key="wordpress" placeholder="Notes…"></textarea>
+    </div>
+  </div>
+
+  <!-- Capacity -->
+  <div class="flow-row" style="margin-top:8px;">
+    <div class="node open">
+      <div class="node-label open">Open question</div>
+      <div class="node-title">Capacity checks</div>
+      <div class="node-note">Each venue has a maximum Day and Evening guest capacity. Should the platform warn or block when the Guest Tab total exceeds venue capacity? And which guest types count toward capacity — Adults and Teens only, or also Children?</div>
+    </div>
+    <div class="annotation">
+      <textarea class="ann-area" data-key="capacity" placeholder="Richard's answer…"></textarea>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════ MISMATCH FLAGS ═══════════════════ -->
+  <div class="section-label">5 &nbsp;—&nbsp; Mismatch flagging</div>
+
+  <div class="flow-row">
+    <div class="node open">
+      <div class="node-label open">Open question</div>
+      <div class="node-title">Products vs Guest Tab count mismatch</div>
+      <div class="node-note">Example: Guest Tab shows 20 Day guests, but 25 Wedding Breakfast meals are on the Products tab. These can legitimately differ — a guest may order two items, or supplier meals are included. Should the platform flag this discrepancy, and if so as a warning only or something stronger?</div>
+    </div>
+    <div class="annotation">
+      <textarea class="ann-area tall" data-key="mismatch" placeholder="Richard's answer — flag it, ignore it, or block?"></textarea>
+    </div>
+  </div>
+
+  <div class="flow-row" style="margin-top:8px;">
+    <div class="node open">
+      <div class="node-label open">Open question</div>
+      <div class="node-title">Supplier meals</div>
+      <div class="node-note">Supplier meals are food products on the event but do not represent guests. Should these be a separate product category so they are excluded from any guest count comparison, or is that already the case?</div>
+    </div>
+    <div class="annotation">
+      <textarea class="ann-area" data-key="suppliermeal" placeholder="Richard's answer…"></textarea>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════ REPORTING ════════════════════════ -->
+  <div class="section-label">6 &nbsp;—&nbsp; Reporting — holding position</div>
+
+  <div class="flow-row">
+    <div class="node">
+      <div class="node-label">Agreed</div>
+      <div class="node-title">Report columns stay on product logic for now</div>
+      <div class="node-note">The Financial Position Report guest columns (Day Guests, Children, Evening Guests) will remain product-derived until this logic document is agreed and signed off. No changes to reporting until the Confluence document is published.</div>
+    </div>
+    <div class="annotation">
+      <textarea class="ann-area" data-key="reporting" placeholder="Notes…"></textarea>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════ OVERALL ══════════════════════════ -->
+  <div class="section-label" style="margin-top:32px;">Overall notes</div>
+  <textarea class="ann-area" data-key="overall" placeholder="General notes from the conversation…" style="height:100px;width:100%;"></textarea>
+
+</div>
+
+<script>
+  const KEY = 'tvg_guest_logic_notes';
+  let saveTimer;
+
+  function setStatus(msg, state) {
+    document.getElementById('saveStatus').textContent = msg;
+    document.getElementById('saveDot').className = 'save-dot ' + (state || '');
+  }
+
+  function save() {
+    const data = {};
+    document.querySelectorAll('[data-key]').forEach(el => { data[el.dataset.key] = el.value; });
+    try {
+      localStorage.setItem(KEY, JSON.stringify(data));
+      setStatus('Saved', 'saved');
+    } catch(e) { setStatus('Could not save', ''); }
+  }
+
+  function load() {
+    try {
+      const raw = localStorage.getItem(KEY);
+      if (!raw) return;
+      const data = JSON.parse(raw);
+      document.querySelectorAll('[data-key]').forEach(el => {
+        if (data[el.dataset.key]) {
+          el.value = data[el.dataset.key];
+          el.classList.add('filled');
+        }
+      });
+      setStatus('Notes restored', 'saved');
+    } catch(e) {}
+  }
+
+  function clearAll() {
+    if (!confirm('Clear all notes? This cannot be undone.')) return;
+    localStorage.removeItem(KEY);
+    document.querySelectorAll('[data-key]').forEach(el => {
+      el.value = '';
+      el.classList.remove('filled');
+    });
+    setStatus('Cleared', '');
+  }
+
+  document.querySelectorAll('[data-key]').forEach(el => {
+    el.addEventListener('input', () => {
+      el.classList.toggle('filled', el.value.trim().length > 0);
+      setStatus('Saving…', 'saving');
+      clearTimeout(saveTimer);
+      saveTimer = setTimeout(save, 800);
+    });
+  });
+
+  load();
+</script>
+</body>
+</html>
