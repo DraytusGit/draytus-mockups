@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kitchen / Chef Sheet</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Arial', sans-serif;
+    background: #e8e8e8;
+    color: #000;
+    font-size: 12px;
+    padding: 24px;
+  }
+
+  .sheet {
+    background: #fff;
+    max-width: 860px;
+    margin: 0 auto;
+    border: 1px solid #aaa;
+  }
+
+  /* Print button bar */
+  .print-bar {
+    background: #222;
+    padding: 8px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .print-bar span { color: #888; font-size: 11px; }
+  .print-btn {
+    background: #fff;
+    border: none;
+    padding: 5px 14px;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: .3px;
+  }
+
+  /* ── Header ── */
+  .sheet-header {
+    padding: 16px 20px 14px;
+    border-bottom: 2px solid #000;
+  }
+  .header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+  }
+  .header-top h1 { font-size: 18px; font-weight: 700; }
+  .ref { font-size: 10px; color: #555; margin-top: 2px; }
+  .page-info { font-size: 10px; color: #555; text-align: right; }
+
+  /* Meta strip */
+  .meta-strip {
+    display: flex;
+    border: 1px solid #bbb;
+    margin-bottom: 12px;
+  }
+  .meta-item {
+    flex: 1;
+    padding: 6px 10px;
+    border-right: 1px solid #bbb;
+  }
+  .meta-item:last-child { border-right: none; }
+  .meta-label { font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: #666; margin-bottom: 1px; }
+  .meta-value { font-size: 11px; font-weight: 700; }
+
+  /* Info panels */
+  .info-panels {
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    gap: 10px;
+  }
+  .info-panel {
+    border: 1px solid #bbb;
+    padding: 8px 12px;
+  }
+  .panel-label {
+    font-size: 8px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    color: #555;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 4px;
+    margin-bottom: 6px;
+  }
+  .guest-counts { display: flex; gap: 20px; }
+  .guest-num { font-size: 26px; font-weight: 700; line-height: 1; }
+  .guest-lbl { font-size: 9px; color: #555; margin-top: 1px; }
+
+  .dietary-row { font-size: 10px; line-height: 1.6; }
+  .dietary-row.severe { font-weight: 700; }
+
+  /* ── Main section heading ── */
+  .section-bar {
+    background: #000;
+    color: #fff;
+    padding: 5px 20px;
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .6px;
+  }
+
+  /* ── Date separator ── */
+  .date-sep {
+    background: #ddd;
+    padding: 4px 20px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .4px;
+    border-top: 1px solid #bbb;
+    border-bottom: 1px solid #bbb;
+  }
+
+  /* ── Item block ── */
+  .item-block {
+    border-bottom: 2px solid #bbb;
+  }
+
+  /* Heading row — time / itinerary / product / qty */
+  .item-heading {
+    display: grid;
+    grid-template-columns: 64px 1fr 1fr 56px;
+    background: #f2f2f2;
+    border-bottom: 1px solid #ccc;
+  }
+  .ih-cell {
+    padding: 7px 10px;
+    border-right: 1px solid #ccc;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .ih-cell:last-child { border-right: none; }
+  .ih-label {
+    font-size: 8px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .4px;
+    color: #666;
+    margin-bottom: 2px;
+  }
+  .ih-value { font-size: 12px; font-weight: 700; color: #000; line-height: 1.3; }
+  .ih-value.time {
+    background: #000;
+    color: #fff;
+    display: inline-block;
+    padding: 2px 7px;
+    font-size: 11px;
+    font-weight: 700;
+    align-self: flex-start;
+  }
+  .ih-value.qty { font-size: 20px; line-height: 1; }
+  .ih-sub { font-size: 9px; color: #777; }
+
+  /* Detail body — full width beneath heading */
+  .item-detail {
+    padding: 10px 20px 12px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 8px 20px;
+  }
+
+  .course-block { }
+  .course-label {
+    font-size: 8px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    color: #555;
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 2px;
+    margin-bottom: 4px;
+  }
+  .dish-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    font-size: 11px;
+    line-height: 1.5;
+  }
+  .dish-name { color: #000; }
+  .dish-qty { font-weight: 700; white-space: nowrap; }
+
+  /* Allergen note — spans full width */
+  .allergen-row {
+    grid-column: 1 / -1;
+    background: #f5f5f5;
+    border-left: 3px solid #000;
+    padding: 5px 10px;
+    font-size: 10px;
+    line-height: 1.5;
+  }
+  .allergen-row strong { font-weight: 700; }
+
+  /* ── Signature block ── */
+  .sig-block {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border-top: 2px solid #000;
+  }
+  .sig-cell { padding: 14px 20px; border-right: 1px solid #bbb; }
+  .sig-cell:last-child { border-right: none; }
+  .sig-label { font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: #666; margin-bottom: 18px; }
+  .sig-line { border-bottom: 1px solid #000; margin-bottom: 3px; }
+  .sig-sub { font-size: 9px; color: #666; }
+
+  /* ── Print ── */
+  @media print {
+    body { background: #fff; padding: 0; }
+    .print-bar { display: none; }
+    .sheet { border: none; max-width: 100%; }
+    .ih-value.time { border: 1px solid #000; }
+    .item-block { page-break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <div class="print-bar">
+    <span>Kitchen / Chef Sheet — print preview</span>
+    <button class="print-btn" onclick="window.print()">Print / Save PDF</button>
+  </div>
+
+  <!-- HEADER -->
+  <div class="sheet-header">
+    <div class="header-top">
+      <div>
+        <h1>Kitchen / Chef Sheet</h1>
+        <div class="ref">Ref: PPM &mdash; Lucy Morton &amp; Craig Jee Wedding &middot; Venue: Plum Park Manor</div>
+        <div class="ref">Customers: Craig Jee, Lucy Morton</div>
+      </div>
+      <div class="page-info">Page 1 of 3</div>
+    </div>
+
+    <div class="meta-strip">
+      <div class="meta-item">
+        <div class="meta-label">Event Date</div>
+        <div class="meta-value">Saturday, 21 March 2026</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Event Manager</div>
+        <div class="meta-value">Shannon Hourigan</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Arrival</div>
+        <div class="meta-value">21/03/2026 at 09:00</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Departure</div>
+        <div class="meta-value">22/03/2026 at 10:00</div>
+      </div>
+    </div>
+
+    <div class="info-panels">
+      <div class="info-panel">
+        <div class="panel-label">Guest Numbers</div>
+        <div class="guest-counts">
+          <div>
+            <div class="guest-num">55</div>
+            <div class="guest-lbl">Day Guests</div>
+          </div>
+          <div>
+            <div class="guest-num">120</div>
+            <div class="guest-lbl">Evening Guests</div>
+          </div>
+          <div>
+            <div class="guest-num">7</div>
+            <div class="guest-lbl">Children</div>
+          </div>
+        </div>
+      </div>
+      <div class="info-panel">
+        <div class="panel-label">Dietary &amp; Allergens Summary</div>
+        <div class="dietary-row severe">SEVERE: Hannah &mdash; Serious airborne allergy to ALL nuts. Carries medication. Inform all kitchen staff.</div>
+        <div class="dietary-row">ALLERGIES: Alfie &mdash; Wheat &middot; Felicity &mdash; Milk &middot; Courteney &mdash; Milk &amp; Fish &middot; James Ritchie &mdash; Celiac</div>
+        <div class="dietary-row">INTOLERANCES: Wendy &mdash; Wheat/Gluten &middot; Adrian</div>
+        <div class="dietary-row">VEGAN MENU: Jo, Tamzin, Chelsea</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCHEDULED ITEMS -->
+  <div class="section-bar">Scheduled Items &mdash; Sorted by Time Ascending</div>
+
+  <!-- DATE -->
+  <div class="date-sep">Saturday, 21 March 2026</div>
+
+  <!-- 15:01 Adults Roast -->
+  <div class="item-block">
+    <div class="item-heading">
+      <div class="ih-cell">
+        <div class="ih-label">Time</div>
+        <span class="ih-value time">15:01</span>
+      </div>
+      <div class="ih-cell">
+        <div class="ih-label">Itinerary Item</div>
+        <div class="ih-value">Adults' Wedding Breakfast to be served</div>
+      </div>
+      <div class="ih-cell">
+        <div class="ih-label">Product</div>
+        <div class="ih-value">The Roast Menu | V2</div>
+      </div>
+      <div class="ih-cell">
+        <div class="ih-label">Qty</div>
+        <div class="ih-value qty">55</div>
+        <div class="ih-sub">covers</div>
+      </div>
+    </div>
+    <div class="item-detail">
+      <div class="course-block">
+        <div class="course-label">Grazing Board Starter</div>
+        <div class="dish-row"><span class="dish-name">Baskets of Focaccia with Sea Salt &amp; Rosemary</span><span class="dish-qty">×55</span></div>
+        <div class="dish-row"><span class="dish-name">Hummus, Kalamata Olives, Sun Blushed Tomatoes, Griddled Peppers, Balsamic Dip</span><span class="dish-qty">×55</span></div>
+      </div>
+      <div class="course-block">
+        <div class="course-label">Main</div>
+        <div class="dish-row"><span class="dish-name">Roast Rack of Pork, Sage &amp; Garlic Butter, Crispy Crackling</span><span class="dish-qty">×55</span></div>
+      </div>
+      <div class="course-block">
+        <div class="course-label">Sides</div>
+        <div class="dish-row"><span class="dish-name">Yorkshire Pudding</span><span class="dish-qty">×55</span></div>
+        <div class="dish-row"><span class="dish-name">Stock Gravy</span><span class="dish-qty">×55</span></div>
+        <div class="dish-row"><span class="dish-name">Roast Potatoes</span><span class="dish-qty">×55</span></div>
+        <div class="dish-row"><span class="dish-name">Seasonal Vegetables</span><span class="dish-qty">×55</span></div>
+      </div>
+      <div class="course-block">
+        <div class="course-label">Dessert</div>
+        <div class="dish-row"><span class="dish-name">Warm Chocolate Brownie</span><span class="dish-qty">×52</span></div>
+        <div class="dish-row"><span class="dish-name">Apple &amp; Seasonal Fruit Crumble &amp; Custard</span><span class="dish-qty">×52</span></div>
+      </div>
+      <div class="allergen-row"><strong>Allergens:</strong> Courteney &mdash; Milk &amp; Fish &middot; James Ritchie &mdash; Celiac &middot; Wendy &mdash; Wheat/Gluten &middot; Hannah &mdash; Serious airborne nut allergy (carries medication, all kitchen staff must be aware)</div>
+    </div>
+  </div>
+
+  <!-- 15:01 Veggie -->
+  <div class="item-block">
+    <div class="item-heading">
+      <div class="ih-cell">
+        <div class="ih-label">Time</div>
+        <span class="ih-value time">15:01</span>
+      </div>
+      <div class="ih-cell">
+        <div class="ih-label">Itinerary Item</div>
+        <div class="ih-value">Adults' Wedding Breakfast to be served</div>
+      </div>
+      <div class="ih-cell">
+        <div class="ih-label">Product</div>
+        <div class="ih-value">The Veggie Menu | V2</div>
+      </div>
+      <div class="ih-cell">
+        <div class="ih-label">Qty</div>
+        <div class="ih-value qty">4</div>
+        <div class="ih-sub">covers</div>
+      </div>
+    </div>
+    <div class="item-detail">
+      <div class="course-block">
+        <div class="course-label">Starter</div>
+        <div class="dish-row"><span class="dish-name">Roast Tomato &amp; Red Pepper Soup with Basil Oil &amp; Toasted Croutons</span><span class="dish-qty">×4</span></div>
+      </div>
+      <div class="course-block">
+        <div class="course-label">Main</div>
+        <div class="dish-row"><span class="dish-name">Vegan &mdash; Lincolnshire Sausage, Mashed Potato &amp; Sweet Onion Gravy</span><span class="dish-qty">×4</span></div>
+      </div>
+      <div class="course-block">
+        <div class="course-label">Dessert</div>
+        <div class="dish-row"><span class="dish-name">Vegan &mdash; Warm Chocolate Brownie, Raspberries &amp; Vanilla Ice Cream</span><span class="dish-qty">×7</span></div>
+      </div>
+      <div class="allergen-row"><strong>Note:</strong> Jo, Tamzin, Chelsea &mdash; Vegan menu. Includes 3 other dietary guests.</div>
+    </div>
+  </div>
+
+  <!-- 15:01 Childrens -->
+  <div class="item-block">
+    <div class="item-heading">
+      <div class="ih-cell">
+        <div class="ih-label">Time</div>
+        <span class="ih-value time">15:01</span>
+      </div>
+      <div class="ih-cell">
+        <div class="ih-label">Itinerary Item</div>
+        <div class="ih-value">Children's Wedding Breakfast to be served</div>
+      </div>
+      <div class="ih-cell">
+        <div class="ih-label">Product</div>
+        <div class="ih-value">Childrens Menu | V2 &amp; V3</div>
+      </div>
+      <div class="ih-cell">
+        <div class="ih-label">Qty</div>
+        <div class="ih-value qty">7</div>
+        <div class="ih-sub">covers</div>
+      </div>
+    </div>
+    <div class="item-detail">
+      <div class="course-block">
+        <div class="course-label">Starter</div>
+        <div class="dish-row"><span class="dish-name">Macaroni Cheese Bites with Rich Tomato Sauce</span><span class="dish-qty">×7</span></div>
+      </div>
+      <div class="course-block">
+        <div class="course-label">Main</div>
+        <div class="dish-row"><span class="dish-name">Homemade Chicken Goujons</span><span class="dish-qty">×7</span></div>
+      </div>
+      <div class="course-block">
+        <div class="course-label">Sides</div>
+        <div class="dish-row"><span class="dish-name">Chips</span><span class="dish-qty">×7</span></div>
+        <div class="dish-row"><span class="dish-name">Baked Beans</span><span class="dish-qty">×7</span></div>
+      </div>
+      <div class="course-block">
+        <div class="course-label">Dessert</div>
+        <div class="dish-row"><span class="dish-name">Warm Chocolate Brownie with Vanilla Ice Cream</span><span class="dish-qty">×7</span></div>
+      </div>
+      <div class="allergen-row"><strong>Allergens:</strong> Alfie &mdash; Wheat Allergy &middot; Felicity &mdash; Milk Intolerance &middot; Note: 2 vegan brownies required (one wheat allergy, one milk intolerance)</div>
+    </div>
+  </div>
+
+  <!-- 15:20 Supplier Meals -->
+  <div class="item-block">
+    <div class="item-heading">
+      <div class="ih-cell">
+        <div class="ih-label">Time</div>
+        <span class="ih-value time">15:20</span>
+      </div>
+      <div class="ih-cell">
+        <div class="ih-label">Itinerary Item</div>
+        <div class="ih-value">Suppliers' Meals to be served</div>
+      </div>
+      <div class="ih-cell">
+        <div class="ih-label">Product</div>
+        <div class="ih-value">Supplier Meals</div>
+      </div>
+      <div class="ih-cell">
+        <div class="ih-label">Qty</div>
+        <div class="ih-value qty">2</div>
+        <div class="ih-sub">covers</div>
+      </div>
+    </div>
+    <div class="item-detail">
+      <div class="course-block">
+        <div class="course-label">2-Course</div>
+        <div class="dish-row"><span class="dish-name">Supplier Main &amp; Dessert (Chef's Choice)</span><span class="dish-qty">×2</span></div>
+      </div>
+      <div class="allergen-row"><strong>Note:</strong> Photographer &amp; Videographer</div>
+    </div>
+  </div>
+
+  <!-- 20:00 Evening -->
+  <div class="item-block">
+    <div class="item-heading">
+      <div class="ih-cell">
+        <div class="ih-label">Time</div>
+        <span class="ih-value time">20:00</span>
+      </div>
+      <div class="ih-cell">
+        <div class="ih-label">Itinerary Item</div>
+        <div class="ih-value">Evening Buffet Served</div>
+      </div>
+      <div class="ih-cell">
+        <div class="ih-label">Product</div>
+        <div class="ih-value">Evening Food Menu | V2</div>
+      </div>
+      <div class="ih-cell">
+        <div class="ih-label">Qty</div>
+        <div class="ih-value qty">120</div>
+        <div class="ih-sub">covers</div>
+      </div>
+    </div>
+    <div class="item-detail">
+      <div class="course-block">
+        <div class="course-label">Evening Food</div>
+        <div class="dish-row"><span class="dish-name">Wood Fired Pizzas</span><span class="dish-qty">×120</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DATE -->
+  <div class="date-sep">Sunday, 22 March 2026</div>
+
+  <!-- 09:00 Breakfast -->
+  <div class="item-block">
+    <div class="item-heading">
+      <div class="ih-cell">
+        <div class="ih-label">Time</div>
+        <span class="ih-value time">09:00</span>
+      </div>
+      <div class="ih-cell">
+        <div class="ih-label">Itinerary Item</div>
+        <div class="ih-value">Full English Breakfast to be served</div>
+      </div>
+      <div class="ih-cell">
+        <div class="ih-label">Product</div>
+        <div class="ih-value">Accommodation Breakfast</div>
+      </div>
+      <div class="ih-cell">
+        <div class="ih-label">Qty</div>
+        <div class="ih-value qty">16</div>
+        <div class="ih-sub">covers</div>
+      </div>
+    </div>
+    <div class="item-detail">
+      <div class="course-block">
+        <div class="course-label">Breakfast</div>
+        <div class="dish-row"><span class="dish-name">Full English Breakfast &mdash; 8 rooms, max 16 guests</span><span class="dish-qty">×16</span></div>
+      </div>
+      <div class="allergen-row"><strong>Note:</strong> Count derived from accommodation occupancy. Guests to check out by 10:00 and return keys to Breakfast Room.</div>
+    </div>
+  </div>
+
+  <!-- SIGNATURES -->
+  <div class="sig-block">
+    <div class="sig-cell">
+      <div class="sig-label">Chef Signature</div>
+      <div class="sig-line">&nbsp;</div>
+      <div class="sig-sub">Signature &amp; Date</div>
+    </div>
+    <div class="sig-cell">
+      <div class="sig-label">Wedding Manager Signature</div>
+      <div class="sig-line">&nbsp;</div>
+      <div class="sig-sub">Signature &amp; Date</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- DESIGN NOTES -->
+<div style="max-width:860px;margin:24px auto 0;background:#fff;border:1px solid #aaa;font-family:Arial,sans-serif;">
+  <div style="background:#1a1a1a;color:#fff;padding:8px 20px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;">
+    Design Notes — Chef Feedback (27 March 2026) &amp; Changes Made
+  </div>
+  <div style="padding:16px 20px;">
+    <p style="font-size:10px;color:#555;margin-bottom:14px;">The following changes were made to the Chef Sheet design in response to feedback from the exec chef, received via Richard Bray on 27 March 2026. Each point below lists what the chef flagged and how it was addressed in this mock-up.</p>
+    <table style="width:100%;border-collapse:collapse;font-size:11px;">
+      <thead>
+        <tr style="background:#f2f2f2;border-bottom:2px solid #000;">
+          <th style="text-align:left;padding:7px 10px;font-size:9px;text-transform:uppercase;letter-spacing:.5px;color:#555;width:38%;">Chef Feedback</th>
+          <th style="text-align:left;padding:7px 10px;font-size:9px;text-transform:uppercase;letter-spacing:.5px;color:#555;">How Addressed</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-bottom:1px solid #e0e0e0;">
+          <td style="padding:8px 10px;vertical-align:top;font-weight:700;">Page 1 — Guest numbers: "Can they auto fill?"</td>
+          <td style="padding:8px 10px;vertical-align:top;">Day, Evening, and Children counts now pull automatically from the Guests tab. No manual entry required.</td>
+        </tr>
+        <tr style="background:#fafafa;border-bottom:1px solid #e0e0e0;">
+          <td style="padding:8px 10px;vertical-align:top;font-weight:700;">Page 1 — "Waste of Space" (large blank area after date header)</td>
+          <td style="padding:8px 10px;vertical-align:top;">Fixed by the new layout. Each item block sits directly beneath the date header with no gap. The blank page is eliminated.</td>
+        </tr>
+        <tr style="border-bottom:1px solid #e0e0e0;">
+          <td style="padding:8px 10px;vertical-align:top;font-weight:700;">Page 2 — "Dish name in full"</td>
+          <td style="padding:8px 10px;vertical-align:top;">The abbreviated product description beneath the dish name has been removed. The full dish name is the only identifier on each product block.</td>
+        </tr>
+        <tr style="background:#fafafa;border-bottom:1px solid #e0e0e0;">
+          <td style="padding:8px 10px;vertical-align:top;font-weight:700;">Page 2 — Dessert marked "Last", Starter marked "First"</td>
+          <td style="padding:8px 10px;vertical-align:top;">Course order now runs consistently: Starter (or Grazing Board), Main, Sides, Dessert. Dessert no longer appears first.</td>
+        </tr>
+        <tr style="border-bottom:1px solid #e0e0e0;">
+          <td style="padding:8px 10px;vertical-align:top;font-weight:700;">Page 2 — "Allergen Info Here"</td>
+          <td style="padding:8px 10px;vertical-align:top;">Allergen information is now surfaced at dish level beneath each product block, cross-referencing which named guests eating that specific dish have requirements. Previously only shown in the summary box at the top.</td>
+        </tr>
+        <tr style="background:#fafafa;border-bottom:1px solid #e0e0e0;">
+          <td style="padding:8px 10px;vertical-align:top;font-weight:700;">Page 2 — "Menu needs to be set in order"</td>
+          <td style="padding:8px 10px;vertical-align:top;">Same as the course ordering fix. Each product block presents courses in logical day order.</td>
+        </tr>
+        <tr style="border-bottom:1px solid #e0e0e0;">
+          <td style="padding:8px 10px;vertical-align:top;font-weight:700;">Page 2 — "Don't need" (product sub-description beneath dish name)</td>
+          <td style="padding:8px 10px;vertical-align:top;">Version description text (e.g. "The Roast — version 2, Includes 1 Starter, 1 Main, 2 Desserts") removed throughout the sheet.</td>
+        </tr>
+        <tr style="background:#fafafa;border-bottom:1px solid #e0e0e0;">
+          <td style="padding:8px 10px;vertical-align:top;font-weight:700;">Page 3 — "Dish name in full" (children's menu)</td>
+          <td style="padding:8px 10px;vertical-align:top;">Same fix applied to children's menu. Full dish name only, no sub-description.</td>
+        </tr>
+        <tr style="border-bottom:1px solid #e0e0e0;">
+          <td style="padding:8px 10px;vertical-align:top;font-weight:700;">Page 3 — Pizzas: "Don't need, Make 1 Total"</td>
+          <td style="padding:8px 10px;vertical-align:top;">The 70 + 50 (Free) split removed. A single combined quantity of 120 is shown.</td>
+        </tr>
+        <tr style="background:#fafafa;border-bottom:1px solid #e0e0e0;">
+          <td style="padding:8px 10px;vertical-align:top;font-weight:700;">Page 3 — "Mornings Breakfast — Number &amp; info"</td>
+          <td style="padding:8px 10px;vertical-align:top;">Breakfast now appears as a separate line item derived from accommodation occupancy, showing room count and total covers. Note: will pull automatically from the Accommodation tab once that is built in autumn.</td>
+        </tr>
+        <tr style="border-bottom:1px solid #e0e0e0;">
+          <td style="padding:8px 10px;vertical-align:top;font-weight:700;">Overall — Black and white printing</td>
+          <td style="padding:8px 10px;vertical-align:top;">No colour used anywhere. Time badges, allergen notes, and all UI elements use black, white, and grey only. Prints correctly without colour.</td>
+        </tr>
+        <tr style="background:#fafafa;">
+          <td style="padding:8px 10px;vertical-align:top;font-weight:700;">Overall — Right column too long, document too many pages</td>
+          <td style="padding:8px 10px;vertical-align:top;">The five-column table layout has been replaced with a heading bar layout. Time, Itinerary Item, Product, and Qty now form a compact single-row header. All course detail runs full-width beneath it. Vastly reduces page count.</td>
+        </tr>
+      </tbody>
+    </table>
+    <p style="font-size:10px;color:#888;margin-top:12px;">Mock-up version: 27 March 2026 &middot; Prepared by Draytus</p>
+  </div>
+</div>
+
+</body>
+</html>
