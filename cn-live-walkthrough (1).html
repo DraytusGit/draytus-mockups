@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Circle Networks Live — Feature Walkthrough</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root { --orange: #F55036; --orange-light: #fff1ee; --slate: #f1f5f9; --white: #fff; --gray-100: #f3f4f6; --gray-200: #e5e7eb; --gray-400: #9ca3af; --gray-500: #6b7280; --gray-600: #4b5563; --gray-800: #1f2937; }
+body { font-family: 'DM Sans', sans-serif; background: #e2e8f0; min-height: 100vh; }
+
+.wt-bar { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; background: #0f172a; display: flex; align-items: stretch; height: 48px; padding: 0 20px; gap: 0; }
+.wt-brand { display: flex; align-items: center; padding-right: 20px; border-right: 1px solid #1e293b; margin-right: 12px; flex-shrink: 0; }
+.wt-brand span { font-size: 11px; font-weight: 600; color: var(--orange); text-transform: uppercase; letter-spacing: 0.1em; }
+.wt-steps { display: flex; align-items: stretch; flex: 1; }
+.wt-step { display: flex; align-items: center; gap: 8px; padding: 0 14px; font-size: 12px; color: #475569; cursor: pointer; border-right: 1px solid #1e293b; position: relative; transition: color 0.15s; white-space: nowrap; }
+.wt-step:hover { color: #94a3b8; }
+.wt-step.active { color: #fff; }
+.wt-step.active::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: var(--orange); }
+.wt-step.done { color: #4ade80; }
+.wt-num { width: 18px; height: 18px; border-radius: 50%; border: 1px solid #334155; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600; flex-shrink: 0; color: #475569; }
+.wt-step.active .wt-num { background: var(--orange); border-color: var(--orange); color: white; }
+.wt-step.done .wt-num { background: #166534; border-color: #166534; color: #4ade80; }
+.wt-note { display: flex; align-items: center; font-size: 11px; color: #334155; margin-left: auto; padding-left: 16px; flex-shrink: 0; }
+
+.screen { display: none; margin-top: 48px; }
+.screen.active { display: block; }
+.platform { background: var(--slate); min-height: calc(100vh - 48px); }
+
+.nav { background: var(--white); border-bottom: 1px solid var(--gray-200); position: sticky; top: 48px; z-index: 100; }
+.nav-inner { max-width: 1280px; margin: 0 auto; padding: 0 32px; display: flex; height: 64px; align-items: center; justify-content: space-between; }
+.nav-logo { font-size: 20px; font-weight: 600; color: var(--orange); }
+.nav-links { display: flex; align-items: stretch; height: 64px; }
+.nav-link { display: flex; align-items: center; padding: 0 16px; font-size: 17px; font-weight: 200; color: var(--gray-800); cursor: pointer; border-bottom: 4px solid transparent; white-space: nowrap; position: relative; }
+.nav-link.active { border-bottom-color: var(--orange); }
+.nav-pill { position: absolute; top: 12px; right: 2px; background: var(--orange); color: white; font-size: 8px; font-weight: 700; padding: 2px 4px; border-radius: 8px; }
+.nav-av { width: 36px; height: 36px; border-radius: 50%; background: var(--gray-100); border: 1px solid var(--gray-200); display: flex; align-items: center; justify-content: center; }
+.nav-av svg { width: 18px; height: 18px; color: var(--gray-400); }
+
+.jbar { background: white; border-bottom: 1px solid var(--gray-200); }
+.jbar-inner { max-width: 1280px; margin: 0 auto; padding: 0 32px; display: flex; align-items: center; height: 40px; gap: 0; }
+.js { display: flex; align-items: center; gap: 7px; font-size: 12px; color: var(--gray-400); padding-right: 12px; }
+.js.done { color: #16a34a; }
+.js.cur { color: var(--orange); font-weight: 500; }
+.jdot { width: 7px; height: 7px; border-radius: 50%; background: var(--gray-200); flex-shrink: 0; }
+.js.done .jdot { background: #16a34a; }
+.js.cur .jdot { background: var(--orange); }
+.jarr { color: var(--gray-200); font-size: 13px; padding-right: 12px; }
+
+.ann { background: #0f172a; border-left: 3px solid var(--orange); padding: 11px 18px; display: flex; gap: 10px; align-items: flex-start; }
+.ann svg { width: 14px; height: 14px; color: var(--orange); flex-shrink: 0; margin-top: 2px; }
+.ann p { font-size: 12px; color: #64748b; line-height: 1.6; }
+.ann p strong { color: #cbd5e1; }
+.ann p a { color: var(--orange); cursor: pointer; }
+
+.main { max-width: 1280px; margin: 0 auto; padding: 24px 32px; }
+.card { background: white; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.07); }
+
+/* SCREEN 1 */
+.hero { background: #111827; border-radius: 12px; padding: 48px 44px; color: white; position: relative; overflow: hidden; margin-bottom: 18px; }
+.hero-glow { position: absolute; top: -80px; right: -60px; width: 320px; height: 320px; border-radius: 50%; background: radial-gradient(circle, rgba(245,80,54,0.15) 0%, transparent 65%); pointer-events: none; }
+.hero-badge { display: inline-flex; align-items: center; gap: 5px; background: rgba(245,80,54,0.12); border: 1px solid rgba(245,80,54,0.28); color: #fca5a5; font-size: 11px; font-weight: 500; padding: 3px 11px; border-radius: 20px; margin-bottom: 16px; letter-spacing: 0.05em; text-transform: uppercase; }
+.hero h1 { font-size: 36px; font-weight: 200; line-height: 1.2; margin-bottom: 18px; }
+.hero h1 strong { color: var(--orange); font-weight: 400; }
+.hero-meta { display: flex; flex-wrap: wrap; gap: 18px; margin-bottom: 26px; }
+.hm { display: flex; align-items: center; gap: 7px; font-size: 14px; font-weight: 300; color: rgba(255,255,255,0.8); }
+.hm svg { width: 14px; height: 14px; color: var(--orange); flex-shrink: 0; }
+.hero-cta { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.btn-buy { background: var(--orange); color: white; border: none; padding: 12px 26px; border-radius: 8px; font-size: 15px; font-weight: 500; cursor: pointer; font-family: inherit; display: inline-flex; align-items: center; gap: 8px; }
+.btn-buy svg { width: 14px; height: 14px; }
+.hero-note { font-size: 13px; color: rgba(255,255,255,0.45); }
+.hero-note strong { color: rgba(255,255,255,0.75); }
+.dcounter { position: absolute; top: 28px; right: 44px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 14px 20px; text-align: center; }
+.dcnt { font-size: 32px; font-weight: 200; color: white; line-height: 1; }
+.dlbl { font-size: 11px; color: rgba(255,255,255,0.45); margin-top: 3px; }
+.dtrend { font-size: 11px; color: #4ade80; margin-top: 5px; display: flex; align-items: center; justify-content: center; gap: 3px; }
+
+.igrid { display: grid; grid-template-columns: repeat(3,1fr); gap: 13px; margin-bottom: 18px; }
+.icard { background: white; border: 1px solid var(--gray-200); border-radius: 10px; padding: 16px; display: flex; gap: 12px; }
+.iico { width: 32px; height: 32px; background: var(--orange-light); border-radius: 7px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.iico svg { width: 15px; height: 15px; color: var(--orange); }
+.ititle { font-size: 13px; font-weight: 500; color: var(--gray-800); margin-bottom: 3px; }
+.ibody { font-size: 12px; color: var(--gray-500); line-height: 1.5; }
+
+.spk-section { background: white; border-radius: 12px; padding: 22px 26px; box-shadow: 0 1px 3px rgba(0,0,0,0.07); }
+.stitle { font-size: 14px; font-weight: 500; color: var(--gray-800); margin-bottom: 14px; }
+.spk-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; }
+.spk { border: 1px solid var(--gray-100); border-radius: 9px; padding: 14px; text-align: center; }
+.spk-av { width: 48px; height: 48px; border-radius: 50%; background: var(--gray-100); border: 2px solid var(--gray-200); margin: 0 auto 9px; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 300; color: var(--gray-400); }
+.spk-name { font-size: 12px; font-weight: 500; color: var(--gray-800); }
+.spk-co { font-size: 11px; color: var(--gray-500); margin-top: 2px; }
+.spk-topic { font-size: 11px; color: var(--orange); margin-top: 5px; }
+
+/* SCREEN 2 */
+.redirect-wrap { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 400px; text-align: center; padding: 40px; }
+.spin { width: 52px; height: 52px; border: 3px solid var(--gray-100); border-top-color: #635BFF; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 22px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.rd-title { font-size: 18px; font-weight: 300; color: var(--gray-800); margin-bottom: 8px; }
+.rd-sub { font-size: 14px; color: var(--gray-500); margin-bottom: 24px; line-height: 1.6; max-width: 400px; }
+.rd-sec { display: flex; align-items: center; justify-content: center; gap: 7px; font-size: 12px; color: var(--gray-400); margin-bottom: 28px; }
+.rd-sec svg { width: 13px; height: 13px; }
+.stripe-mock { background: #f8f9fe; border: 1px solid #e2e4f0; border-radius: 12px; padding: 24px 32px; width: 100%; max-width: 440px; text-align: left; }
+.sm-hdr { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; padding-bottom: 14px; border-bottom: 1px solid #e2e4f0; }
+.sm-mark { width: 30px; height: 30px; background: #635BFF; border-radius: 7px; display: flex; align-items: center; justify-content: center; }
+.sm-mark svg { width: 16px; height: 16px; color: white; }
+.sm-co { font-size: 13px; font-weight: 500; color: #1a1a2e; }
+.sm-desc { font-size: 12px; color: #6b7280; }
+.sm-amt { font-size: 26px; font-weight: 300; color: #1a1a2e; margin-bottom: 14px; }
+.sm-field { background: white; border: 1px solid #d1d5db; border-radius: 6px; padding: 9px 11px; margin-bottom: 9px; font-size: 13px; color: #9ca3af; font-style: italic; }
+.sm-row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin-bottom: 9px; }
+.sm-btn { width: 100%; background: #635BFF; color: white; border: none; padding: 11px; border-radius: 7px; font-size: 14px; font-weight: 500; cursor: pointer; font-family: inherit; }
+.sm-note { font-size: 11px; color: #9ca3af; text-align: center; margin-top: 8px; display: flex; align-items: center; justify-content: center; gap: 4px; }
+.btn-sim { background: var(--orange); color: white; border: none; padding: 11px 24px; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; font-family: inherit; margin-top: 18px; display: inline-flex; align-items: center; gap: 8px; }
+
+/* SCREEN 3 */
+.confirm-wrap { display: flex; flex-direction: column; align-items: center; padding: 36px 28px; }
+.ctick { width: 60px; height: 60px; background: #f0fdf4; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 18px; }
+.ctick svg { width: 28px; height: 28px; color: #16a34a; }
+.ctitle { font-size: 22px; font-weight: 300; color: var(--gray-800); margin-bottom: 8px; text-align: center; }
+.csub { font-size: 14px; color: var(--gray-500); text-align: center; margin-bottom: 28px; line-height: 1.6; max-width: 460px; }
+.cgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; width: 100%; max-width: 640px; margin-bottom: 24px; }
+.ccard { background: white; border: 1px solid var(--gray-200); border-radius: 9px; padding: 18px; }
+.ccard-lbl { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--gray-400); margin-bottom: 6px; }
+.ccard-val { font-size: 13px; color: var(--gray-800); }
+.ccard-val.green { color: #16a34a; font-weight: 500; display: flex; align-items: center; gap: 5px; }
+.ccard-val.green svg { width: 14px; height: 14px; }
+.access-banner { background: var(--orange-light); border: 1px solid rgba(245,80,54,0.18); border-radius: 11px; padding: 18px 22px; width: 100%; max-width: 640px; display: flex; gap: 14px; align-items: flex-start; margin-bottom: 24px; }
+.access-banner svg { width: 20px; height: 20px; color: var(--orange); flex-shrink: 0; margin-top: 2px; }
+.ab-title { font-size: 14px; font-weight: 500; color: #7c2d12; margin-bottom: 4px; }
+.ab-body { font-size: 13px; color: #9a3412; line-height: 1.5; }
+.cactions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+.btn-p { background: var(--orange); color: white; border: none; padding: 11px 22px; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; font-family: inherit; display: inline-flex; align-items: center; gap: 7px; }
+.btn-p svg { width: 14px; height: 14px; }
+.btn-g { background: white; color: var(--gray-600); border: 1px solid var(--gray-200); padding: 11px 22px; border-radius: 8px; font-size: 14px; cursor: pointer; font-family: inherit; }
+
+/* SCREEN 4 */
+.dir-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; flex-wrap: wrap; gap: 12px; }
+.dir-badge { display: inline-flex; align-items: center; gap: 6px; background: var(--orange-light); color: var(--orange); font-size: 12px; font-weight: 500; padding: 4px 12px; border-radius: 20px; }
+.dir-badge svg { width: 11px; height: 11px; }
+.dir-srch { display: flex; align-items: center; border: 1px solid var(--gray-200); border-radius: 7px; overflow: hidden; background: white; }
+.dir-srch-ico { padding: 9px 11px; }
+.dir-srch-ico svg { width: 15px; height: 15px; color: var(--orange); display: block; }
+.dir-srch input { border: none; outline: none; font-size: 13px; padding: 9px 11px 9px 0; font-family: inherit; width: 180px; background: transparent; color: var(--gray-800); }
+.dgrid { display: grid; grid-template-columns: repeat(3,1fr); gap: 13px; }
+.dcard { background: white; border: 1px solid var(--gray-200); border-radius: 10px; padding: 16px; display: flex; gap: 12px; cursor: pointer; transition: border-color 0.15s, box-shadow 0.15s; }
+.dcard:hover { border-color: var(--orange); box-shadow: 0 2px 8px rgba(245,80,54,0.08); }
+.dav { width: 46px; height: 46px; border-radius: 50%; background: var(--gray-100); border: 2px solid var(--gray-200); display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 300; color: var(--gray-400); flex-shrink: 0; }
+.dname { font-size: 13px; font-weight: 500; color: var(--gray-800); }
+.drole { font-size: 12px; color: var(--gray-500); margin-top: 2px; }
+.dloc { font-size: 12px; color: var(--gray-400); margin-top: 5px; display: flex; align-items: center; gap: 3px; }
+.dloc svg { width: 10px; height: 10px; }
+.dmore { text-align: center; padding: 20px; border: 1px dashed var(--gray-200); border-radius: 9px; margin-top: 12px; font-size: 13px; color: var(--gray-400); }
+.dmore strong { color: var(--gray-600); }
+</style>
+</head>
+<body>
+
+<div class="wt-bar">
+  <div class="wt-brand"><span>CN Live · Walkthrough</span></div>
+  <div class="wt-steps">
+    <div class="wt-step active" id="wt1" onclick="go(1)"><span class="wt-num">1</span> Conference landing</div>
+    <div class="wt-step" id="wt2" onclick="go(2)"><span class="wt-num">2</span> Stripe checkout</div>
+    <div class="wt-step" id="wt3" onclick="go(3)"><span class="wt-num">3</span> Ticket confirmed</div>
+    <div class="wt-step" id="wt4" onclick="go(4)"><span class="wt-num">4</span> Delegate directory</div>
+  </div>
+  <div class="wt-note">Built from live codebase · April 2026</div>
+</div>
+
+<!-- SCREEN 1 -->
+<div class="screen active" id="s1">
+  <div class="platform">
+    <nav class="nav"><div class="nav-inner">
+      <div class="nav-logo">CN</div>
+      <div class="nav-links">
+        <div class="nav-link">Events</div><div class="nav-link">Groups</div><div class="nav-link">Members</div><div class="nav-link">Resources</div><div class="nav-link">Members Area</div>
+        <div class="nav-link active">Live <span class="nav-pill">NEW</span></div>
+      </div>
+      <div class="nav-av"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg></div>
+    </div></nav>
+
+    <div class="jbar"><div class="jbar-inner">
+      <div class="js cur"><span class="jdot"></span> Discover</div><span class="jarr">›</span>
+      <div class="js"><span class="jdot"></span> Buy ticket via Stripe</div><span class="jarr">›</span>
+      <div class="js"><span class="jdot"></span> Access confirmed</div><span class="jarr">›</span>
+      <div class="js"><span class="jdot"></span> Browse delegates</div>
+    </div></div>
+
+    <div class="ann">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+      <p><strong>Screen 1 of 4 — Conference landing page.</strong> A new "Live" nav link is added to the existing NavigationBar.vue — one line of change. This page is new: a public-facing conference page with a live delegate counter that creates urgency without showing individual names. Clicking "Get your ticket" redirects to Stripe's hosted checkout — nothing is rebuilt inside Circle. <a onclick="go(2)">See the Stripe handoff →</a></p>
+    </div>
+
+    <div class="main">
+      <div class="hero">
+        <div class="hero-glow"></div>
+        <div class="hero-badge">Circle Networks Live 2026</div>
+        <h1>The UK's Premier<br><strong>Business Networking</strong><br>Conference</h1>
+        <div class="hero-meta">
+          <div class="hm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Saturday 19 September 2026</div>
+          <div class="hm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> Birmingham, United Kingdom</div>
+          <div class="hm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 9:00 AM — 5:00 PM</div>
+        </div>
+        <div class="hero-cta">
+          <button class="btn-buy" onclick="go(2)">Get your ticket — £195 + VAT <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>
+          <span class="hero-note">Early bird ends <strong>30 June 2026</strong></span>
+        </div>
+        <div class="dcounter">
+          <div class="dcnt">127</div>
+          <div class="dlbl">delegates registered</div>
+          <div class="dtrend"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:10px;height:10px;"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg> 47 this week</div>
+        </div>
+      </div>
+
+      <div class="igrid">
+        <div class="icard">
+          <div class="iico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+          <div><div class="ititle">Delegate Directory — live now</div><div class="ibody">Access the full delegate list the moment your ticket is confirmed. Earlier registration means more time to plan your connections.</div></div>
+        </div>
+        <div class="icard">
+          <div class="iico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+          <div><div class="ititle">Expert Speakers</div><div class="ibody">A full day of keynotes, panels, and workshops from business leaders across the Circle Networks community and beyond.</div></div>
+        </div>
+        <div class="icard">
+          <div class="iico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+          <div><div class="ititle">Structured Networking</div><div class="ibody">The Circle Networks format you know, scaled up. Facilitated sessions designed to make every introduction count.</div></div>
+        </div>
+      </div>
+
+      <div class="spk-section">
+        <div class="stitle">Confirmed Speakers</div>
+        <div class="spk-grid">
+          <div class="spk"><div class="spk-av">JS</div><div class="spk-name">Jamie Stewart</div><div class="spk-co">Circle Networks</div><div class="spk-topic">Opening Keynote</div></div>
+          <div class="spk"><div class="spk-av">SR</div><div class="spk-name">Sarah Roberts</div><div class="spk-co">GrowthLab</div><div class="spk-topic">Scaling Through Connection</div></div>
+          <div class="spk"><div class="spk-av">MT</div><div class="spk-name">Marcus Thompson</div><div class="spk-co">Vertex Partners</div><div class="spk-topic">Investment Readiness</div></div>
+          <div class="spk" style="opacity:0.4; border-style:dashed;"><div class="spk-av" style="border-style:dashed;">+</div><div class="spk-name" style="color:var(--gray-400);">More to be announced</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN 2 -->
+<div class="screen" id="s2">
+  <div class="platform">
+    <nav class="nav"><div class="nav-inner">
+      <div class="nav-logo">CN</div>
+      <div class="nav-links"><div class="nav-link">Events</div><div class="nav-link">Groups</div><div class="nav-link">Members</div><div class="nav-link">Resources</div><div class="nav-link">Members Area</div><div class="nav-link active">Live <span class="nav-pill">NEW</span></div></div>
+      <div class="nav-av"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg></div>
+    </div></nav>
+
+    <div class="jbar"><div class="jbar-inner">
+      <div class="js done"><span class="jdot"></span> Discover</div><span class="jarr">›</span>
+      <div class="js cur"><span class="jdot"></span> Buy ticket via Stripe</div><span class="jarr">›</span>
+      <div class="js"><span class="jdot"></span> Access confirmed</div><span class="jarr">›</span>
+      <div class="js"><span class="jdot"></span> Browse delegates</div>
+    </div></div>
+
+    <div class="ann">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+      <p><strong>Screen 2 of 4 — Stripe's hosted checkout.</strong> Circle redirects to Stripe — nothing is rebuilt inside the platform. Stripe is already connected and live for membership payments so the account, keys, and webhook handling are all in place. This is a one-off payment rather than a subscription, which Iurie needs to wire up, but the integration risk is low. On success, Stripe fires a webhook back to Circle which grants the delegate access flag automatically. <a onclick="go(3)">See the return to Circle →</a></p>
+    </div>
+
+    <div class="main">
+      <div class="card">
+        <div class="redirect-wrap">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:26px;">
+            <div style="width:34px;height:34px;background:#635BFF;border-radius:8px;display:flex;align-items:center;justify-content:center;"><svg viewBox="0 0 24 24" fill="white" style="width:18px;height:18px;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg></div>
+            <div style="font-size:17px;font-weight:300;color:var(--gray-800);">Redirecting to Stripe secure checkout</div>
+          </div>
+          <div class="spin"></div>
+          <div class="rd-sub">Circle Networks uses Stripe's hosted checkout page. Your payment details are handled entirely by Stripe and are never stored on the Circle platform.</div>
+          <div class="rd-sec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> 256-bit SSL · PCI DSS compliant</div>
+          <div class="stripe-mock">
+            <div class="sm-hdr">
+              <div class="sm-mark"><svg viewBox="0 0 24 24" fill="white" style="width:15px;height:15px;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg></div>
+              <div><div class="sm-co">Circle Networks</div><div class="sm-desc">CN Live 2026 — General Admission</div></div>
+            </div>
+            <div class="sm-amt">£234.00 <span style="font-size:15px;color:var(--gray-400);font-weight:300;">inc VAT</span></div>
+            <div class="sm-field">Card number</div>
+            <div class="sm-row2"><div class="sm-field">MM / YY</div><div class="sm-field">CVC</div></div>
+            <button class="sm-btn">Pay £234.00</button>
+            <div class="sm-note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:11px;height:11px;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Powered by Stripe</div>
+          </div>
+          <button class="btn-sim" onclick="go(3)">Simulate successful payment <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN 3 -->
+<div class="screen" id="s3">
+  <div class="platform">
+    <nav class="nav"><div class="nav-inner">
+      <div class="nav-logo">CN</div>
+      <div class="nav-links"><div class="nav-link">Events</div><div class="nav-link">Groups</div><div class="nav-link">Members</div><div class="nav-link">Resources</div><div class="nav-link">Members Area</div><div class="nav-link active">Live <span class="nav-pill">NEW</span></div></div>
+      <div class="nav-av"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg></div>
+    </div></nav>
+
+    <div class="jbar"><div class="jbar-inner">
+      <div class="js done"><span class="jdot"></span> Discover</div><span class="jarr">›</span>
+      <div class="js done"><span class="jdot"></span> Buy ticket via Stripe</div><span class="jarr">›</span>
+      <div class="js cur"><span class="jdot"></span> Access confirmed</div><span class="jarr">›</span>
+      <div class="js"><span class="jdot"></span> Browse delegates</div>
+    </div></div>
+
+    <div class="ann">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+      <p><strong>Screen 3 of 4 — Back inside Circle after payment.</strong> Stripe's webhook fires on success. Circle receives it and grants the delegate access flag to the user's account in the background. The user is landed here automatically — no manual step needed from Jamie or anyone else. The orange banner immediately surfaces the delegate directory, making the early-registration value tangible. <a onclick="go(4)">See the delegate directory →</a></p>
+    </div>
+
+    <div class="main">
+      <div class="card">
+        <div class="confirm-wrap">
+          <div class="ctick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
+          <div class="ctitle">You're in. Welcome to CN Live 2026.</div>
+          <div class="csub">Your ticket is confirmed and your delegate access is now active. A confirmation email is on its way to jamie@circlenetworks.co.uk.</div>
+          <div class="cgrid">
+            <div class="ccard"><div class="ccard-lbl">Event</div><div class="ccard-val">Circle Networks Live 2026</div></div>
+            <div class="ccard"><div class="ccard-lbl">Date</div><div class="ccard-val">Saturday 19 September 2026</div></div>
+            <div class="ccard"><div class="ccard-lbl">Location</div><div class="ccard-val">Birmingham, United Kingdom</div></div>
+            <div class="ccard"><div class="ccard-lbl">Delegate access</div><div class="ccard-val green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Active now</div></div>
+          </div>
+          <div class="access-banner">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <div><div class="ab-title">The delegate directory is live — 127 people are already registered</div><div class="ab-body">You have 5 months before the event to browse profiles, find the right people, and start conversations. Delegates who register closer to the date will have far less time to do this.</div></div>
+          </div>
+          <div class="cactions">
+            <button class="btn-p" onclick="go(4)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> Browse delegate directory</button>
+            <button class="btn-g">View my ticket</button>
+            <button class="btn-g">Back to events</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN 4 -->
+<div class="screen" id="s4">
+  <div class="platform">
+    <nav class="nav"><div class="nav-inner">
+      <div class="nav-logo">CN</div>
+      <div class="nav-links"><div class="nav-link">Events</div><div class="nav-link">Groups</div><div class="nav-link">Members</div><div class="nav-link">Resources</div><div class="nav-link">Members Area</div><div class="nav-link active">Live <span class="nav-pill">NEW</span></div></div>
+      <div class="nav-av"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg></div>
+    </div></nav>
+
+    <div class="jbar"><div class="jbar-inner">
+      <div class="js done"><span class="jdot"></span> Discover</div><span class="jarr">›</span>
+      <div class="js done"><span class="jdot"></span> Buy ticket via Stripe</div><span class="jarr">›</span>
+      <div class="js done"><span class="jdot"></span> Access confirmed</div><span class="jarr">›</span>
+      <div class="js cur"><span class="jdot"></span> Browse delegates</div>
+    </div></div>
+
+    <div class="ann">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+      <p><strong>Screen 4 of 4 — Delegate directory.</strong> A permission-gated filtered view of the existing Members/Index.vue using the existing PublicCard component — no new page infrastructure needed. Only users with the delegate access flag can see this. Non-delegates see a locked state. <strong>This is the end of the core journey.</strong> Conference content (Phase 4), matchmaking, and gamification (Phase 5) sit beyond this and will each be scoped separately before any development begins.</p>
+    </div>
+
+    <div class="main">
+      <div class="card" style="padding:24px;">
+        <div class="dir-top">
+          <div>
+            <h1 style="font-size:19px;font-weight:300;color:var(--gray-800);margin-bottom:7px;">Connect with fellow delegates</h1>
+            <div class="dir-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/></svg> Circle Networks Live 2026 · 127 delegates</div>
+          </div>
+          <div class="dir-srch">
+            <div class="dir-srch-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>
+            <input placeholder="Search delegates…">
+          </div>
+        </div>
+
+        <div class="dgrid">
+          <div class="dcard"><div class="dav">JS</div><div><div class="dname">Jamie Stewart</div><div class="drole">CEO · Circle Networks</div><div class="dloc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> Sandbach, UK</div></div></div>
+          <div class="dcard"><div class="dav" style="background:#fff1ee;">SR</div><div><div class="dname">Sarah Roberts</div><div class="drole">Founder · GrowthLab UK</div><div class="dloc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> Manchester, UK</div></div></div>
+          <div class="dcard"><div class="dav">MT</div><div><div class="dname">Marcus Thompson</div><div class="drole">MD · Vertex Partners</div><div class="dloc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> Birmingham, UK</div></div></div>
+          <div class="dcard"><div class="dav" style="background:#eff6ff;">PK</div><div><div class="dname">Priya Kapoor</div><div class="drole">Director · Kapoor Consulting</div><div class="dloc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> London, UK</div></div></div>
+          <div class="dcard"><div class="dav">TH</div><div><div class="dname">Tom Hennessey</div><div class="drole">CEO · Northern Scale</div><div class="dloc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> Leeds, UK</div></div></div>
+          <div class="dcard"><div class="dav" style="background:#f0fdf4;">AL</div><div><div class="dname">Amanda Lewis</div><div class="drole">Founder · Lewington Digital</div><div class="dloc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> Bristol, UK</div></div></div>
+        </div>
+        <div class="dmore"><strong>121 more delegates</strong> are registered and visible to you. This is a representative sample.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function go(n) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.wt-step').forEach(s => s.classList.remove('active','done'));
+  document.getElementById('s'+n).classList.add('active');
+  for (let i=1; i<=4; i++) {
+    const el = document.getElementById('wt'+i);
+    if (i < n) el.classList.add('done');
+    else if (i === n) el.classList.add('active');
+  }
+}
+</script>
+</body>
+</html>
