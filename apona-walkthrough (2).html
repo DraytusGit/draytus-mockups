@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Apona Prototype</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #eef0f3; color: #1f2937; font-size: 14px; line-height: 1.5; overflow: hidden; }
+
+  .app { display: flex; flex-direction: column; height: 100vh; background: #f9fafb; }
+
+  /* TOP BAR */
+  .topbar { background: #fff; border-bottom: 1px solid #e5e7eb; padding: 0 24px; height: 60px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+  .brand { display: flex; align-items: center; gap: 10px; font-size: 16px; font-weight: 700; color: #1f2937; letter-spacing: 0.5px; }
+  .brand-mark { width: 28px; height: 28px; background: #1f2937; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 800; font-size: 13px; }
+  .topbar-right { display: flex; align-items: center; gap: 18px; font-size: 13px; color: #4b5563; }
+  .user-chip { display: flex; align-items: center; gap: 8px; padding: 6px 12px; background: #f3f4f6; border-radius: 20px; font-size: 12.5px; }
+  .user-avatar { width: 24px; height: 24px; border-radius: 50%; background: #d1d5db; display: flex; align-items: center; justify-content: center; color: #4b5563; font-size: 11px; font-weight: 700; }
+
+  /* ROLE NAV */
+  .role-nav { background: #fff; border-bottom: 1px solid #e5e7eb; display: flex; padding: 0 24px; flex-shrink: 0; overflow-x: auto; }
+  .role-tab { padding: 12px 18px; font-size: 13px; color: #6b7280; cursor: pointer; border-bottom: 2px solid transparent; font-weight: 500; white-space: nowrap; }
+  .role-tab:hover { color: #1f2937; }
+  .role-tab.active { color: #1f2937; border-bottom-color: #1f2937; font-weight: 700; }
+  .role-tag { font-size: 10px; background: #e5e7eb; color: #4b5563; padding: 2px 6px; border-radius: 3px; margin-left: 6px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; }
+  .role-tag.phase-two { background: #ddd6fe; color: #5b21b6; }
+
+  /* WORKSPACE */
+  .workspace { flex: 1; overflow-y: auto; padding: 28px 32px; position: relative; }
+  .container { max-width: 1100px; margin: 0 auto; }
+
+  /* BUTTONS */
+  .btn { display: inline-flex; align-items: center; justify-content: center; padding: 9px 18px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; font-family: inherit; gap: 6px; }
+  .btn:focus { outline: 2px solid #9ca3af; outline-offset: 2px; }
+  .btn-primary { background: #1f2937; color: #fff; }
+  .btn-primary:hover { background: #111827; }
+  .btn-secondary { background: #fff; border: 1px solid #d1d5db; color: #374151; }
+  .btn-secondary:hover { background: #f9fafb; border-color: #9ca3af; }
+  .btn-danger { background: #fff; border: 1px solid #fca5a5; color: #991b1b; }
+  .btn-danger:hover { background: #fef2f2; }
+  .btn-sm { padding: 6px 12px; font-size: 12px; }
+
+  /* FORM */
+  .field-group { margin-bottom: 18px; }
+  .field-label { font-size: 12px; font-weight: 600; color: #374151; margin-bottom: 6px; display: block; }
+  .field-input, select.field-input { width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 13px; background: #fff; color: #1f2937; font-family: inherit; }
+  .field-input:focus { outline: none; border-color: #6b7280; box-shadow: 0 0 0 3px rgba(107, 114, 128, 0.15); }
+  .field-help { font-size: 11px; color: #9ca3af; margin-top: 4px; }
+  .row-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+
+  /* CARDS */
+  .card { background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 18px 20px; margin-bottom: 12px; }
+  .card.clickable { cursor: pointer; transition: border-color 0.15s, transform 0.15s; }
+  .card.clickable:hover { border-color: #9ca3af; transform: translateY(-1px); }
+  .card-title { font-size: 14px; font-weight: 700; color: #111827; margin-bottom: 4px; }
+  .card-sub { font-size: 12.5px; color: #6b7280; }
+  .card-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+
+  /* PANEL */
+  .panel { background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; padding: 28px 32px; margin-bottom: 20px; box-shadow: 0 1px 2px rgba(0,0,0,0.03); }
+  .panel-header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 6px; flex-wrap: wrap; gap: 12px; }
+  .panel-title { font-size: 20px; font-weight: 700; color: #111827; }
+  .panel-subtitle { font-size: 13px; color: #6b7280; margin-bottom: 22px; }
+
+  .h-section { font-size: 14px; font-weight: 700; color: #111827; margin-bottom: 12px; }
+
+  /* PILLS */
+  .pill { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+  .pill-pending { background: #fef3c7; color: #92400e; }
+  .pill-verified { background: #dcfce7; color: #166534; }
+  .pill-resubmit { background: #fee2e2; color: #991b1b; }
+  .pill-uploaded { background: #dbeafe; color: #1e40af; }
+  .pill-expired { background: #fee2e2; color: #991b1b; }
+  .pill-valid { background: #dcfce7; color: #166534; }
+
+  /* TABLE */
+  .data-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  .data-table thead td { background: #f9fafb; padding: 10px 12px; font-weight: 700; color: #374151; font-size: 11px; text-transform: uppercase; letter-spacing: 0.3px; border-bottom: 1px solid #e5e7eb; }
+  .data-table tbody td { padding: 12px; border-bottom: 1px solid #f3f4f6; color: #374151; }
+  .data-table tbody tr.clickable { cursor: pointer; }
+  .data-table tbody tr.clickable:hover { background: #f9fafb; }
+
+  /* UPLOAD ZONE */
+  .upload-zone { border: 2px dashed #d1d5db; border-radius: 8px; padding: 36px 20px; text-align: center; color: #6b7280; background: #fafafa; cursor: pointer; }
+  .upload-zone:hover { border-color: #9ca3af; background: #f3f4f6; }
+  .upload-zone-icon { font-size: 32px; margin-bottom: 8px; opacity: 0.5; }
+  .upload-zone-title { font-size: 14px; font-weight: 600; color: #374151; margin-bottom: 4px; }
+  .upload-zone-sub { font-size: 12px; color: #9ca3af; }
+
+  /* STATS */
+  .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 22px; }
+  .stat { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px 18px; }
+  .stat-label { font-size: 11px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.3px; font-weight: 600; }
+  .stat-value { font-size: 24px; font-weight: 700; color: #111827; margin-top: 4px; }
+  .stat-sub { font-size: 11.5px; color: #9ca3af; margin-top: 2px; }
+
+  /* GUIDANCE */
+  .guide-slide { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 30px; text-align: center; }
+  .guide-step { font-size: 11px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700; margin-bottom: 8px; }
+  .guide-title { font-size: 18px; font-weight: 700; margin-bottom: 8px; color: #111827; }
+  .guide-body { font-size: 13.5px; color: #4b5563; max-width: 480px; margin: 0 auto; line-height: 1.6; }
+  .guide-img { background: #e5e7eb; border-radius: 6px; height: 180px; margin: 20px auto 16px; display: flex; align-items: center; justify-content: center; color: #9ca3af; font-size: 12px; max-width: 380px; }
+  .guide-dots { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 18px 0 8px; }
+  .guide-dot { width: 8px; height: 8px; background: #d1d5db; border-radius: 50%; cursor: pointer; }
+  .guide-dot.active { background: #4b5563; }
+
+  /* CHECKER REVIEW */
+  .review-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+  .review-passport { background: #f3f4f6; border-radius: 8px; padding: 16px; min-height: 380px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .review-passport-mark { width: 100%; min-height: 340px; background: repeating-linear-gradient(45deg, #e5e7eb, #e5e7eb 10px, #f3f4f6 10px, #f3f4f6 20px); border-radius: 4px; display: flex; align-items: center; justify-content: center; }
+  .review-passport-mark span { background: #fff; padding: 10px 16px; border-radius: 4px; color: #6b7280; font-size: 12.5px; font-weight: 600; }
+  .photo-thumbs { display: flex; gap: 8px; margin-top: 12px; }
+  .photo-thumb { width: 48px; height: 36px; background: #e5e7eb; border-radius: 4px; border: 2px solid transparent; cursor: pointer; }
+  .photo-thumb.active { border-color: #1f2937; }
+
+  /* LIVERY RESULT */
+  .result-cleared { border-left: 4px solid #16a34a; background: #f0fdf4; padding: 18px 20px; border-radius: 8px; }
+  .result-flag { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 4px; color: #166534; }
+
+  /* BANNER */
+  .banner { padding: 12px 18px; border-radius: 8px; margin-bottom: 18px; font-size: 13px; display: flex; align-items: center; gap: 10px; }
+  .banner-info { background: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe; }
+  .banner-success { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+
+  /* MISC */
+  .row-flex { display: flex; gap: 12px; align-items: center; }
+  .row-flex-between { display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+  .text-muted { color: #6b7280; font-size: 12.5px; }
+  .filter-bar { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
+  .filter-bar select, .filter-bar input { padding: 8px 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 12.5px; font-family: inherit; color: #374151; background: #fff; }
+  .breadcrumb { font-size: 12px; color: #6b7280; margin-bottom: 12px; }
+  .breadcrumb a { color: #4b5563; cursor: pointer; }
+  .breadcrumb a:hover { text-decoration: underline; }
+
+  /* SCREENS */
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* PROTOTYPE INFO BAR */
+  .proto-bar { background: #1f2937; color: #d1d5db; padding: 8px 24px; font-size: 11.5px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+  .proto-bar-left { display: flex; align-items: center; gap: 12px; }
+  .proto-bar strong { color: #fff; font-weight: 700; }
+  .pill-proto { background: #fbbf24; color: #78350f; padding: 2px 8px; border-radius: 3px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; }
+
+  /* ANNOTATIONS OVERLAY */
+  .anno-toggle { position: fixed; bottom: 20px; right: 20px; background: #1f2937; color: #fff; border: none; padding: 12px 18px; border-radius: 24px; font-size: 13px; font-weight: 600; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 8px; font-family: inherit; z-index: 100; }
+  .anno-toggle:hover { background: #111827; }
+  .anno-toggle.active { background: #fbbf24; color: #78350f; }
+  .anno-icon { width: 18px; height: 18px; border-radius: 50%; background: #fff; color: #1f2937; display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; }
+  .anno-toggle.active .anno-icon { background: #78350f; color: #fbbf24; }
+
+  .anno-panel { position: fixed; top: 0; right: -440px; width: 420px; height: 100vh; background: #fffbeb; border-left: 3px solid #fbbf24; box-shadow: -4px 0 16px rgba(0,0,0,0.08); padding: 28px 28px 80px; overflow-y: auto; transition: right 0.25s ease-out; z-index: 99; }
+  .anno-panel.open { right: 0; }
+  .anno-panel-title { font-size: 12px; font-weight: 700; color: #92400e; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+  .anno-panel-screen { font-size: 18px; font-weight: 700; color: #78350f; margin-bottom: 18px; }
+  .anno-section { margin-bottom: 18px; }
+  .anno-section-title { font-size: 11px; font-weight: 700; color: #b45309; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+  .anno-panel ul { list-style: none; padding: 0; }
+  .anno-panel li { position: relative; padding: 4px 0 4px 18px; font-size: 13px; color: #78350f; line-height: 1.6; }
+  .anno-panel li::before { content: '•'; position: absolute; left: 4px; color: #b45309; font-weight: 700; }
+  .anno-flag { background: #fef3c7; border-left: 3px solid #f59e0b; padding: 10px 14px; border-radius: 4px; font-size: 12.5px; color: #78350f; margin-top: 8px; }
+  .anno-close { position: absolute; top: 16px; right: 18px; background: none; border: none; font-size: 22px; color: #92400e; cursor: pointer; line-height: 1; }
+
+  .workspace::-webkit-scrollbar { width: 10px; }
+  .workspace::-webkit-scrollbar-track { background: #f3f4f6; }
+  .workspace::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 5px; }
+  .workspace::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+
+  @media (max-width: 900px) {
+    .row-grid, .review-grid, .stats-grid { grid-template-columns: 1fr; }
+    .anno-panel { width: 100%; right: -100%; }
+    .anno-panel.open { right: 0; }
+    .workspace { padding: 20px; }
+    .panel { padding: 20px; }
+  }
+
+  /* PASSCODE GATE */
+  .gate { position: fixed; inset: 0; background: #1f2937; z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 20px; }
+  .gate.hidden { display: none; }
+  .gate-card { background: #fff; border-radius: 12px; padding: 40px 44px; max-width: 420px; width: 100%; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.3); }
+  .gate-brand { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 24px; }
+  .gate-brand-mark { width: 36px; height: 36px; background: #1f2937; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 800; font-size: 16px; }
+  .gate-brand-text { font-size: 18px; font-weight: 800; letter-spacing: 1px; color: #1f2937; }
+  .gate-title { font-size: 18px; font-weight: 700; color: #111827; margin-bottom: 6px; }
+  .gate-sub { font-size: 13px; color: #6b7280; margin-bottom: 22px; line-height: 1.5; }
+  .gate-input { width: 100%; padding: 12px 14px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 15px; font-family: inherit; text-align: center; letter-spacing: 2px; color: #1f2937; margin-bottom: 12px; }
+  .gate-input:focus { outline: none; border-color: #1f2937; box-shadow: 0 0 0 3px rgba(31, 41, 55, 0.15); }
+  .gate-btn { width: 100%; padding: 11px 20px; background: #1f2937; color: #fff; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit; }
+  .gate-btn:hover { background: #111827; }
+  .gate-error { font-size: 12px; color: #991b1b; margin-top: 10px; min-height: 16px; }
+  .gate-footer { font-size: 11px; color: #9ca3af; margin-top: 22px; }
+</style>
+</head>
+<body>
+
+<!-- PASSCODE GATE -->
+<div class="gate" id="gate">
+  <div class="gate-card">
+    <div class="gate-brand">
+      <div class="gate-brand-mark">A</div>
+      <div class="gate-brand-text">APONA</div>
+    </div>
+    <div class="gate-title">Private preview</div>
+    <div class="gate-sub">This walkthrough is shared in confidence. Enter the access code to continue.</div>
+    <input type="password" class="gate-input" id="gate-input" placeholder="Access code" autocomplete="off">
+    <button class="gate-btn" id="gate-btn">Continue</button>
+    <div class="gate-error" id="gate-error"></div>
+    <div class="gate-footer">Apona Equine Vaccination Verification Platform &middot; Prototype</div>
+  </div>
+</div>
+
+<div class="app">
+
+  <div class="proto-bar">
+    <div class="proto-bar-left">
+      <span class="pill-proto">Prototype</span>
+      <span>Apona walkthrough. Click buttons and links to move through real flows. Use the role tabs to switch user.</span>
+    </div>
+    <div>Styling deliberately neutral, ahead of branding.</div>
+  </div>
+
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-mark">A</div>
+      <span>APONA</span>
+    </div>
+    <div class="topbar-right">
+      <span id="topbar-context">Equine Vaccination Verification</span>
+      <div class="user-chip">
+        <div class="user-avatar" id="user-initials">SW</div>
+        <span id="user-name">Sarah Williams</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="role-nav">
+    <div class="role-tab active" data-role="owner">Owner / Agent</div>
+    <div class="role-tab" data-role="checker">Checker</div>
+    <div class="role-tab" data-role="admin">Super Admin</div>
+    <div class="role-tab" data-role="event">Event Organiser</div>
+    <div class="role-tab" data-role="livery">Livery Yard</div>
+    <div class="role-tab" data-role="vet">Vet <span class="role-tag phase-two">Phase Two</span></div>
+  </div>
+
+  <div class="workspace">
+    <div class="container">
+
+      <!-- ══ OWNER: SIGN UP ══ -->
+      <section class="screen active" data-screen="signup">
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">Welcome to Apona</div>
+            <span class="text-muted">Create your account</span>
+          </div>
+          <div class="panel-subtitle">Add yourself and your first horse to get started. You can add more horses anytime from the dashboard.</div>
+
+          <div class="row-grid">
+            <div>
+              <div class="h-section">Your details</div>
+              <div class="field-group">
+                <label class="field-label">Full name</label>
+                <input class="field-input" value="Sarah Williams">
+              </div>
+              <div class="field-group">
+                <label class="field-label">Email</label>
+                <input class="field-input" value="sarah@example.com">
+              </div>
+              <div class="field-group">
+                <label class="field-label">Mobile</label>
+                <input class="field-input" value="07700 900000">
+              </div>
+              <div class="field-group">
+                <label class="field-label">I am</label>
+                <select class="field-input">
+                  <option>The owner of the horse(s)</option>
+                  <option>An agent acting on behalf of the owner</option>
+                </select>
+              </div>
+            </div>
+            <div>
+              <div class="h-section">Your first horse</div>
+              <div class="field-group">
+                <label class="field-label">Horse name</label>
+                <input class="field-input" value="Buttercup">
+              </div>
+              <div class="field-group">
+                <label class="field-label">UELN</label>
+                <input class="field-input" value="826 005 12345678">
+                <div class="field-help">Unique Equine Lifetime Number, found on the front pages of the passport.</div>
+              </div>
+              <div class="field-group">
+                <label class="field-label">Microchip number</label>
+                <input class="field-input" value="985 100 123456789">
+              </div>
+              <div class="field-group">
+                <label class="field-label">Owner name (optional)</label>
+                <input class="field-input" placeholder="Skip if you are the owner">
+                <div class="field-help">Only required if you are an agent acting on behalf of someone else.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row-flex" style="justify-content: flex-end; margin-top: 20px;">
+            <button class="btn btn-secondary">Cancel</button>
+            <button class="btn btn-primary" data-goto="guidance">Create account &amp; continue</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══ OWNER: GUIDANCE ══ -->
+      <section class="screen" data-screen="guidance">
+        <div class="breadcrumb"><a data-goto="signup">Sign up</a> &rsaquo; Photograph guidance</div>
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">Before you upload</div>
+            <button class="btn btn-secondary btn-sm" data-goto="upload">Skip guidance</button>
+          </div>
+          <div class="panel-subtitle">A short walkthrough so you know exactly which pages to photograph. You can come back to this anytime from the help link.</div>
+
+          <div class="guide-slide">
+            <div class="guide-step" id="guide-step-label">Step 2 of 4</div>
+            <div class="guide-title" id="guide-title-text">Find the vaccination record pages</div>
+            <div class="guide-img">[Diagram: passport open to vaccination pages]</div>
+            <div class="guide-body" id="guide-body-text">Open the passport at the vaccination record section. You will need to photograph the vet stamp, the vaccine batch number, and the date for each entry.</div>
+            <div class="guide-dots">
+              <span class="guide-dot" data-step="1"></span>
+              <span class="guide-dot active" data-step="2"></span>
+              <span class="guide-dot" data-step="3"></span>
+              <span class="guide-dot" data-step="4"></span>
+            </div>
+            <div class="row-flex" style="justify-content: center; margin-top: 12px;">
+              <button class="btn btn-secondary" id="guide-back">Back</button>
+              <button class="btn btn-primary" id="guide-next">Next step</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══ OWNER: UPLOAD ══ -->
+      <section class="screen" data-screen="upload">
+        <div class="breadcrumb"><a data-goto="dashboard">My horses</a> &rsaquo; Buttercup &rsaquo; Upload vaccination pages</div>
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">Upload vaccination pages for Buttercup</div>
+            <a class="text-muted" data-goto="guidance" style="cursor: pointer; text-decoration: underline;">View guidance</a>
+          </div>
+          <div class="panel-subtitle">Take photos of the vaccination pages. You can add as many as needed. Multiple photos supported.</div>
+
+          <div class="upload-zone">
+            <div class="upload-zone-icon">📷</div>
+            <div class="upload-zone-title">Take a photo or upload from gallery</div>
+            <div class="upload-zone-sub">Tap to open camera. Multiple photos supported.</div>
+            <div style="margin-top: 16px;"><button class="btn btn-primary">Open camera</button></div>
+          </div>
+
+          <div style="margin-top: 22px;">
+            <div class="h-section">Photos added (2)</div>
+            <div class="row-flex" style="gap: 10px;">
+              <div style="width: 110px; height: 80px; background: #e5e7eb; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #6b7280; font-size: 11px; font-weight: 600;">Page 23</div>
+              <div style="width: 110px; height: 80px; background: #e5e7eb; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #6b7280; font-size: 11px; font-weight: 600;">Page 24</div>
+            </div>
+          </div>
+
+          <div class="row-flex" style="justify-content: flex-end; margin-top: 24px;">
+            <button class="btn btn-secondary">Save draft</button>
+            <button class="btn btn-primary" data-goto="dashboard" data-action="submit-upload">Submit for verification</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══ OWNER: DASHBOARD ══ -->
+      <section class="screen" data-screen="dashboard">
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">My horses</div>
+            <button class="btn btn-primary btn-sm" data-goto="upload">+ Add another horse</button>
+          </div>
+          <div class="panel-subtitle">Vaccination status across all the horses on your account.</div>
+
+          <div class="banner banner-success" id="submit-banner" style="display: none;">
+            <strong>Submitted.</strong> Buttercup's vaccination pages are now pending verification. You will be notified once reviewed.
+          </div>
+
+          <div class="stats-grid">
+            <div class="stat">
+              <div class="stat-label">Horses</div>
+              <div class="stat-value">3</div>
+              <div class="stat-sub">2 verified, 1 pending</div>
+            </div>
+            <div class="stat">
+              <div class="stat-label">Next expiry</div>
+              <div class="stat-value">42 days</div>
+              <div class="stat-sub">Buttercup, 7 Jul 2026</div>
+            </div>
+            <div class="stat">
+              <div class="stat-label">Action required</div>
+              <div class="stat-value">1</div>
+              <div class="stat-sub">Resubmit photo for Pip</div>
+            </div>
+          </div>
+
+          <div class="card clickable">
+            <div class="card-row">
+              <div>
+                <div class="card-title">Buttercup</div>
+                <div class="card-sub">UELN 826 005 12345678 &middot; Expires 7 Jul 2026</div>
+              </div>
+              <span class="pill pill-verified">Verified</span>
+            </div>
+          </div>
+          <div class="card clickable">
+            <div class="card-row">
+              <div>
+                <div class="card-title">Pip</div>
+                <div class="card-sub">UELN 826 005 87654321 &middot; Photo unclear, please resubmit</div>
+              </div>
+              <div class="row-flex">
+                <span class="pill pill-resubmit">Resubmit needed</span>
+                <button class="btn btn-secondary btn-sm" data-goto="upload">Resubmit</button>
+              </div>
+            </div>
+          </div>
+          <div class="card clickable">
+            <div class="card-row">
+              <div>
+                <div class="card-title">Marigold</div>
+                <div class="card-sub">UELN 826 005 11223344 &middot; Submitted 24 May 2026</div>
+              </div>
+              <span class="pill pill-pending">Pending verification</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══ CHECKER: QUEUE ══ -->
+      <section class="screen" data-screen="checker-queue">
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">My verification queue</div>
+            <span class="text-muted">28 assigned to me &middot; 11 hr avg turnaround</span>
+          </div>
+          <div class="panel-subtitle">Submissions waiting for your review. Pick the next one to work through.</div>
+
+          <div class="filter-bar">
+            <select><option>All assigned to me</option><option>Pending</option><option>Resubmits</option></select>
+            <input placeholder="Search horse or owner">
+            <span class="text-muted">Showing 12 of 28.</span>
+          </div>
+
+          <div class="card clickable" data-goto="checker-review">
+            <div class="card-row">
+              <div>
+                <div class="card-title">Buttercup &middot; Sarah Williams</div>
+                <div class="card-sub">Submitted 24 May 2026 &middot; 2 photos</div>
+              </div>
+              <div class="row-flex">
+                <span class="pill pill-pending">Pending</span>
+                <button class="btn btn-primary btn-sm" data-goto="checker-review">Review</button>
+              </div>
+            </div>
+          </div>
+          <div class="card clickable">
+            <div class="card-row">
+              <div>
+                <div class="card-title">Storm &middot; David Chen</div>
+                <div class="card-sub">Submitted 23 May 2026 &middot; 3 photos</div>
+              </div>
+              <div class="row-flex">
+                <span class="pill pill-pending">Pending</span>
+                <button class="btn btn-secondary btn-sm">Review</button>
+              </div>
+            </div>
+          </div>
+          <div class="card clickable">
+            <div class="card-row">
+              <div>
+                <div class="card-title">Pip &middot; Sarah Williams</div>
+                <div class="card-sub">Resubmitted 22 May 2026 &middot; 4 photos</div>
+              </div>
+              <div class="row-flex">
+                <span class="pill pill-uploaded">Resubmitted</span>
+                <button class="btn btn-secondary btn-sm">Review</button>
+              </div>
+            </div>
+          </div>
+          <div class="card clickable">
+            <div class="card-row">
+              <div>
+                <div class="card-title">Mason &middot; Olivia Brooks</div>
+                <div class="card-sub">Submitted 22 May 2026 &middot; 2 photos</div>
+              </div>
+              <div class="row-flex">
+                <span class="pill pill-pending">Pending</span>
+                <button class="btn btn-secondary btn-sm">Review</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══ CHECKER: REVIEW ══ -->
+      <section class="screen" data-screen="checker-review">
+        <div class="breadcrumb"><a data-goto="checker-queue">My queue</a> &rsaquo; Buttercup &middot; Sarah Williams</div>
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">Review submission</div>
+            <span class="text-muted">Submission 1 of 28 in your batch</span>
+          </div>
+          <div class="panel-subtitle">Check the photographs against the extracted details. Confirm or correct, then approve or request resubmission.</div>
+
+          <div class="review-grid">
+            <div>
+              <div class="review-passport">
+                <div class="review-passport-mark"><span>Photo 1 of 2: Vaccination page</span></div>
+              </div>
+              <div class="photo-thumbs">
+                <div class="photo-thumb active"></div>
+                <div class="photo-thumb"></div>
+              </div>
+            </div>
+            <div>
+              <div class="h-section">Extracted details</div>
+              <div class="field-group">
+                <label class="field-label">Horse</label>
+                <input class="field-input" value="Buttercup">
+              </div>
+              <div class="field-group">
+                <label class="field-label">Vaccine type</label>
+                <input class="field-input" value="Equine Influenza &amp; Tetanus">
+              </div>
+              <div class="field-group">
+                <label class="field-label">Date administered</label>
+                <input class="field-input" value="07 / 07 / 2025">
+              </div>
+              <div class="field-group">
+                <label class="field-label">Batch number</label>
+                <input class="field-input" value="EQ-2025-4471">
+              </div>
+              <div class="field-group">
+                <label class="field-label">Administering vet</label>
+                <input class="field-input" value="Greenfield Equine Practice">
+              </div>
+              <div class="field-group">
+                <label class="field-label">Vet stamp visible &amp; valid</label>
+                <select class="field-input"><option>Yes</option><option>No</option></select>
+              </div>
+            </div>
+          </div>
+
+          <div class="row-flex" style="justify-content: space-between; margin-top: 24px;">
+            <button class="btn btn-secondary" data-goto="checker-queue">Back to queue</button>
+            <div class="row-flex">
+              <button class="btn btn-danger">Request resubmission</button>
+              <button class="btn btn-primary" data-goto="checker-queue">Approve &amp; verify</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══ ADMIN ══ -->
+      <section class="screen" data-screen="admin">
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">Verification queue overview</div>
+            <button class="btn btn-primary btn-sm">Allocate next batch</button>
+          </div>
+          <div class="panel-subtitle">Live view of the verification workload and checker performance.</div>
+
+          <div class="stats-grid">
+            <div class="stat">
+              <div class="stat-label">Pending review</div>
+              <div class="stat-value">214</div>
+              <div class="stat-sub">+ 32 since yesterday</div>
+            </div>
+            <div class="stat">
+              <div class="stat-label">Active checkers</div>
+              <div class="stat-value">8</div>
+              <div class="stat-sub">Avg 28 per day</div>
+            </div>
+            <div class="stat">
+              <div class="stat-label">Avg turnaround</div>
+              <div class="stat-value">11 hrs</div>
+              <div class="stat-sub">Target: under 24 hrs</div>
+            </div>
+          </div>
+
+          <div class="h-section">Checker load</div>
+          <table class="data-table">
+            <thead><tr><td>Checker</td><td>Assigned</td><td>Reviewed today</td><td>In progress</td><td>Actions</td></tr></thead>
+            <tbody>
+              <tr><td>James Patel</td><td>28</td><td>14</td><td>1</td><td><button class="btn btn-secondary btn-sm">Reassign</button></td></tr>
+              <tr><td>Olivia Brooks</td><td>22</td><td>9</td><td>0</td><td><button class="btn btn-secondary btn-sm">Reassign</button></td></tr>
+              <tr><td>Daniel Okoye</td><td>31</td><td>18</td><td>2</td><td><button class="btn btn-secondary btn-sm">Reassign</button></td></tr>
+              <tr><td>Hannah Lee</td><td>19</td><td>11</td><td>0</td><td><button class="btn btn-secondary btn-sm">Reassign</button></td></tr>
+              <tr><td>Marcus Webb</td><td>26</td><td>13</td><td>1</td><td><button class="btn btn-secondary btn-sm">Reassign</button></td></tr>
+            </tbody>
+          </table>
+
+          <div class="row-flex" style="justify-content: flex-end; margin-top: 22px; gap: 10px;">
+            <button class="btn btn-secondary">Manage checker accounts</button>
+            <button class="btn btn-secondary">Export report</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══ EVENT ══ -->
+      <section class="screen" data-screen="event">
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">Validate event entries</div>
+            <span class="text-muted">Horse of the Year Show 2026</span>
+          </div>
+          <div class="panel-subtitle">Submit a UELN list and a date window. The platform validates each horse for that period and returns a clear pass or fail.</div>
+
+          <div class="row-flex" style="gap: 16px; align-items: flex-end; margin-bottom: 22px;">
+            <div class="field-group" style="flex: 1; margin-bottom: 0;">
+              <label class="field-label">Event date window: from</label>
+              <input class="field-input" value="01 / 10 / 2026">
+            </div>
+            <div class="field-group" style="flex: 1; margin-bottom: 0;">
+              <label class="field-label">To</label>
+              <input class="field-input" value="07 / 10 / 2026">
+            </div>
+            <div class="field-group" style="flex: 1.4; margin-bottom: 0;">
+              <label class="field-label">Upload UELN list (CSV)</label>
+              <button class="btn btn-secondary" style="width: 100%;">📎 HOYS_entries_2026.csv</button>
+            </div>
+          </div>
+
+          <div class="row-flex-between" style="margin-bottom: 14px;">
+            <button class="btn btn-primary">Run validation</button>
+            <span class="text-muted">1,612 horses submitted &middot; Validated against 01 to 07 Oct 2026.</span>
+          </div>
+
+          <table class="data-table">
+            <thead><tr><td>UELN</td><td>Horse name</td><td>Status for window</td><td>Result</td></tr></thead>
+            <tbody>
+              <tr><td>826 005 12345678</td><td>Buttercup</td><td>Valid throughout</td><td><span class="pill pill-valid">Pass</span></td></tr>
+              <tr><td>826 005 33445566</td><td>Storm</td><td>Valid throughout</td><td><span class="pill pill-valid">Pass</span></td></tr>
+              <tr><td>826 005 77889900</td><td>Pebble</td><td>Expires 03 Oct 2026</td><td><span class="pill pill-expired">Fail</span></td></tr>
+              <tr><td>826 005 22334455</td><td>Marigold</td><td>No verified record</td><td><span class="pill pill-expired">Fail</span></td></tr>
+              <tr><td>826 005 99887766</td><td>Cloudburst</td><td>Valid throughout</td><td><span class="pill pill-valid">Pass</span></td></tr>
+            </tbody>
+          </table>
+
+          <div class="row-flex" style="justify-content: flex-end; margin-top: 18px;">
+            <button class="btn btn-secondary">Export results (CSV)</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══ LIVERY ══ -->
+      <section class="screen" data-screen="livery">
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">Check a horse</div>
+            <span class="text-muted">Summerford Park Livery</span>
+          </div>
+          <div class="panel-subtitle">Look up any horse by UELN or microchip number. Get an immediate yes or no.</div>
+
+          <div class="row-flex" style="gap: 12px; align-items: flex-end; margin-bottom: 24px;">
+            <div class="field-group" style="flex: 1; margin-bottom: 0;">
+              <label class="field-label">UELN or microchip</label>
+              <input class="field-input" value="826 005 12345678">
+            </div>
+            <button class="btn btn-primary">Check now</button>
+          </div>
+
+          <div class="result-cleared">
+            <div class="result-flag">Cleared</div>
+            <div class="card-title" style="margin-bottom: 4px;">Buttercup</div>
+            <div class="card-sub" style="color: #374151;">UELN 826 005 12345678 &middot; Owner Sarah Williams</div>
+            <div style="margin-top: 14px; font-size: 13px; color: #374151; line-height: 1.7;">
+              <div>Vaccination valid: <strong>Yes</strong></div>
+              <div>Last verified: 24 May 2026</div>
+              <div>Expires: 07 July 2026 (42 days)</div>
+            </div>
+          </div>
+
+          <div class="h-section" style="margin: 28px 0 10px;">Recent checks at your yard</div>
+          <table class="data-table">
+            <thead><tr><td>When</td><td>Horse</td><td>UELN</td><td>Result</td></tr></thead>
+            <tbody>
+              <tr><td>26 May 2026, 09:14</td><td>Buttercup</td><td>826 005 12345678</td><td><span class="pill pill-valid">Cleared</span></td></tr>
+              <tr><td>26 May 2026, 08:42</td><td>Pebble</td><td>826 005 77889900</td><td><span class="pill pill-expired">Expired</span></td></tr>
+              <tr><td>25 May 2026, 16:30</td><td>Storm</td><td>826 005 33445566</td><td><span class="pill pill-valid">Cleared</span></td></tr>
+              <tr><td>25 May 2026, 14:08</td><td>Marigold</td><td>826 005 11223344</td><td><span class="pill pill-pending">Pending</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ══ VET ══ -->
+      <section class="screen" data-screen="vet">
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">Record a vaccination</div>
+            <span class="text-muted">Greenfield Equine Practice</span>
+          </div>
+          <div class="panel-subtitle">Find the horse, fill in the vaccination details, confirm. Replaces owner re upload in phase two.</div>
+
+          <div class="banner banner-info">
+            <strong>Phase two feature.</strong> Manual upload by owners remains in parallel during the transition.
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">Find horse by UELN or microchip</label>
+            <input class="field-input" value="826 005 12345678">
+            <div class="field-help">Found: Buttercup, owned by Sarah Williams.</div>
+          </div>
+
+          <div class="row-grid" style="margin-top: 14px;">
+            <div>
+              <div class="field-group">
+                <label class="field-label">Date administered</label>
+                <input class="field-input" value="26 / 05 / 2026">
+              </div>
+              <div class="field-group">
+                <label class="field-label">Vaccine type</label>
+                <select class="field-input"><option>Equine Influenza &amp; Tetanus</option><option>Equine Influenza only</option><option>Tetanus only</option></select>
+              </div>
+            </div>
+            <div>
+              <div class="field-group">
+                <label class="field-label">Batch number</label>
+                <input class="field-input" value="EQ-2026-1184">
+              </div>
+              <div class="field-group">
+                <label class="field-label">Administering vet</label>
+                <input class="field-input" value="Dr. Helen Marsh">
+              </div>
+            </div>
+          </div>
+
+          <div class="row-flex" style="justify-content: flex-end; margin-top: 18px; gap: 10px;">
+            <button class="btn btn-secondary">Save draft</button>
+            <button class="btn btn-primary">Confirm vaccination</button>
+          </div>
+
+          <div class="h-section" style="margin: 28px 0 10px;">Vaccination history for Buttercup</div>
+          <table class="data-table">
+            <thead><tr><td>Date</td><td>Vaccine</td><td>Batch</td><td>Vet</td></tr></thead>
+            <tbody>
+              <tr><td>07 Jul 2025</td><td>Equine Influenza &amp; Tetanus</td><td>EQ-2025-4471</td><td>Dr. Helen Marsh</td></tr>
+              <tr><td>08 Jan 2025</td><td>Equine Influenza</td><td>EQ-2024-9876</td><td>Dr. Helen Marsh</td></tr>
+              <tr><td>14 Jul 2024</td><td>Equine Influenza &amp; Tetanus</td><td>EQ-2024-3309</td><td>Dr. Helen Marsh</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+</div>
+
+<button class="anno-toggle" id="anno-toggle">
+  <span class="anno-icon">i</span>
+  <span id="anno-toggle-label">Show notes</span>
+</button>
+
+<div class="anno-panel" id="anno-panel">
+  <button class="anno-close" id="anno-close">&times;</button>
+  <div class="anno-panel-title">Annotations</div>
+  <div class="anno-panel-screen" id="anno-screen-name">Sign Up</div>
+  <div id="anno-content"></div>
+</div>
+
+<script>
+  const annotations = {
+    signup: {
+      name: "Sign Up and First Horse",
+      sections: [
+        { title: "Purpose", items: [
+          "First time experience: account and first horse created in one short flow.",
+          "The owner / agent toggle determines whether the owner field is required."
+        ]},
+        { title: "Design notes", items: [
+          "UELN and microchip are the primary horse identifiers, captured early.",
+          "Horse name is a free text label for the user's benefit, not used for identification.",
+          "Multiple horses are added later from the dashboard. One account to many horses."
+        ]}
+      ],
+      flag: "Open item: agent definition needs tightening with Apona. Showing teams, livery managers and similar count. One off transient users (transport, security) may sit outside the platform."
+    },
+    guidance: {
+      name: "Photograph Guidance",
+      sections: [
+        { title: "Purpose", items: [
+          "Walks owners through what to photograph before their first upload.",
+          "Always accessible via the help link from the upload screen."
+        ]},
+        { title: "Design notes", items: [
+          "Four step carousel: where to find the pages, what to capture, lighting tips, what good looks like.",
+          "Skip option is available so confident users are not blocked."
+        ]}
+      ],
+      flag: "Open item: exact passport pages and sections to be photographed to be confirmed with Apona. This shapes both this walkthrough and the checker workflow."
+    },
+    upload: {
+      name: "Photo Upload",
+      sections: [
+        { title: "Purpose", items: [
+          "Most repeated user action across the platform, so friction is the enemy.",
+          "Direct camera access with multi photo support."
+        ]},
+        { title: "Design notes", items: [
+          "Once submitted, the record moves to pending verification on the owner's dashboard.",
+          "Submission triggers the chase cycle if a checker later requests resubmission."
+        ]}
+      ]
+    },
+    dashboard: {
+      name: "Owner Dashboard",
+      sections: [
+        { title: "Purpose", items: [
+          "At a glance status across all horses on the account.",
+          "Clear next action when something needs attention."
+        ]},
+        { title: "Design notes", items: [
+          "Pills give status at a glance: verified, pending, resubmit needed.",
+          "Resubmit prompts include the checker's reason so the owner knows what to fix.",
+          "Expiry warnings surface upcoming issues before they become problems."
+        ]}
+      ],
+      flag: "Open item: WhatsApp notifications under consideration for phase one. Depends on Apona's capacity to manage that channel."
+    },
+    "checker-queue": {
+      name: "Checker Queue",
+      sections: [
+        { title: "Purpose", items: [
+          "The checker sees only the submissions assigned to them by the super admin.",
+          "Optimised for working through a batch quickly and consistently."
+        ]},
+        { title: "Design notes", items: [
+          "Oldest pending surfaces first. Resubmissions called out so chase cycles do not stall.",
+          "Filter and search support large batches when workload spikes."
+        ]}
+      ],
+      flag: "Open item: in house verification team composition (size, mix of vets and non vets) to be confirmed with Apona. Does not affect platform design."
+    },
+    "checker-review": {
+      name: "Checker Review",
+      sections: [
+        { title: "Purpose", items: [
+          "Side by side: original photographs on the left, extracted detail fields on the right.",
+          "Approve and verify, or request resubmission with a clear reason."
+        ]},
+        { title: "Design notes", items: [
+          "The checker enters detail from the photographs, with the system pre filling where confidence is high.",
+          "Audit trail captures who approved what and when."
+        ]}
+      ]
+    },
+    admin: {
+      name: "Super Admin",
+      sections: [
+        { title: "Purpose", items: [
+          "Apona team's operational view. Manage checker accounts, allocate batches, monitor turnaround.",
+          "Handles escalations and any out of band cases."
+        ]},
+        { title: "Design notes", items: [
+          "Full system visibility. Other roles see only what is needed for their job.",
+          "Turnaround time is a key metric and is surfaced prominently."
+        ]}
+      ]
+    },
+    event: {
+      name: "Event Verification",
+      sections: [
+        { title: "Purpose", items: [
+          "Static validation. Events care about their entry window, nothing beyond it.",
+          "Designed to be run once close to the event date."
+        ]},
+        { title: "Design notes", items: [
+          "Batch UELN list upload via CSV, plus API endpoint for systems integration.",
+          "Failures are clear and actionable so the event team can chase entrants directly.",
+          "Results downloadable for the event records."
+        ]}
+      ]
+    },
+    livery: {
+      name: "Livery Yard Real Time Query",
+      sections: [
+        { title: "Purpose", items: [
+          "Real time validation at the yard gate. Tappable on a phone in seconds.",
+          "Yes / no answer based on the current state of the database."
+        ]},
+        { title: "Design notes", items: [
+          "Access scoped so the yard sees what it needs, not the wider database.",
+          "Recent checks history gives the yard their own record without needing to log them separately.",
+          "Expiry warnings within the cleared response so the yard can flag upcoming issues."
+        ]}
+      ]
+    },
+    vet: {
+      name: "Vet Update (Phase Two)",
+      sections: [
+        { title: "Purpose", items: [
+          "Replaces owner re upload as the primary route for new vaccinations.",
+          "Low touch design: find horse, fill four fields, confirm."
+        ]},
+        { title: "Design notes", items: [
+          "Phase two feature. Manual upload route remains in parallel during the transition.",
+          "Audit trail records the administering vet for every entry.",
+          "Vaccination history visible to the vet at the point of care."
+        ]}
+      ]
+    }
+  };
+
+  // Guidance carousel
+  const guideSteps = [
+    { title: "Welcome", body: "We will guide you through what to photograph. It takes about a minute." },
+    { title: "Find the vaccination record pages", body: "Open the passport at the vaccination record section. You will need to photograph the vet stamp, the vaccine batch number, and the date for each entry." },
+    { title: "Lighting and focus", body: "Photograph in good natural light if possible. Make sure all text on the page is clear and readable." },
+    { title: "What good looks like", body: "Whole page in frame, no glare, all stamps and numbers legible. Take more than one shot if in doubt." }
+  ];
+  let guideStep = 2;
+  function renderGuide() {
+    document.getElementById('guide-step-label').textContent = 'Step ' + guideStep + ' of 4';
+    document.getElementById('guide-title-text').textContent = guideSteps[guideStep - 1].title;
+    document.getElementById('guide-body-text').textContent = guideSteps[guideStep - 1].body;
+    document.querySelectorAll('.guide-dot').forEach(d => {
+      d.classList.toggle('active', parseInt(d.dataset.step) === guideStep);
+    });
+    document.getElementById('guide-back').disabled = guideStep === 1;
+    document.getElementById('guide-next').textContent = guideStep === 4 ? 'Start uploading' : 'Next step';
+  }
+  document.getElementById('guide-back').addEventListener('click', () => { if (guideStep > 1) { guideStep--; renderGuide(); } });
+  document.getElementById('guide-next').addEventListener('click', () => {
+    if (guideStep < 4) { guideStep++; renderGuide(); } else { showScreen('upload'); }
+  });
+  document.querySelectorAll('.guide-dot').forEach(d => d.addEventListener('click', () => {
+    guideStep = parseInt(d.dataset.step); renderGuide();
+  }));
+
+  const roleMap = {
+    signup: 'owner', guidance: 'owner', upload: 'owner', dashboard: 'owner',
+    'checker-queue': 'checker', 'checker-review': 'checker',
+    admin: 'admin', event: 'event', livery: 'livery', vet: 'vet'
+  };
+  const roleContext = {
+    owner: { name: 'Sarah Williams', initials: 'SW', context: 'Owner / Agent' },
+    checker: { name: 'James Patel', initials: 'JP', context: 'Checker' },
+    admin: { name: 'Admin', initials: 'AD', context: 'Apona Operations' },
+    event: { name: 'HOYS 2026', initials: 'HY', context: 'Event Organiser' },
+    livery: { name: 'Summerford Park', initials: 'SP', context: 'Livery Yard' },
+    vet: { name: 'Dr. Helen Marsh', initials: 'HM', context: 'Veterinary Practice' }
+  };
+  const roleEntryScreen = {
+    owner: 'dashboard',
+    checker: 'checker-queue',
+    admin: 'admin',
+    event: 'event',
+    livery: 'livery',
+    vet: 'vet'
+  };
+
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    const target = document.querySelector('[data-screen="' + id + '"]');
+    if (target) target.classList.add('active');
+
+    const role = roleMap[id];
+    document.querySelectorAll('.role-tab').forEach(t => t.classList.toggle('active', t.dataset.role === role));
+
+    const ctx = roleContext[role];
+    document.getElementById('user-name').textContent = ctx.name;
+    document.getElementById('user-initials').textContent = ctx.initials;
+    document.getElementById('topbar-context').textContent = ctx.context;
+
+    updateAnnotations(id);
+    document.querySelector('.workspace').scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  document.querySelectorAll('[data-goto]').forEach(el => {
+    el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const target = el.dataset.goto;
+      if (el.dataset.action === 'submit-upload') {
+        document.getElementById('submit-banner').style.display = 'flex';
+        setTimeout(() => { document.getElementById('submit-banner').style.display = 'none'; }, 6000);
+      }
+      showScreen(target);
+    });
+  });
+
+  document.querySelectorAll('.role-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      showScreen(roleEntryScreen[tab.dataset.role]);
+    });
+  });
+
+  function updateAnnotations(screenId) {
+    const data = annotations[screenId];
+    if (!data) return;
+    document.getElementById('anno-screen-name').textContent = data.name;
+    const content = document.getElementById('anno-content');
+    let html = '';
+    data.sections.forEach(sec => {
+      html += '<div class="anno-section"><div class="anno-section-title">' + sec.title + '</div><ul>';
+      sec.items.forEach(item => { html += '<li>' + item + '</li>'; });
+      html += '</ul></div>';
+    });
+    if (data.flag) {
+      html += '<div class="anno-flag"><strong>Flag:</strong> ' + data.flag + '</div>';
+    }
+    content.innerHTML = html;
+  }
+  updateAnnotations('signup');
+
+  const annoToggle = document.getElementById('anno-toggle');
+  const annoPanel = document.getElementById('anno-panel');
+  const annoToggleLabel = document.getElementById('anno-toggle-label');
+  function setAnnoOpen(open) {
+    annoPanel.classList.toggle('open', open);
+    annoToggle.classList.toggle('active', open);
+    annoToggleLabel.textContent = open ? 'Hide notes' : 'Show notes';
+  }
+  annoToggle.addEventListener('click', () => setAnnoOpen(!annoPanel.classList.contains('open')));
+  document.getElementById('anno-close').addEventListener('click', () => setAnnoOpen(false));
+
+  // ─── PASSCODE GATE ───
+  const ACCESS_CODE = 'apona2026';
+  const gate = document.getElementById('gate');
+  const gateInput = document.getElementById('gate-input');
+  const gateBtn = document.getElementById('gate-btn');
+  const gateError = document.getElementById('gate-error');
+
+  if (sessionStorage.getItem('apona-access') === 'granted') {
+    gate.classList.add('hidden');
+  } else {
+    setTimeout(() => gateInput.focus(), 100);
+  }
+
+  function tryAccess() {
+    if (gateInput.value.trim().toLowerCase() === ACCESS_CODE) {
+      sessionStorage.setItem('apona-access', 'granted');
+      gate.classList.add('hidden');
+      gateError.textContent = '';
+    } else {
+      gateError.textContent = 'Code not recognised. Please try again.';
+      gateInput.value = '';
+      gateInput.focus();
+    }
+  }
+  gateBtn.addEventListener('click', tryAccess);
+  gateInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') tryAccess(); });
+</script>
+
+</body>
+</html>
