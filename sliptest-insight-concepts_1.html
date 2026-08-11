@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SlipTest InSight — Scheduler &amp; AI Reporting Concepts</title>
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --yellow:#F7CD2B; --yellow-d:#f0c000; --yellow-soft:#fdf6d9;
+    --grey-btn:#E0E1E2; --grey-btn-d:#cacbcd;
+    --bg:#f2f2f2; --card:#ffffff; --alt:#fafafa;
+    --ink:rgba(0,0,0,.87); --muted:rgba(0,0,0,.6); --faint:rgba(0,0,0,.4);
+    --border:rgba(34,36,38,.15); --border2:rgba(34,36,38,.1);
+    --info:#276F86; --info-bg:#F8FFFF; --info-br:#a9d5de;
+    --warn:#794b02; --warn-bg:#FFF8DB; --warn-br:#b58105;
+    --pos:#2C662D; --pos-bg:#FCFFF5; --pos-br:#a3c293;
+    --green:#21BA45; --green-t:#1a7f37; --green-bg:#e4f6e7;
+    --orange:#F2711C; --orange-t:#9c4221; --orange-bg:#fdecdd;
+    --red:#DB2828; --red-t:#a51616; --red-bg:#fbe4e4;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Lato','Helvetica Neue',Arial,Helvetica,sans-serif;background:var(--bg);color:var(--ink);font-size:14px;line-height:1.4}
+  button{font-family:inherit;cursor:pointer}
+  a{color:var(--info)}
+
+  /* ── TOP CHROME ── */
+  .topbar{background:#fff;border-bottom:1px solid var(--border);padding:12px 26px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:30}
+  .logo{display:flex;flex-direction:column;line-height:1}
+  .logo .l1{font-size:12px;font-weight:900;letter-spacing:.5px;color:var(--ink)}
+  .logo .l1 span{color:var(--yellow-d)}
+  .logo .l2{font-size:26px;font-weight:900;letter-spacing:-.5px;color:var(--ink);margin-top:1px}
+  .logo .l2 span{color:var(--yellow)}
+  .top-right{display:flex;align-items:center;gap:14px}
+  .concept-pill{background:#1b1c1d;color:#fff;font-weight:900;font-size:10.5px;padding:6px 12px;border-radius:4px;letter-spacing:.5px}
+  .user-chip{display:flex;align-items:center;gap:8px;font-weight:700;font-size:13px;color:var(--muted)}
+  .user-chip .av{width:26px;height:26px;border-radius:50%;background:var(--grey-btn);display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:12px}
+
+  /* ── TAB MENU ── */
+  .tabs{background:#fff;border-bottom:1px solid var(--border);padding:0 26px;display:flex;gap:2px;position:sticky;top:57px;z-index:29}
+  .tab{padding:13px 18px;font-weight:700;font-size:13.5px;color:var(--muted);border:none;background:none;border-bottom:3px solid transparent;transition:.15s}
+  .tab:hover{color:var(--ink)}
+  .tab.active{color:var(--ink);border-bottom-color:var(--yellow)}
+  .tab.dim{color:var(--faint);cursor:default}
+  .tab .badge{background:var(--red);color:#fff;font-size:10px;font-weight:900;padding:1px 6px;border-radius:20px;margin-left:6px}
+
+  .wrap{padding:22px 26px 60px;max-width:1320px;margin:0 auto}
+  .view{display:none} .view.active{display:block}
+
+  /* ── CARD (Semantic style, yellow header) ── */
+  .card{background:var(--card);border:1px solid var(--border);border-radius:5px;box-shadow:0 1px 2px rgba(0,0,0,.03)}
+  .card-h{background:var(--yellow);padding:11px 16px;border-radius:5px 5px 0 0;display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .card-h h2{font-size:15px;font-weight:900;color:var(--ink)}
+  .card-h .sub{font-size:11.5px;color:rgba(0,0,0,.55);font-weight:700}
+  .card-h .hbtns{display:flex;gap:8px}
+
+  .btn{border:none;background:var(--grey-btn);color:var(--muted);font-weight:700;font-size:12px;padding:8px 13px;border-radius:4px;display:inline-flex;align-items:center;gap:6px;transition:.15s}
+  .btn:hover{background:var(--grey-btn-d)}
+  .btn.primary{background:var(--yellow);color:var(--ink)}
+  .btn.primary:hover{background:var(--yellow-d)}
+  .btn svg{width:13px;height:13px}
+  .btn.sm{padding:6px 10px;font-size:11px}
+
+  /* KPI tiles */
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
+  .kpi{background:#fff;border:1px solid var(--border);border-radius:5px;padding:15px 16px;border-top:3px solid var(--yellow)}
+  .kpi .n{font-size:26px;font-weight:900;letter-spacing:-.5px}
+  .kpi .l{font-size:11.5px;color:var(--muted);font-weight:700;margin-top:2px}
+  .kpi .n.red{color:var(--red)} .kpi .n.green{color:var(--green-t)} .kpi .n.orange{color:var(--orange-t)}
+
+  /* info / note boxes */
+  .msg{border-radius:5px;padding:12px 15px;font-size:12.5px;line-height:1.55;margin:0}
+  .msg.info{background:var(--info-bg);border:1px solid var(--info-br);color:var(--info)}
+  .msg.info b{color:var(--info)}
+  .msg.warn{background:var(--warn-bg);border:1px solid var(--warn-br);color:var(--warn)}
+  .msg.pos{background:var(--pos-bg);border:1px solid var(--pos-br);color:var(--pos)}
+  .msg .mt{font-weight:900;margin-bottom:4px}
+
+  /* ── SCHEDULER ── */
+  .sched-grid{display:grid;grid-template-columns:264px 1fr;gap:16px}
+  .backlog .item{padding:11px 15px;border-bottom:1px solid var(--border2);cursor:pointer;transition:background .12s}
+  .backlog .item:last-child{border-bottom:none}
+  .backlog .item:hover{background:var(--alt)}
+  .backlog .item .c{font-weight:900;font-size:12.5px}
+  .backlog .item .m{font-size:11px;color:var(--muted);margin-top:2px}
+  .due{font-size:10px;font-weight:900;padding:2px 8px;border-radius:4px}
+  .due.over{background:var(--red-bg);color:var(--red-t)}
+  .due.soon{background:var(--orange-bg);color:var(--orange-t)}
+  .due.ok{background:var(--info-bg);color:var(--info);border:1px solid var(--info-br)}
+
+  .board-scroll{overflow-x:auto}
+  .board{display:grid;grid-template-columns:repeat(5,minmax(152px,1fr));gap:10px;padding:14px;min-width:830px}
+  .day-col{background:var(--bg);border:1px solid var(--border2);border-radius:5px;padding:8px;min-height:340px}
+  .day-h{font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);padding:4px 6px 9px;display:flex;justify-content:space-between}
+  .day-h .cnt{color:var(--faint)}
+  .job{background:#fff;border:1px solid var(--border);border-left:4px solid var(--tech,#888);border-radius:4px;padding:8px 9px;margin-bottom:8px;cursor:pointer;transition:box-shadow .12s,transform .12s}
+  .job:hover{box-shadow:0 3px 9px rgba(0,0,0,.13);transform:translateY(-1px)}
+  .job .jc{font-weight:900;font-size:12px;line-height:1.25}
+  .job .jm{font-size:10.5px;color:var(--muted);margin-top:3px}
+  .job .jrow{display:flex;align-items:center;justify-content:space-between;margin-top:7px;gap:4px}
+  .chip{font-size:9.5px;font-weight:900;padding:2px 7px;border-radius:20px;color:#fff;white-space:nowrap}
+  .st{font-size:9.5px;font-weight:900;padding:2px 6px;border-radius:3px;white-space:nowrap}
+  .st.sched{background:#eef1f5;color:#5a6570}
+  .st.rams{background:var(--warn-bg);color:var(--warn);border:1px solid var(--warn-br)}
+  .st.conf{background:var(--green-bg);color:var(--green-t)}
+  .st.done{background:#e8e8e8;color:#555}
+
+  .legend{display:flex;gap:16px;flex-wrap:wrap;padding:11px 16px;border-top:1px solid var(--border2);font-size:11px;color:var(--muted);font-weight:700;align-items:center}
+  .legend .dot{width:10px;height:10px;border-radius:2px;display:inline-block;margin-right:5px;vertical-align:middle}
+
+  /* drawer */
+  .drawer-wrap{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;z-index:50;justify-content:flex-end}
+  .drawer-wrap.open{display:flex}
+  .drawer{width:392px;max-width:92vw;background:#fff;height:100%;overflow-y:auto;box-shadow:-8px 0 30px rgba(0,0,0,.18);animation:slidein .18s ease}
+  @keyframes slidein{from{transform:translateX(30px);opacity:.6}to{transform:none;opacity:1}}
+  .drawer-h{padding:14px 18px;background:var(--yellow);position:sticky;top:0}
+  .drawer-h .x{float:right;border:none;background:rgba(0,0,0,.12);width:28px;height:28px;border-radius:4px;font-size:15px;color:var(--ink)}
+  .drawer-h .dt{font-size:16px;font-weight:900}
+  .drawer-h .ds{font-size:12px;color:rgba(0,0,0,.6);font-weight:700;margin-top:1px}
+  .drawer-b{padding:18px}
+  .field{margin-bottom:14px}
+  .field .k{font-size:10.5px;text-transform:uppercase;letter-spacing:.5px;color:var(--faint);font-weight:900;margin-bottom:3px}
+  .field .v{font-size:13.5px;font-weight:700}
+  .flow{display:flex;gap:4px;margin:6px 0 2px;flex-wrap:wrap}
+  .flow .step{flex:1;min-width:52px;text-align:center;font-size:9px;font-weight:900;padding:6px 3px;border-radius:4px;background:#eef1f5;color:var(--faint)}
+  .flow .step.done{background:var(--green-bg);color:var(--green-t)}
+  .flow .step.cur{background:var(--yellow);color:var(--ink)}
+  .cascade{display:none;margin-top:8px}
+  .cascade.show{display:block}
+
+  /* toast */
+  .toast-wrap{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);z-index:80;display:flex;flex-direction:column;gap:8px;align-items:center}
+  .toast{background:#1b1c1d;color:#fff;padding:11px 18px;border-radius:5px;font-size:12.5px;font-weight:700;box-shadow:0 6px 20px rgba(0,0,0,.28);display:flex;align-items:center;gap:9px;animation:pop .2s ease}
+  .toast .ok{color:var(--yellow)}
+  @keyframes pop{from{transform:translateY(8px);opacity:0}to{transform:none;opacity:1}}
+
+  /* ── AI REPORTING ── */
+  .ai-grid{display:grid;grid-template-columns:330px 1fr;gap:16px}
+  .pad{padding:16px}
+  .seg{display:flex;gap:6px;flex-wrap:wrap}
+  .seg button{border:1px solid var(--border);background:#fff;border-radius:4px;padding:7px 12px;font-size:11.5px;font-weight:700;color:var(--muted)}
+  .seg button.on{background:var(--yellow);border-color:var(--yellow-d);color:var(--ink)}
+  .prompt-list{display:flex;flex-direction:column;gap:8px}
+  .prompt{border:1px solid var(--border);border-radius:4px;padding:10px 12px;font-size:12px;color:var(--muted);cursor:pointer;line-height:1.4;background:#fff;text-align:left;transition:.12s}
+  .prompt:hover{border-color:var(--yellow-d)}
+  .prompt.on{border-color:var(--yellow-d);background:var(--yellow-soft);color:var(--ink);font-weight:700}
+  textarea{width:100%;border:1px solid var(--border);border-radius:4px;padding:10px;font-family:inherit;font-size:12.5px;color:var(--ink);resize:vertical;min-height:66px}
+  textarea:focus{outline:none;border-color:var(--yellow-d)}
+  .guard ul{list-style:none;margin-top:5px} .guard li{padding-left:18px;position:relative;margin:3px 0}
+  .guard li::before{content:'✓';position:absolute;left:0;color:var(--green);font-weight:900}
+  .guard li.no::before{content:'✕';color:var(--red)}
+
+  .report{border:1px solid var(--border);border-radius:5px;overflow:hidden}
+  .rep-cover{background:#3f3f3f;color:#fff;padding:18px 20px;text-align:center;position:relative}
+  .rep-cover .rt{font-size:17px;font-weight:900}
+  .rep-cover .rs{font-size:11.5px;color:#d6d6d6;margin-top:4px;font-weight:700}
+  .rep-cover .badge{position:absolute;top:14px;right:16px;background:var(--yellow);color:var(--ink);font-size:10px;font-weight:900;padding:4px 9px;border-radius:4px}
+  .rep-meta{width:100%;border-collapse:collapse;font-size:12px;margin:16px 0 4px}
+  .rep-meta th{background:#e8e8e8;text-align:left;padding:8px 10px;font-weight:900;color:var(--ink);border:1px solid var(--border)}
+  .rep-meta td{padding:8px 10px;border:1px solid var(--border);color:var(--ink)}
+  .yhead{background:var(--yellow);color:var(--ink);font-weight:900;font-size:14px;padding:10px 14px;border-radius:4px;margin:20px 0 10px}
+  .loc-table{width:100%;border-collapse:collapse;font-size:11.5px}
+  .loc-table th{background:#e8e8e8;padding:7px 10px;border:1px solid #d4d4d4;font-weight:900;color:var(--ink);text-align:center}
+  .loc-table th.loc{text-align:left}
+  .loc-table td.loc{background:#fff;border:1px solid var(--border2);font-weight:700;color:var(--ink)}
+  .loc-table td.cell{text-align:center;font-weight:900;color:rgba(0,0,0,.87);border:1px solid #fff}
+  .g-green{background:#008000;color:#fff} .g-orange{background:#FFA500} .g-red{background:#FF0000;color:#fff}
+  .rep-body{padding:18px 20px}
+  .rep-h{font-size:11.5px;font-weight:900;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin:18px 0 8px;padding-bottom:5px;border-bottom:2px solid var(--yellow)}
+  .rep-h:first-child{margin-top:0}
+  .rep-h span{font-weight:700;color:var(--faint);text-transform:none;letter-spacing:0}
+  .summary{font-size:12.5px;line-height:1.6;color:var(--ink)}
+  .summary b{font-weight:900}
+  .summary ul{margin:6px 0;list-style:none}
+  .summary li{padding-left:15px;position:relative;margin:3px 0}
+  .summary li::before{content:'▪';position:absolute;left:0;color:var(--yellow-d);font-size:11px;top:1px}
+  table.readings{width:100%;border-collapse:collapse;font-size:11.5px;margin-top:2px}
+  table.readings th{background:var(--bg);text-align:left;padding:7px 10px;font-weight:900;border-bottom:1px solid var(--border);font-size:10.5px;text-transform:uppercase;letter-spacing:.3px;color:var(--muted)}
+  table.readings td{padding:7px 10px;border-bottom:1px solid var(--border2);color:var(--ink)}
+  .pill{font-size:10px;font-weight:900;padding:2px 8px;border-radius:20px}
+  .pill.pass{background:var(--green-bg);color:var(--green-t)}
+  .pill.mod{background:var(--orange-bg);color:var(--orange-t)}
+  .pill.fail{background:var(--red-bg);color:var(--red-t)}
+  .empty{padding:56px 20px;text-align:center;color:var(--faint)}
+  .empty svg{width:42px;height:42px;opacity:.5;margin-bottom:10px}
+  .spinner{width:34px;height:34px;border:3px solid var(--border);border-top-color:var(--yellow-d);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 12px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .note{font-size:11px;color:var(--faint);font-style:italic;margin-top:10px}
+
+  .foot-note{margin-top:22px;padding:14px 16px;background:#fff;border:1px solid var(--border);border-left:4px solid var(--yellow);border-radius:5px;font-size:11.5px;color:var(--muted);line-height:1.6}
+  .foot-note b{color:var(--ink)}
+  .draytus-tag{text-align:center;margin-top:22px;font-size:11px;color:var(--faint);font-weight:700;letter-spacing:.3px}
+  .draytus-tag b{color:var(--red-t)}
+  /* ── TECHNICIAN AVAILABILITY ── */
+  .tgrid{display:grid;grid-template-columns:184px repeat(5,1fr);gap:8px}
+  .tgrid .th{font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);padding:4px 8px 2px;text-align:center}
+  .tgrid .th.first{text-align:left}
+  .tname{background:#fff;border:1px solid var(--border);border-left:4px solid var(--tc,#888);border-radius:5px;padding:9px 11px}
+  .tname .nm{font-weight:900;font-size:13px}
+  .tname .meta{font-size:10.5px;color:var(--muted);margin-top:2px;line-height:1.4}
+  .tcell{background:#fff;border:1px solid var(--border);border-radius:5px;padding:8px;min-height:66px;display:flex;flex-direction:column;justify-content:center}
+  .cap-bar{height:6px;border-radius:3px;background:#eceff2;overflow:hidden;margin-bottom:5px}
+  .cap-bar span{display:block;height:100%;background:var(--green)}
+  .tcell .free{font-size:11.5px;font-weight:800;color:var(--green-t)}
+  .tcell .hrs{font-size:10px;color:var(--faint);margin-top:2px}
+  .tcell .cnote{font-size:10px;color:var(--warn);font-weight:800;margin-top:3px}
+  .tcell.full .cap-bar span{background:var(--red)}
+  .tcell.full .free{color:var(--red-t)}
+  .tcell.off{background:var(--bg);color:var(--faint);align-items:center}
+  .tcell.off .free{color:var(--faint);font-weight:700}
+
+  /* ── SCHEDULING WIZARD ── */
+  .wiz-wrap{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;z-index:60;align-items:center;justify-content:center}
+  .wiz-wrap.open{display:flex}
+  .wiz{width:580px;max-width:94vw;max-height:92vh;display:flex;flex-direction:column;background:#fff;border-radius:6px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+  .wiz-h{background:var(--yellow);padding:13px 18px;font-weight:900;font-size:15px;display:flex;justify-content:space-between;align-items:center;border-radius:6px 6px 0 0}
+  .wiz-steps{display:flex;gap:6px;padding:12px 18px;border-bottom:1px solid var(--border)}
+  .wiz-step{flex:1;text-align:center;font-size:10.5px;font-weight:800;color:var(--faint);padding:7px 4px;border-radius:4px;background:var(--bg)}
+  .wiz-step.on{background:var(--yellow);color:var(--ink)}
+  .wiz-step.done{background:var(--green-bg);color:var(--green-t)}
+  .wiz-b{padding:18px;overflow-y:auto}
+  .wiz-f{padding:13px 18px;border-top:1px solid var(--border);display:flex;justify-content:space-between}
+  .opt{border:1px solid var(--border);border-radius:5px;padding:11px 13px;margin-bottom:8px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:10px;transition:.12s}
+  .opt:hover{border-color:var(--yellow-d)}
+  .opt.on{border-color:var(--yellow-d);background:var(--yellow-soft)}
+  .opt .oc{font-weight:900;font-size:13px}
+  .opt .om{font-size:11px;color:var(--muted);margin-top:2px}
+  .opt .chip{color:#fff}
+  .avail-pill{font-size:10px;font-weight:800;padding:3px 9px;border-radius:20px;white-space:nowrap}
+  .avail-pill.good{background:var(--green-bg);color:var(--green-t)}
+  .avail-pill.tight{background:var(--warn-bg);color:var(--warn)}
+  .avail-pill.full{background:var(--red-bg);color:var(--red-t)}
+  .wiz-sum{border:1px solid var(--border);border-radius:5px;overflow:hidden}
+  .wiz-sum .r{display:flex;justify-content:space-between;padding:10px 13px;border-bottom:1px solid var(--border2);font-size:12.5px}
+  .wiz-sum .r:last-child{border-bottom:none}
+  .wiz-sum .r .k{color:var(--muted);font-weight:700}
+  .wiz-sum .r .v{font-weight:800;text-align:right}
+
+  @media (max-width:900px){.sched-grid,.ai-grid{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(2,1fr)}.tgrid{grid-template-columns:140px repeat(5,minmax(100px,1fr))}}
+</style>
+</head>
+<body>
+
+<!-- TOP CHROME -->
+<div class="topbar">
+  <div class="logo">
+    <div class="l1">Slip<span>Test</span></div>
+    <div class="l2"><span>In</span>Sight</div>
+  </div>
+  <div class="top-right">
+    <span class="concept-pill">CONCEPT · DRAYTUS</span>
+    <div class="user-chip"><span class="av">D</span>Welcome, Draytus ▾</div>
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab dim">Dashboard</button>
+  <button class="tab active" data-view="scheduler">Scheduler <span class="badge">new</span></button>
+  <button class="tab" data-view="techs">Technicians <span class="badge">new</span></button>
+  <button class="tab" data-view="ai">AI Reporting <span class="badge">new</span></button>
+  <button class="tab dim">CRM</button>
+  <button class="tab dim">System Settings</button>
+</div>
+
+<div class="wrap">
+
+  <!-- ══════════ SCHEDULER ══════════ -->
+  <section class="view active" id="view-scheduler">
+    <div class="kpis">
+      <div class="kpi"><div class="n">462</div><div class="l">Customers on cycle</div></div>
+      <div class="kpi"><div class="n red">17</div><div class="l">Due / overdue to schedule</div></div>
+      <div class="kpi"><div class="n orange">6</div><div class="l">RAMS awaiting send</div></div>
+      <div class="kpi"><div class="n green">28</div><div class="l">Visits booked this week</div></div>
+    </div>
+
+    <div class="sched-grid">
+      <div class="card backlog">
+        <div class="card-h"><h2>Due to schedule</h2><span class="sub">by cycle</span></div>
+        <div id="backlogList"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-h">
+          <h2>Week board · 15–19 Jun 2026</h2>
+          <div class="hbtns">
+            <button class="btn sm" onclick="toast('Filtering by technician (demo)')">Technician</button>
+            <button class="btn sm primary" onclick="toast('Auto-plan suggested 5 optimal routes','ok')">Auto-plan routes</button>
+          </div>
+        </div>
+        <div class="board-scroll"><div class="board" id="board"></div></div>
+        <div class="legend" id="legend"></div>
+      </div>
+    </div>
+
+    <div class="foot-note">
+      <b>What this shows.</b> The scheduling step that off-the-shelf tools (Big Change) could not handle: routine-cycle customers (annual / six-monthly) surfacing automatically as they fall due, visits organised across the technician team by day, and the full downstream flow on each job, scheduling, RAMS to customer, technician despatch, on-site data into InSight, then the published report. Click any job for its flow and the <b>reschedule cascade</b>, the moving-parts problem Mike raised.
+    </div>
+  </section>
+
+  <!-- ══════════ TECHNICIANS ══════════ -->
+  <section class="view" id="view-techs">
+    <div class="kpis">
+      <div class="kpi"><div class="n">4</div><div class="l">Field technicians</div></div>
+      <div class="kpi"><div class="n green">31</div><div class="l">Free visit slots this week</div></div>
+      <div class="kpi"><div class="n orange">3</div><div class="l">Part-day constraints</div></div>
+      <div class="kpi"><div class="n">78%</div><div class="l">Team utilisation</div></div>
+    </div>
+    <div class="card">
+      <div class="card-h"><h2>Technician availability · 15–19 Jun 2026</h2>
+        <div class="hbtns"><button class="btn sm primary" onclick="switchView('scheduler')">Open week board</button></div></div>
+      <div class="pad">
+        <div class="board-scroll"><div id="techGrid" style="min-width:840px"></div></div>
+        <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:12px;font-size:11px;color:var(--muted);font-weight:700;align-items:center">
+          <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:var(--green);margin-right:5px;vertical-align:middle"></span>Slots free</span>
+          <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:var(--red);margin-right:5px;vertical-align:middle"></span>Fully booked</span>
+          <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:var(--warn-br);margin-right:5px;vertical-align:middle"></span>Part-day constraint</span>
+        </div>
+      </div>
+    </div>
+    <div class="foot-note">
+      <b>Why this screen.</b> This is the half Mike flagged, availability drives the schedule. Each technician has working hours, a home base and part-day constraints (training, early finish, a day off). When you schedule a visit the flow only offers slots a technician can actually take, which is what the off-the-shelf tools could not do. Try it: on the Scheduler, click <b>Schedule visit</b> on a due customer.
+    </div>
+  </section>
+
+  <!-- ══════════ AI REPORTING ══════════ -->
+  <section class="view" id="view-ai">
+    <div class="ai-grid">
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div class="card">
+          <div class="card-h"><h2>Build a report</h2></div>
+          <div class="pad">
+            <div class="field">
+              <div class="k">Site &amp; test</div>
+              <div class="v" id="buildSite">Northgate Retail Park · Unit 4</div>
+              <div style="font-size:11.5px;color:var(--muted);margin-top:2px" id="buildMeta">SlipAlert · 5 locations · 14 Jun 2026</div>
+            </div>
+            <div class="k" style="font-size:10.5px;text-transform:uppercase;letter-spacing:.5px;color:var(--faint);font-weight:900;margin-bottom:6px">Industry template</div>
+            <div class="seg" id="industrySeg"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-h"><h2>AI assist</h2><span class="sub">Belinda's actual prompts</span></div>
+          <div class="pad">
+            <div style="font-size:11.5px;color:var(--muted);margin-bottom:8px">From Belinda's example pack (4 Jun 2026). Prompts for this sector:</div>
+            <div class="prompt-list" id="promptList"></div>
+            <div style="margin:12px 0 6px" class="k" >Your instruction to the AI</div>
+            <textarea id="promptBox" placeholder="Pick a prompt above or type your own…"></textarea>
+            <button class="btn primary" style="width:100%;justify-content:center;margin-top:10px" onclick="generate()">✦ Generate summary</button>
+          </div>
+        </div>
+
+        <div class="msg pos guard">
+          <div class="mt">🛡 Guardrails baked in (from Belinda's prompts)</div>
+          <ul>
+            <li>Applies the PTV scale: 0-24 high, 25-35 moderate, 36+ low</li>
+            <li>References anti-slip footwear and the cleaning / housekeeping regime</li>
+            <li>Compares surfaces and flags the impact of contamination</li>
+            <li>Produces an Executive Summary, Recommendations and Conclusions in SlipTest's report style</li>
+            <li class="no">Never invents or alters the captured readings</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card" style="align-self:start">
+        <div class="card-h">
+          <h2>Report preview</h2>
+          <div class="hbtns"><button class="btn sm" onclick="toast('Exported to PDF — formatting preserved','ok')">Export PDF</button></div>
+        </div>
+        <div class="pad" id="reportArea">
+          <div class="empty">
+            <svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h5"/></svg>
+            <div style="font-weight:700;color:var(--muted)">Pick a template and prompt, then Generate</div>
+            <div style="font-size:12px;margin-top:4px">The AI drafts the Technicians Summary from the captured readings. You review and edit before it goes out.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="foot-note">
+      <b>What this shows.</b> Belinda's manual ChatGPT workflow brought inside InSight. The sectors and prompts here are her real ones, taken from her 4 June example pack (Food factory, Factory / warehouse, Shopping centre, Hotel): her example reports become selectable <b>templates</b>, her prompts become one-click <b>skills</b>, and the wording she applies by hand (the PTV scale, footwear, cleaning regime, compare-surfaces) is enforced by the platform. The AI drafts the Technician's Summary and Recommendations from the captured readings; a person reviews and edits before send. The summary keeps its formatting through to PDF, closing the gap logged in SLI-1.
+    </div>
+  </section>
+
+  <div class="draytus-tag">Concept mock-up prepared by <b>DRAYTUS</b> · not live data</div>
+</div>
+
+<!-- DRAWER -->
+<div class="drawer-wrap" id="drawerWrap" onclick="if(event.target===this)closeDrawer()">
+  <div class="drawer">
+    <div class="drawer-h">
+      <button class="x" onclick="closeDrawer()">✕</button>
+      <div class="dt" id="dJob">Job</div>
+      <div class="ds" id="dSite">site</div>
+    </div>
+    <div class="drawer-b" id="drawerBody"></div>
+  </div>
+</div>
+
+<!-- SCHEDULING WIZARD -->
+<div class="wiz-wrap" id="wizWrap" onclick="if(event.target===this)closeWiz()">
+  <div class="wiz">
+    <div class="wiz-h"><span id="wizTitle">Schedule a visit</span>
+      <button onclick="closeWiz()" style="border:none;background:rgba(0,0,0,.15);width:26px;height:26px;border-radius:4px;font-size:14px">✕</button></div>
+    <div class="wiz-steps" id="wizSteps"></div>
+    <div class="wiz-b" id="wizBody"></div>
+    <div class="wiz-f">
+      <button class="btn" id="wizBack" onclick="wizBack()">Back</button>
+      <button class="btn primary" id="wizNext" onclick="wizNext()">Next</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script>
+const TECH={
+  DP:{name:'Dave P.', c:'#DB2828'},
+  PK:{name:'Priya K.', c:'#2185D0'},
+  TM:{name:'Tom M.', c:'#21BA45'},
+  RH:{name:'Rhys H.', c:'#6435C9'}
+};
+const FLOW=['Scheduled','RAMS sent','Confirmed','On site','In InSight','Report'];
+
+const JOBS=[
+  {id:1, day:0, cust:'Meridian Foods', site:'Bakery floor, Slough', tech:'DP', type:'Pendulum · 8 locations', time:'08:30', stage:2},
+  {id:2, day:0, cust:'Parkview Leisure', site:'Poolside, Reading', tech:'PK', type:'Pendulum · wet/dry', time:'11:00', stage:1},
+  {id:3, day:1, cust:'Northgate Retail Park', site:'Unit 4, Luton', tech:'TM', type:'Pendulum · 12 locations', time:'09:00', stage:3},
+  {id:4, day:1, cust:'Halden School', site:'Sports hall, Bucks', tech:'DP', type:'Surface roughness', time:'13:30', stage:1},
+  {id:5, day:2, cust:'Riverside Care Home', site:'Corridors, Bedford', tech:'RH', type:'Pendulum · 6 locations', time:'10:00', stage:0},
+  {id:6, day:2, cust:'City Transport Hub', site:'Concourse, MK', tech:'PK', type:'Pendulum · 20 locations', time:'08:00', stage:2},
+  {id:7, day:3, cust:'Bella Kitchens', site:'Showroom, Northampton', tech:'TM', type:'Pendulum · 4 locations', time:'12:00', stage:0},
+  {id:8, day:3, cust:'Oakwood Hotel', site:'Lobby + spa, Milton K.', tech:'RH', type:'Pendulum · wet/dry', time:'15:00', stage:0},
+  {id:9, day:4, cust:'Fairlawn Manufacturing', site:'Line 2, Wellingboro', tech:'DP', type:'Pendulum · 10 locations', time:'09:30', stage:0}
+];
+const BACKLOG=[
+  {cust:'Meridian Foods', site:'Slough', due:'over', label:'2 days overdue', cycle:'Annual'},
+  {cust:'Danforth Logistics', site:'Corby', due:'over', label:'Overdue', cycle:'6-monthly'},
+  {cust:'Greenfield Academy', site:'Kettering', due:'soon', label:'Due in 4 days', cycle:'Annual'},
+  {cust:'Ashcroft Retail', site:'Luton', due:'soon', label:'Due in 6 days', cycle:'6-monthly'},
+  {cust:'Pinewood Care', site:'Bedford', due:'ok', label:'Due in 12 days', cycle:'Annual'},
+  {cust:'Vantage Offices', site:'Milton Keynes', due:'ok', label:'Due in 15 days', cycle:'Annual'}
+];
+const DAYS=['Mon 15','Tue 16','Wed 17','Thu 18','Fri 19'];
+
+function renderBoard(){
+  const b=document.getElementById('board'); b.innerHTML='';
+  DAYS.forEach((d,i)=>{
+    const jobs=JOBS.filter(j=>j.day===i);
+    const col=document.createElement('div'); col.className='day-col';
+    col.innerHTML=`<div class="day-h"><span>${d}</span><span class="cnt">${jobs.length}</span></div>`;
+    jobs.forEach(j=>{
+      const t=TECH[j.tech], stg=j.stage;
+      let stClass='sched',stTxt='Scheduled';
+      if(stg===1){stClass='rams';stTxt='RAMS sent'}
+      else if(stg===2){stClass='conf';stTxt='Confirmed'}
+      else if(stg>=3){stClass='done';stTxt=FLOW[Math.min(stg,5)]}
+      const card=document.createElement('div');
+      card.className='job'; card.style.setProperty('--tech',t.c);
+      card.innerHTML=`<div class="jc">${j.cust}</div>
+        <div class="jm">${j.time} · ${j.type}</div>
+        <div class="jm">${j.site}</div>
+        <div class="jrow"><span class="chip" style="background:${t.c}">${t.name}</span><span class="st ${stClass}">${stTxt}</span></div>`;
+      card.onclick=()=>openDrawer(j.id);
+      col.appendChild(card);
+    });
+    b.appendChild(col);
+  });
+  document.getElementById('legend').innerHTML='<span style="font-weight:900;color:var(--ink)">Technicians:</span>'+
+    Object.values(TECH).map(t=>`<span><span class="dot" style="background:${t.c}"></span>${t.name}</span>`).join('');
+}
+function renderBacklog(){
+  const el=document.getElementById('backlogList'); el.innerHTML='';
+  BACKLOG.forEach((x,idx)=>{
+    const d=document.createElement('div'); d.className='item';
+    d.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+        <span class="c">${x.cust}</span><span class="due ${x.due}">${x.label}</span></div>
+      <div class="m">${x.site} · ${x.cycle} cycle</div>
+      ${x.scheduled?'<div class="btn sm primary" style="margin-top:8px;cursor:default">✓ Scheduled</div>':`<button class="btn sm" style="margin-top:8px" onclick="event.stopPropagation();openWiz(${idx})">+ Schedule visit</button>`}`;
+    el.appendChild(d);
+  });
+}
+
+/* ── technician availability ── */
+const AVAIL={
+  DP:{base:'Slough', hrs:'07:00–15:00', days:[{cap:3,load:2},{cap:3,load:1},{cap:3,load:0,note:'Training AM'},{cap:3,load:1},{cap:2,load:1,note:'Early finish 13:00'}]},
+  PK:{base:'Reading', hrs:'08:00–16:30', days:[{cap:3,load:1},{cap:3,load:1},{cap:3,load:1},{cap:3,load:2},{cap:3,load:1}]},
+  TM:{base:'Luton', hrs:'08:00–16:00', days:[{cap:3,load:0},{cap:3,load:1},{cap:2,load:1,note:'Dentist PM'},{cap:3,load:1},{cap:3,load:0}]},
+  RH:{base:'Bedford', hrs:'09:00–17:00', days:[{cap:2,load:0},{cap:3,load:0},{cap:3,load:1},{cap:2,load:1},{off:true}]}
+};
+function techFree(k){return AVAIL[k].days.reduce((s,d)=>s+(d.off?0:Math.max(0,d.cap-d.load)),0);}
+function renderTechs(){
+  const el=document.getElementById('techGrid'); if(!el)return;
+  let h='<div class="tgrid"><div class="th first">Technician</div>'+DAYS.map(d=>`<div class="th">${d}</div>`).join('');
+  Object.keys(AVAIL).forEach(k=>{
+    const t=TECH[k], a=AVAIL[k];
+    h+=`<div class="tname" style="--tc:${t.c}"><div class="nm">${t.name}</div><div class="meta">${a.base} · ${a.hrs}</div></div>`;
+    a.days.forEach(dd=>{
+      if(dd.off){h+='<div class="tcell off"><div class="free">Day off</div></div>';return;}
+      const free=dd.cap-dd.load, pct=Math.round(dd.load/dd.cap*100), full=free<=0;
+      h+=`<div class="tcell ${full?'full':''}">
+        <div class="cap-bar"><span style="width:${pct}%"></span></div>
+        <div class="free">${full?'Full':free+' free'}</div>
+        ${dd.note?`<div class="cnote">${dd.note}</div>`:`<div class="hrs">${dd.load}/${dd.cap} booked</div>`}
+      </div>`;
+    });
+  });
+  el.innerHTML=h+'</div>';
+}
+
+/* ── scheduling wizard ── */
+const WSTEPS=['Site','Technician','Slot','Confirm'];
+let wiz={idx:null,cust:null,step:0,tech:null,slot:null};
+function openWiz(idx){ wiz={idx,cust:BACKLOG[idx],step:0,tech:null,slot:null}; document.getElementById('wizWrap').classList.add('open'); renderWiz(); }
+function closeWiz(){ document.getElementById('wizWrap').classList.remove('open'); }
+function wizPickTech(k){ wiz.tech=k; wiz.slot=null; renderWiz(); }
+function wizPickSlot(i){ wiz.slot=i; renderWiz(); }
+function techSlots(k){
+  const a=AVAIL[k], times=['09:00','10:30','13:00','11:00','14:30'], out=[];
+  a.days.forEach((dd,i)=>{ if(dd.off)return; if(dd.cap-dd.load>0){ out.push({day:i,time:times[i%times.length],tight:!!dd.note,note:dd.note||null}); } });
+  return out.slice(0,4);
+}
+function wizBack(){ if(wiz.step>0){wiz.step--;renderWiz();} }
+function wizNext(){
+  if(wiz.step===1&&!wiz.tech){toast('Choose a technician first');return;}
+  if(wiz.step===2&&wiz.slot===null){toast('Choose a slot first');return;}
+  if(wiz.step<3){wiz.step++;renderWiz();return;}
+  // confirm
+  const t=TECH[wiz.tech], s=techSlots(wiz.tech)[wiz.slot];
+  BACKLOG[wiz.idx].scheduled=true; renderBacklog();
+  closeWiz();
+  toast(`${wiz.cust.cust} booked with ${t.name}, ${DAYS[s.day]} ${s.time} — RAMS sent`,'ok');
+}
+function renderWiz(){
+  const c=wiz.cust;
+  document.getElementById('wizTitle').textContent='Schedule a visit · '+c.cust;
+  document.getElementById('wizSteps').innerHTML=WSTEPS.map((s,i)=>`<div class="wiz-step ${i===wiz.step?'on':(i<wiz.step?'done':'')}">${i+1}. ${s}</div>`).join('');
+  const body=document.getElementById('wizBody'); let h='';
+  if(wiz.step===0){
+    h=`<div class="wiz-sum">
+      <div class="r"><span class="k">Customer</span><span class="v">${c.cust}</span></div>
+      <div class="r"><span class="k">Site</span><span class="v">${c.site}</span></div>
+      <div class="r"><span class="k">Cycle</span><span class="v">${c.cycle}</span></div>
+      <div class="r"><span class="k">Status</span><span class="v">${c.label}</span></div>
+      <div class="r"><span class="k">Test</span><span class="v">SlipAlert pendulum · ~8 locations</span></div>
+      <div class="r"><span class="k">RAMS</span><span class="v">Required before visit</span></div></div>
+      <p style="font-size:11.5px;color:var(--muted);margin-top:10px">Next, pick a technician. The flow only offers people who can actually take this visit this week.</p>`;
+  } else if(wiz.step===1){
+    const ranked=Object.keys(AVAIL).sort((a,b)=>techFree(b)-techFree(a));
+    h=ranked.map(k=>{
+      const t=TECH[k], f=techFree(k);
+      const cls=f>=4?'good':(f>=2?'tight':'full'), lab=f>=4?'Good availability':(f>=2?'Limited':'Fully booked');
+      return `<div class="opt ${wiz.tech===k?'on':''}" onclick="wizPickTech('${k}')">
+        <div><div class="oc"><span class="chip" style="background:${t.c};padding:2px 8px;border-radius:20px;font-size:10px">${t.name}</span></div>
+        <div class="om">${AVAIL[k].base} · ${AVAIL[k].hrs} · ${f} free slots this week</div></div>
+        <span class="avail-pill ${cls}">${lab}</span></div>`;
+    }).join('');
+  } else if(wiz.step===2){
+    const slots=techSlots(wiz.tech), t=TECH[wiz.tech];
+    h=slots.map((s,i)=>`<div class="opt ${wiz.slot===i?'on':''}" onclick="wizPickSlot(${i})">
+        <div><div class="oc">${DAYS[s.day]} · ${s.time}</div>
+        <div class="om">${s.tight?('Tight, after '+s.note.toLowerCase()):('Fits '+t.name+"'s route")}</div></div>
+        <span class="avail-pill ${s.tight?'tight':'good'}">${s.tight?'Tight':'Free'}</span></div>`).join('');
+    if(!slots.length)h='<p style="color:var(--muted)">No free slots this week for this technician. Go back and pick another.</p>';
+  } else {
+    const t=TECH[wiz.tech], s=techSlots(wiz.tech)[wiz.slot];
+    h=`<div class="wiz-sum">
+      <div class="r"><span class="k">Customer</span><span class="v">${c.cust}</span></div>
+      <div class="r"><span class="k">Site</span><span class="v">${c.site}</span></div>
+      <div class="r"><span class="k">Technician</span><span class="v">${t.name} · ${AVAIL[wiz.tech].base}</span></div>
+      <div class="r"><span class="k">Slot</span><span class="v">${DAYS[s.day]} · ${s.time}</span></div>
+      <div class="r"><span class="k">RAMS</span><span class="v">Auto-send to customer on confirm</span></div>
+      <div class="r"><span class="k">Despatch</span><span class="v">Job to ${t.name}'s app</span></div></div>`;
+    if(s.tight)h+=`<div class="msg warn" style="margin-top:12px"><b>Moving parts.</b> This slot is tight (${s.note.toLowerCase()}), so confirming may nudge one later job on ${t.name}'s route. The board will re-flow the chain automatically.</div>`;
+  }
+  body.innerHTML=h;
+  document.getElementById('wizBack').style.visibility=wiz.step===0?'hidden':'visible';
+  const nb=document.getElementById('wizNext'); nb.textContent=wiz.step===3?'Schedule & send RAMS':'Next';
+}
+function openDrawer(id){
+  const j=JOBS.find(x=>x.id===id); const t=TECH[j.tech];
+  document.getElementById('dJob').textContent=j.cust;
+  document.getElementById('dSite').textContent=j.site+' · '+j.type;
+  const steps=FLOW.map((s,idx)=>{
+    let cls=''; if(idx<j.stage)cls='done'; else if(idx===j.stage)cls='cur';
+    return `<div class="step ${cls}">${s}</div>`;
+  }).join('');
+  const ramsBtn=j.stage<1?`<button class="btn sm primary" onclick="toast('RAMS pack emailed to customer','ok')">Send RAMS to customer</button>`:'';
+  document.getElementById('drawerBody').innerHTML=`
+    <div class="field"><div class="k">Assigned technician</div>
+      <div class="v"><span class="chip" style="background:${t.c}">${t.name}</span></div></div>
+    <div style="display:flex;gap:14px">
+      <div class="field" style="flex:1"><div class="k">Date &amp; time</div><div class="v">${DAYS[j.day]} · ${j.time}</div></div>
+      <div class="field" style="flex:1"><div class="k">Cycle</div><div class="v">Routine</div></div>
+    </div>
+    <div class="field"><div class="k">Job flow</div><div class="flow">${steps}</div></div>
+    <div class="field"><div class="k">Actions</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px">
+        ${ramsBtn}
+        <button class="btn sm" onclick="toast('Job details pushed to ${t.name}\\'s app','ok')">Despatch to technician</button>
+        <button class="btn sm" onclick="showCascade()">Reschedule</button>
+      </div>
+    </div>
+    <div class="cascade" id="cascade">
+      <div class="msg warn">
+        <div class="mt">Moving parts warning</div>
+        ${j.cust} runs long, so it clashes with the next visit on ${t.name}'s route. This move pushes <b>2 downstream jobs</b> and one RAMS send date.
+        <div style="display:flex;gap:8px;margin-top:10px">
+          <button class="btn sm primary" onclick="toast('Chain re-flowed — 2 jobs &amp; RAMS auto-adjusted','ok');closeDrawer()">Auto-adjust the chain</button>
+          <button class="btn sm" onclick="toast('Only this visit moved','ok');closeDrawer()">Move just this one</button>
+        </div>
+      </div>
+    </div>
+    <div class="note">RAMS = Risk Assessment &amp; Method Statement, sent to the customer before the visit.</div>`;
+  document.getElementById('drawerWrap').classList.add('open');
+}
+function showCascade(){document.getElementById('cascade').classList.add('show');}
+function closeDrawer(){document.getElementById('drawerWrap').classList.remove('open');}
+
+// Prompts below are Belinda's actual prompts, taken from "Chat prompts.docx"
+// in her 4 June 2026 example pack. The master prompt is reused per sector.
+const P_REUSE='Do the same again for the attached report, using the same parameters.';
+const P_COMPARE='Compare the earlier clean-condition test against the latest operational-condition test, highlight the impact of contamination on slip resistance (PTV changes), identify any surfaces that may no longer be fit for purpose, and provide a concise Executive Summary, Recommendations and Conclusions consistent with the previous report style.';
+const INDUSTRIES={
+  'Food factory':{
+    site:'ABP Kettyle Irish Foods', prop:'Food production site', method:'SlipAlert', tech:'Belinda Bleakley',
+    prompts:[
+      'Analyse the attached report. Include reference to the PTV scale where 0-24 is high risk, 25-35 is moderate risk and 36 and above is low risk. Make reference to the importance of wearing anti-slip footwear. Comment on the high levels of contamination on the surfaces and the importance of having a robust cleaning regime in place. Comment also on the need for staff to be alert to the heightened slip risk in this food production site and their role in managing the risk and keeping their work areas as free from contamination as possible. Compare the performance of the different floor surfaces and comment on the impact that higher levels of contamination can have on slip resistance even on good anti-slip surfaces.',
+      P_REUSE, P_COMPARE
+    ],
+    summary:`<p><b>Executive summary.</b> Several production and access areas fall into the high slip-risk band once wet, driven by heavy contamination from water, debris and fat. Anti-slip footwear and a robust cleaning regime are the critical controls on this site.</p>
+      <ul><li>Chillers and the laundry drop to <b>high risk</b> when wet (PTV 14–22).</li>
+      <li>The main production corridor is <b>moderate</b> wet; reception is borderline low.</li>
+      <li>Good performers exist (chiller corridor PTV 61 wet), showing surface choice matters.</li></ul>
+      <p><b>Recommendations:</b> increase cleaning frequency in the wet, contaminated areas, maintain anti-slip footwear compliance, review flooring on the worst-performing surfaces, and reinforce staff awareness of keeping work areas free from contamination.</p>`,
+    rows:[['Chiller 5',34,14],['WIP Chiller',38,22],['Main Production Corridor',41,26],['Reception',45,36],['Chiller Corridor',70,61]]
+  },
+  'Factory / warehouse':{
+    site:'Rotork · Leeds', prop:'Manufacturing / warehouse', method:'SlipAlert', tech:'Belinda Bleakley',
+    prompts:[
+      'Analyse the attached report. Include reference to the PTV scale where 0-24 is high risk, 25-35 is moderate risk and 36 and above is low risk. Make reference to the importance of wearing anti-slip footwear. Comment on contamination from oils, coolants and process fluids and the importance of a robust housekeeping and cleaning regime. Comment also on the need for staff to be alert to the heightened slip risk on the production and warehouse floor and their role in keeping walkways free from contamination. Compare the performance of the different floor surfaces and comment on the impact that contamination can have on slip resistance even on good anti-slip surfaces.',
+      P_REUSE, P_COMPARE
+    ],
+    summary:`<p><b>Executive summary.</b> The floor is broadly sound as found; process fluids and the wash areas pull several zones into the moderate to high band once wet.</p>
+      <ul><li>Assembly and warehouse aisles hold a <b>low slip potential</b> as found.</li>
+      <li>The <b>wash bay</b> and <b>paint line</b> read <b>high risk</b> wet under fluid contamination.</li>
+      <li>Housekeeping is the fastest lever on the flagged areas.</li></ul>
+      <p><b>Recommendations:</b> introduce drip containment and scheduled clean-downs at the wash bay and paint line, review anti-slip coatings on those surfaces, and maintain footwear compliance across the floor.</p>`,
+    rows:[['Assembly bay',44,33],['Warehouse aisle',42,36],['Goods-in ramp',38,29],['Paint line',40,24],['Wash bay',34,19]]
+  },
+  'Shopping centre':{
+    site:'Merry Hill Shopping Centre · Upper Mall', prop:'Shopping centre', method:'SlipAlert', tech:'Belinda Bleakley',
+    prompts:[
+      'Analyse the attached report. Include reference to the PTV scale where 0-24 is high risk, 25-35 is moderate risk and 36 and above is low risk. Make reference to the importance of managing tracked-in rainwater and spillages at entrances and food-court areas with a responsive cleaning and spillage regime. Comment on the need to manage wet-weather slip risk in public areas using matting and signage. Compare the performance of the different floor surfaces and comment on the impact that surface water can have on slip resistance even on good anti-slip surfaces.',
+      P_REUSE, P_COMPARE
+    ],
+    summary:`<p><b>Executive summary.</b> Public floors perform well as found. Entrances and the food court are the wet-weather watch-points where tracked-in water reduces grip.</p>
+      <ul><li>The central mall and most zones hold a <b>low slip potential</b> as found.</li>
+      <li>The <b>mall entrance</b> and <b>toilet lobby</b> drop to moderate/high when wet.</li>
+      <li>The food court is moderate wet, consistent with spillage.</li></ul>
+      <p><b>Recommendations:</b> extend entrance matting runs, maintain a responsive spillage regime with wet-floor signage, and re-test entrances and the food court at the next routine visit.</p>`,
+    rows:[['Central mall',45,38],['Escalator landing',41,33],['Mall entrance',43,29],['Food court',39,27],['Toilet lobby',37,25]]
+  },
+  'Hotel':{
+    site:'The Berkeley · Back of House & Spa', prop:'Hotel & spa', method:'SlipAlert', tech:'Belinda Bleakley',
+    prompts:[
+      'Analyse the attached report. Include reference to the PTV scale where 0-24 is high risk, 25-35 is moderate risk and 36 and above is low risk. Make reference to the importance of wearing appropriate footwear in back-of-house areas. Comment on wet-area risk around baths, pool surrounds and spa, and back-of-house kitchen contamination, and the importance of a robust cleaning regime. Comment also on the need for staff and guests to be alert to slip risk in wet areas. Compare the performance of the different floor surfaces and comment on the impact that water and contamination can have on slip resistance even on good anti-slip surfaces.',
+      P_REUSE, P_COMPARE
+    ],
+    summary:`<p><b>Executive summary.</b> Guest-facing areas present well. The spa surround and back-of-house kitchen are the wet-area risks to manage actively.</p>
+      <ul><li>Lobby and bar zones hold a <b>low slip potential</b> as found.</li>
+      <li>The <b>kitchen line</b> and <b>spa pool surround</b> read <b>high risk</b> when wet.</li>
+      <li>Changing rooms are moderate wet.</li></ul>
+      <p><b>Recommendations:</b> apply barefoot-rated anti-slip treatment to the spa surround, tighten the kitchen clean-down regime, maintain footwear in back-of-house, and keep wet-area signage in place.</p>`,
+    rows:[['Lobby',44,37],['Bar area',41,34],['Changing rooms',38,28],['Spa pool surround',33,24],['Kitchen line',36,22]]
+  }
+};
+function ptvClass(v){return v>=36?'g-green':(v>=25?'g-orange':'g-red');}
+let curIndustry='Food factory', curPrompt=null;
+function renderIndustries(){
+  const seg=document.getElementById('industrySeg'); seg.innerHTML='';
+  Object.keys(INDUSTRIES).forEach(k=>{
+    const b=document.createElement('button'); b.textContent=k; if(k===curIndustry)b.className='on';
+    b.onclick=()=>{curIndustry=k;curPrompt=null;renderIndustries();renderPrompts();document.getElementById('promptBox').value='';resetReport();};
+    seg.appendChild(b);
+  });
+  const ind=INDUSTRIES[curIndustry];
+  const bs=document.getElementById('buildSite'); if(bs)bs.textContent=ind.site;
+  const bm=document.getElementById('buildMeta'); if(bm)bm.textContent=`${ind.method} · ${ind.rows.length} locations · 14 Jun 2026`;
+}
+function resetReport(){
+  const a=document.getElementById('reportArea'); if(!a)return;
+  a.innerHTML=`<div class="empty">
+    <svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h5"/></svg>
+    <div style="font-weight:700;color:var(--muted)">Pick a template and prompt, then Generate</div>
+    <div style="font-size:12px;margin-top:4px">The AI drafts the Technician's Summary from the captured readings. You review and edit before it goes out.</div></div>`;
+}
+function renderPrompts(){
+  const pl=document.getElementById('promptList'); pl.innerHTML='';
+  const tags=['Sector analysis prompt','Reuse on next report','Year-on-year comparison'];
+  INDUSTRIES[curIndustry].prompts.forEach((p,i)=>{
+    const b=document.createElement('button'); b.className='prompt'+(curPrompt===i?' on':'');
+    const label=p.length>150?p.slice(0,150)+'…':p;
+    b.innerHTML=`<div style="font-weight:900;font-size:10.5px;color:var(--muted);margin-bottom:3px">${tags[i]||'Prompt'}</div>${label}`;
+    b.onclick=()=>{curPrompt=i;renderPrompts();document.getElementById('promptBox').value=p;};
+    pl.appendChild(b);
+  });
+}
+function sparkline(){
+  const data=[31,34,33,29,36], w=430,h=120,pad=26,max=50,min=15;
+  const x=i=>pad+i*((w-pad*2)/(data.length-1));
+  const y=v=>h-20-((v-min)/(max-min))*(h-40);
+  const pts=data.map((v,i)=>`${x(i)},${y(v)}`).join(' ');
+  const thr=y(36);
+  const dots=data.map((v,i)=>`<circle cx="${x(i)}" cy="${y(v)}" r="3.5" fill="#F2711C"/><text x="${x(i)}" y="${y(v)-9}" font-size="9" fill="#333" text-anchor="middle" font-weight="700">${v}</text>`).join('');
+  const labs=['-4','-3','-2','-1','Now'].map((l,i)=>`<text x="${x(i)}" y="${h-4}" font-size="8.5" fill="#999" text-anchor="middle">${l}</text>`).join('');
+  return `<svg viewBox="0 0 ${w} ${h}" width="100%" style="max-width:440px">
+    <line x1="${pad}" y1="${thr}" x2="${w-pad}" y2="${thr}" stroke="#21BA45" stroke-width="1" stroke-dasharray="4 3"/>
+    <text x="${w-pad}" y="${thr-4}" font-size="8.5" fill="#1a7f37" text-anchor="end" font-weight="700">Pass threshold · 36 PTV</text>
+    <polyline points="${pts}" fill="none" stroke="#F2711C" stroke-width="2.2" stroke-linejoin="round"/>
+    ${dots}${labs}</svg>`;
+}
+function generate(){
+  const instr=document.getElementById('promptBox').value.trim();
+  if(!instr){toast('Pick or type a prompt first');return;}
+  document.getElementById('reportArea').innerHTML=`<div class="empty"><div class="spinner"></div><div style="font-weight:700;color:var(--muted)">Drafting from ${INDUSTRIES[curIndustry].rows.length} locations of captured readings…</div><div style="font-size:11.5px;margin-top:4px">Applying ${curIndustry} template &amp; guardrails</div></div>`;
+  setTimeout(renderReport,1050);
+}
+function renderReport(){
+  const ind=INDUSTRIES[curIndustry];
+  const rows=ind.rows.map(r=>`<tr><td class="loc">${r[0]}</td><td class="cell ${ptvClass(r[1])}">${r[1]}</td><td class="cell ${ptvClass(r[2])}">${r[2]}</td></tr>`).join('');
+  document.getElementById('reportArea').innerHTML=`
+    <div class="report">
+      <div class="rep-cover">
+        <div class="badge">DRAFT</div>
+        <div class="rt">${ind.site.split(' · ')[0]}</div>
+        <div class="rs">${ind.site} · 14 Jun 2026</div>
+      </div>
+      <div class="rep-body">
+        <table class="rep-meta">
+          <tr><th>Test Method</th><th>Property Type</th><th>Technician</th></tr>
+          <tr><td>${ind.method}</td><td>${ind.prop}</td><td>${ind.tech}</td></tr>
+        </table>
+        <div class="yhead">Summary Results</div>
+        <div class="msg info" style="margin-bottom:14px"><b>Please Note.</b> As Found readings give an accurate view of the floor in normal conditions. Wet readings are usually lower and indicate higher risk only when the floor is contaminated by liquid. Control of spillage is essential in public areas.</div>
+        <div style="font-weight:900;font-size:13px;margin:16px 0 8px">Averaged Location Results</div>
+        <table class="loc-table">
+          <thead><tr><th class="loc" rowspan="2">Location</th><th colspan="2">PTV</th></tr>
+          <tr><th>As Found</th><th>Wet</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+        <div class="yhead">Technician's Summary and Recommendations <span style="font-weight:700;font-size:11px;color:rgba(0,0,0,.55)">· AI-drafted, awaiting review</span></div>
+        <div class="summary">${ind.summary}</div>
+        <div class="rep-h">Average results vs previous visits</div>
+        ${sparkline()}
+        <div class="note">PTV (Pendulum Test Value): 36+ low slip potential · 25–35 moderate · below 25 high. Raw readings are captured on site and are not altered by the AI.</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:12px">
+      <button class="btn primary sm" onclick="toast('Summary approved &amp; locked','ok')">Approve summary</button>
+      <button class="btn sm" onclick="toast('Opened for editing (demo)')">Edit wording</button>
+      <button class="btn sm" onclick="toast('Regenerating with a different tone (demo)')">Regenerate</button>
+    </div>`;
+}
+
+function switchView(v){
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+  const t=document.querySelector('.tab[data-view="'+v+'"]'); if(t)t.classList.add('active');
+  document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));
+  document.getElementById('view-'+v).classList.add('active');
+  window.scrollTo(0,0);
+}
+document.querySelectorAll('.tab[data-view]').forEach(n=>{ n.onclick=()=>switchView(n.dataset.view); });
+function toast(msg,ok){
+  const w=document.getElementById('toastWrap');
+  const t=document.createElement('div'); t.className='toast';
+  t.innerHTML=(ok?'<span class="ok">✓</span>':'')+`<span>${msg}</span>`;
+  w.appendChild(t);
+  setTimeout(()=>{t.style.opacity='0';t.style.transition='opacity .3s';setTimeout(()=>t.remove(),300);},2600);
+}
+renderBoard(); renderBacklog(); renderTechs(); renderIndustries(); renderPrompts();
+</script>
+</body>
+</html>
