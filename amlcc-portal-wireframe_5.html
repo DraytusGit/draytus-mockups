@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AMLCC — AI-Driven Onboarding (Wireframe)</title>
+<style>
+  :root{
+    --bg:#eef0f4; --panel:#ffffff; --line:#dfe3ea; --line2:#eaedf2;
+    --ink:#242a33; --muted:#7b8494; --navy:#1F3864; --navy2:#2f4d86;
+    --good:#2e7d5b; --goodbg:#e6f4ec; --warn:#9a6b12; --warnbg:#fbf1dc;
+    --review:#5a4b9a; --reviewbg:#ece9f7; --note:#0f6d75; --notebg:#e2f3f4;
+    --sug:#8a5a00; --sugbg:#fdf1de; --chip:#f1f3f7; --user:#1F3864;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--ink);font-size:14px;line-height:1.5}
+  .wrap{max-width:1180px;margin:0 auto;padding:18px 20px 60px}
+  .browserbar{display:flex;align-items:center;gap:8px;background:#dde1e8;border:1px solid var(--line);border-bottom:none;border-radius:10px 10px 0 0;padding:9px 14px}
+  .dot{width:11px;height:11px;border-radius:50%;background:#c3c8d2}
+  .url{margin-left:10px;background:#fff;border:1px solid var(--line);border-radius:6px;padding:4px 12px;color:var(--muted);font-size:12px;flex:1}
+  .app{background:var(--panel);border:1px solid var(--line);border-radius:0 0 12px 12px;overflow:hidden}
+
+  .top{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--line)}
+  .brand{display:flex;align-items:center;gap:12px}
+  .logo{width:34px;height:34px;border-radius:8px;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;letter-spacing:.5px;font-size:13px}
+  .brand h1{font-size:15px;margin:0;font-weight:650}
+  .brand p{margin:1px 0 0;font-size:12px;color:var(--muted)}
+  .whoami{text-align:right;font-size:12px;color:var(--muted)}
+  .whoami b{color:var(--ink);font-weight:600;display:block;font-size:13px}
+
+  .tabs{display:flex;gap:4px;padding:8px 16px;background:#f2f4f8;border-bottom:1px solid var(--line);flex-wrap:wrap}
+  .tab{border:1px solid transparent;background:none;padding:7px 13px;border-radius:8px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;font-family:inherit}
+  .tab.on{background:#fff;border-color:var(--line);color:var(--navy);box-shadow:0 1px 3px rgba(0,0,0,.05)}
+  .tabnote{margin-left:auto;font-size:11.5px;color:var(--muted);align-self:center;font-style:italic}
+
+  .persona{display:flex;gap:12px;align-items:center;padding:12px 20px;border-bottom:1px solid var(--line)}
+  .persona .pic{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;color:#fff;flex:none;letter-spacing:.3px}
+  .persona b{font-size:14px;display:block;line-height:1.3}
+  .persona span{font-size:12px;color:#54607a}
+  .p-op{background:#eef2fa}.p-op .pic{background:var(--navy)}
+  .p-rev{background:#f3f0fb}.p-rev .pic{background:var(--review)}
+  .p-stat{background:#e7f3f3}.p-stat .pic{background:var(--note)}
+  .p-cli{background:#edf3fc}.p-cli .pic{background:var(--navy2)}
+
+  /* business selector (operator) */
+  .bizbar{display:flex;gap:10px;align-items:center;padding:12px 20px;background:#fff;border-bottom:1px solid var(--line);overflow:auto}
+  .bizlbl{font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);font-weight:700;flex:none;margin-right:2px}
+  .biz{border:1px solid var(--line);border-radius:10px;padding:8px 13px;cursor:pointer;min-width:186px;flex:none;transition:.12s}
+  .biz:hover{border-color:var(--navy2)}
+  .biz.on{border-color:var(--navy);box-shadow:0 0 0 2px rgba(31,56,100,.12)}
+  .biz b{font-size:13px;display:block}
+  .biz span{font-size:11.5px;color:var(--muted)}
+  .biz.on span{color:var(--navy2);font-weight:600}
+
+  .strip{display:flex;align-items:center;gap:16px;padding:12px 20px;background:#f7f8fb;border-bottom:1px solid var(--line)}
+  .strip .lead{font-weight:650;font-size:14px}
+  .bar{flex:1;height:9px;background:#e3e7ee;border-radius:20px;overflow:hidden;max-width:420px}
+  .bar > i{display:block;height:100%;background:linear-gradient(90deg,var(--navy),var(--navy2));width:33%;transition:width .5s ease}
+  .count{font-size:12.5px;color:var(--muted)}
+  .count b{color:var(--navy);font-weight:700}
+
+  .panes{display:grid;grid-template-columns:340px 1fr;min-height:500px}
+  .left{border-right:1px solid var(--line);padding:16px;background:#fbfcfe;overflow:auto}
+  .right{display:flex;flex-direction:column;background:#fff}
+  .grouplbl{font-size:11px;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);margin:14px 4px 6px;font-weight:700}
+  .lh{display:flex;align-items:center;justify-content:space-between;margin:2px 4px 10px}
+  .lh h2{font-size:12px;letter-spacing:.6px;text-transform:uppercase;color:var(--muted);margin:0;font-weight:700}
+
+  .task{display:flex;gap:10px;align-items:flex-start;background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 11px;margin-bottom:8px;cursor:pointer;transition:.15s}
+  .task:hover{border-color:var(--navy2);box-shadow:0 1px 6px rgba(31,56,100,.08)}
+  .task.active{border-color:var(--navy);box-shadow:0 0 0 2px rgba(31,56,100,.12)}
+  .task.done{opacity:.62}
+  .tick{width:20px;height:20px;border-radius:50%;border:2px solid #cfd5df;flex:none;margin-top:1px;display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff}
+  .task.done .tick{background:var(--good);border-color:var(--good)}
+  .task.review .tick{background:var(--review);border-color:var(--review)}
+  .task.active .tick{border-color:var(--navy)}
+  .tbody{flex:1;min-width:0}
+  .tbody .tt{font-weight:600;font-size:13.5px}
+  .tbody .tm{font-size:12px;color:var(--muted);margin-top:1px}
+  .badge{font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:20px;display:inline-block;margin-top:6px;letter-spacing:.3px}
+  .b-todo{background:var(--chip);color:#5a6272}
+  .b-review{background:var(--reviewbg);color:var(--review)}
+  .b-done{background:var(--goodbg);color:var(--good)}
+  .b-new{background:var(--warnbg);color:var(--warn)}
+
+  .chat-head{padding:12px 18px;border-bottom:1px solid var(--line2);display:flex;align-items:center;gap:9px}
+  .ai-ava{width:26px;height:26px;border-radius:50%;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
+  .chat-head .ct{font-weight:650;font-size:13.5px}
+  .chat-head .cs{font-size:11.5px;color:var(--muted)}
+  .stream{flex:1;overflow:auto;padding:20px 18px;display:flex;flex-direction:column;gap:14px;background:#fbfcfe;min-height:380px}
+  .row{display:flex;gap:9px;max-width:82%}
+  .row.ai{align-self:flex-start}
+  .row.me{align-self:flex-end;flex-direction:row-reverse}
+  .ava{width:26px;height:26px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700}
+  .ava.ai{background:var(--navy);color:#fff}
+  .ava.me{background:#cdd4df;color:#3a4150}
+  .bub{padding:9px 13px;border-radius:14px;font-size:13.5px}
+  .ai .bub{background:#fff;border:1px solid var(--line);border-top-left-radius:4px}
+  .me .bub{background:var(--user);color:#fff;border-top-right-radius:4px}
+  .bub.help{background:var(--notebg);border-color:#bfe3e6;color:#245a5f}
+  .saved{align-self:flex-start;margin-left:35px;font-size:11.5px;color:var(--good);display:flex;align-items:center;gap:5px;margin-top:-6px}
+  .saved::before{content:"✓";font-weight:800}
+  .sugtag{align-self:flex-start;margin-left:35px;font-size:11px;color:var(--sug);background:var(--sugbg);border:1px solid #eed3a6;padding:2px 8px;border-radius:20px;margin-top:-4px;font-weight:600}
+
+  .composer{border-top:1px solid var(--line);padding:12px 16px;background:#fff}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+  .chip{border:1px solid var(--navy2);color:var(--navy);background:#fff;border-radius:20px;padding:7px 14px;font-size:13px;cursor:pointer;font-weight:600;transition:.12s}
+  .chip:hover{background:var(--navy);color:#fff}
+  .chip.sug{border-color:#d8a53a;color:var(--sug);background:var(--sugbg)}
+  .chip.sug:hover{background:#d8a53a;color:#fff}
+  .chip.ghost{border-color:var(--line);color:var(--muted);font-weight:500}
+  .chip.ghost:hover{background:#eef1f6;color:var(--ink)}
+  .inputline{display:flex;gap:9px;align-items:center}
+  .inputline input{flex:1;border:1px solid var(--line);border-radius:10px;padding:10px 13px;font-size:13.5px;font-family:inherit;background:#f7f8fb;color:#9aa2b0}
+  .send{background:var(--navy);color:#fff;border:none;border-radius:10px;padding:10px 16px;font-weight:600;font-size:13px;cursor:pointer}
+  .upload{border:1px dashed var(--line);border-radius:10px;padding:9px 14px;color:var(--muted);font-size:13px;cursor:pointer;background:#fff}
+
+  .receipt{align-self:center;background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 18px;max-width:88%;box-shadow:0 2px 10px rgba(0,0,0,.05)}
+  .receipt h4{margin:0 0 4px;font-size:14px;color:var(--navy)}
+  .receipt .sub{font-size:12px;color:var(--muted);margin-bottom:10px}
+  .receipt ul{margin:0;padding-left:18px;font-size:12.5px;color:#3a4150}
+  .receipt li{margin-bottom:3px}
+
+  .work{padding:20px 22px;background:#fbfcfe}
+  .work h3{margin:0 0 3px;font-size:16px}
+  .work .rvsub{color:var(--muted);font-size:12.5px;margin-bottom:16px}
+  .sub-card{background:#fff;border:1px solid var(--line);border-radius:11px;padding:14px 15px;margin-bottom:12px}
+  .sub-card .sh{display:flex;justify-content:space-between;align-items:flex-start}
+  .sub-card .st{font-weight:650;font-size:14px}
+  .sub-card .meta{font-size:11.5px;color:var(--muted);margin-top:2px}
+  .kvrow{display:flex;gap:8px;font-size:12.5px;margin-top:8px;padding-top:8px;border-top:1px dashed var(--line)}
+  .kvrow .k{color:var(--muted);min-width:120px}
+  .kvrow .v{color:var(--ink);font-weight:500}
+  .src{font-size:11px;color:var(--note);background:var(--notebg);padding:1px 7px;border-radius:20px;margin-left:6px}
+  .rvbtns{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+  .btn{border-radius:9px;padding:8px 14px;font-size:12.5px;font-weight:650;cursor:pointer;border:1px solid var(--line);background:#fff;color:var(--ink);font-family:inherit}
+  .btn.pri{background:var(--good);border-color:var(--good);color:#fff}
+  .btn.sec{background:#fff;color:var(--navy);border-color:var(--navy2)}
+  .stline{display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-top:1px solid var(--line2);font-size:12.5px}
+  .stline .sn{color:#41485a}
+  .stg{font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:20px;letter-spacing:.2px}
+  .g-signed{background:var(--goodbg);color:var(--good)}
+  .g-review{background:var(--reviewbg);color:var(--review)}
+  .g-conf{background:#e7eefb;color:var(--navy2)}
+  .g-wait{background:var(--warnbg);color:var(--warn)}
+
+  .statuswrap{padding:20px 22px;background:#fbfcfe}
+  .bigstate{display:flex;align-items:center;gap:16px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin-bottom:18px}
+  .ring{width:64px;height:64px;border-radius:50%;background:conic-gradient(var(--navy) 0turn 0.66turn,#e3e7ee 0.66turn 1turn);display:flex;align-items:center;justify-content:center;flex:none}
+  .ring i{width:48px;height:48px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--navy);font-size:15px;font-style:normal}
+  .bigstate h3{margin:0 0 3px;font-size:17px}
+  .bigstate p{margin:0;color:var(--muted);font-size:13px}
+  .pill{display:inline-block;font-size:11.5px;font-weight:700;padding:3px 10px;border-radius:20px;background:var(--reviewbg);color:var(--review);margin-top:7px}
+  .partgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .part{background:#fff;border:1px solid var(--line);border-radius:12px;padding:15px 16px}
+  .part.wait{border-color:#eed3a6;background:#fffdf8}
+  .parthd{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+  .pava{width:30px;height:30px;border-radius:50%;background:#e6eaf2;color:var(--navy);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px}
+  .parthd .pn{font-weight:650;font-size:14px}
+  .parthd .pr{font-size:11.5px;color:var(--muted)}
+  .part .stline:first-of-type{border-top:none}
+  .waitbanner{margin-top:8px;font-size:12px;color:var(--warn);background:var(--warnbg);border-radius:8px;padding:8px 10px}
+
+  .rvwrap{display:grid;grid-template-columns:1fr 320px;min-height:460px}
+  .rvside{border-left:1px solid var(--line);background:#fbfcfe;padding:16px;display:flex;flex-direction:column}
+  .rvside .rvh{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+  .roflag{font-size:10.5px;font-weight:700;color:var(--warn);background:var(--warnbg);padding:2px 8px;border-radius:20px}
+  .assist{background:#fff;border:1px solid var(--line);border-radius:11px;padding:12px 13px;font-size:12.5px;color:#3a4150;margin-top:10px}
+  .assist b{color:var(--navy)}
+  .assist ul{margin:7px 0 0;padding-left:16px}
+  .assist li{margin-bottom:4px}
+
+  .notes{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:14px}
+  .note{border:1px dashed var(--note);background:var(--notebg);border-radius:10px;padding:11px 12px}
+  .note b{color:var(--note);font-size:11px;letter-spacing:.4px;text-transform:uppercase;display:block;margin-bottom:3px}
+  .note p{margin:0;font-size:12.5px;color:#375c60}
+  .whoswho{border:1px dashed #c9b3e6;background:#f5f1fb;border-radius:10px;padding:12px 14px;margin-top:14px}
+  .whoswho b{color:var(--review)}
+  .whoswho p{margin:5px 0 0;font-size:12.5px;color:#48407a}
+  .flow{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;align-items:center;justify-content:center;font-size:12px;color:var(--muted)}
+  .flow .step{background:#fff;border:1px solid var(--line);border-radius:20px;padding:5px 12px;font-weight:600;color:var(--navy)}
+  .flow .arr{color:#b6bdc9;font-weight:700}
+  .legend{margin-top:10px;font-size:12px;color:var(--muted);text-align:center}
+
+  .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);background:var(--navy);color:#fff;padding:11px 18px;border-radius:10px;font-size:13px;box-shadow:0 6px 24px rgba(0,0,0,.22);opacity:0;transition:.35s;pointer-events:none;z-index:50}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .toast b{color:#ffd98a}
+  .wm{display:inline-block;background:var(--warnbg);color:var(--warn);font-size:11px;font-weight:700;padding:2px 9px;border-radius:20px;margin-left:8px;vertical-align:middle;letter-spacing:.3px}
+  .hide{display:none !important}
+  @media(max-width:820px){.panes,.rvwrap{grid-template-columns:1fr}.partgrid,.notes{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="browserbar">
+    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+    <span class="url">amlcc.com</span>
+  </div>
+
+  <div class="app">
+    <div class="top">
+      <div class="brand">
+        <div class="logo">AML</div>
+        <div><h1>AMLCC <span class="wm">WIREFRAME</span></h1><p id="topsub">Your businesses</p></div>
+      </div>
+      <div class="whoami" id="who"><b>Priya Shah</b>AMLCC operator</div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab on" data-v="operator">1 · Operator</button>
+      <button class="tab" data-v="reviewer">2 · Reviewer</button>
+      <button class="tab" data-v="status">3 · Status</button>
+      <button class="tab" data-v="client">4 · Client portal</button>
+      <span class="tabnote">Screens 1 and 4 are the same design. Only screen 4 is ever seen by the end client.</span>
+    </div>
+
+    <!-- ============ 1. OPERATOR ============ -->
+    <div id="v-operator">
+      <div class="persona p-op">
+        <div class="pic">OP</div>
+        <div><b>Operator — your businesses</b><span>An AMLCC user (accountant) picks a business, sees what is left to do, and the assistant walks them through it. Same design as the client portal.</span></div>
+      </div>
+      <div class="bizbar" id="bizbar">
+        <span class="bizlbl">Your businesses</span>
+        <div class="biz on" data-biz="acme"><b>Acme Trading Ltd</b><span>3 items outstanding</span></div>
+        <div class="biz" data-biz="bright"><b>Brightwork Studios Ltd</b><span>Not started</span></div>
+        <div class="biz" data-biz="harbour"><b>Harbour Point LLP</b><span>With reviewer</span></div>
+      </div>
+      <div class="strip">
+        <span class="lead" id="op-lead">Acme Trading Ltd — what’s left</span>
+        <div class="bar"><i id="op-pbar"></i></div>
+        <span class="count"><b id="op-pdone">0</b> of <b id="op-ptot">0</b> done</span>
+      </div>
+      <div class="panes">
+        <div class="left">
+          <div class="lh"><h2>To do on this business</h2><span class="count" id="op-remain">—</span></div>
+          <div id="op-todo"></div>
+          <div class="grouplbl" style="margin-top:16px">With the reviewer</div>
+          <div id="op-review"></div>
+          <div class="grouplbl">Completed</div>
+          <div id="op-done"></div>
+        </div>
+        <div class="right">
+          <div class="chat-head"><div class="ai-ava">AI</div><div><div class="ct">AMLCC Assistant</div><div class="cs" id="op-chatctx">Pick a task, or let me take you through</div></div></div>
+          <div class="stream" id="op-stream"></div>
+          <div class="composer">
+            <div class="chips" id="op-chips"></div>
+            <div class="inputline"><div class="upload">📎 Upload</div><input placeholder="Type your answer…" readonly><button class="send">Send</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ 2. REVIEWER ============ -->
+    <div id="v-reviewer" class="hide">
+      <div class="persona p-rev">
+        <div class="pic">RV</div>
+        <div><b>Reviewer — check and sign off</b><span>A senior AMLCC user, for example the MLRO, checks what the operator and client have submitted and signs it off. The reviewer decides, not the assistant.</span></div>
+      </div>
+      <div class="rvwrap">
+        <div class="work" style="padding-bottom:8px">
+          <h3>Acme Trading Ltd — items to sign off</h3>
+          <div class="rvsub">Completed items land here for you to check. Sign off, add a comment, or send an item back with a question.</div>
+          <div class="sub-card">
+            <div class="sh"><div><div class="st">Company details</div><div class="meta">Completed by the operator · today 09:14</div></div><span class="stg g-review">Awaiting sign off</span></div>
+            <div class="kvrow"><div class="k">Registered office</div><div class="v">14 Prospect Road, Leeds <span class="src">source: Companies House</span></div></div>
+            <div class="kvrow"><div class="k">Trading address</div><div class="v">Same as registered <span class="src">confirmed by client</span></div></div>
+            <div class="rvbtns"><button class="btn pri">Sign off</button><button class="btn sec">Add a comment</button><button class="btn">Send back with a question</button></div>
+          </div>
+          <div class="sub-card">
+            <div class="sh"><div><div class="st">Beneficial owners &amp; PEP screening</div><div class="meta">Submitted by the client · today 09:19</div></div><span class="stg g-review">Awaiting sign off</span></div>
+            <div class="kvrow"><div class="k">Owners confirmed</div><div class="v">Jane Okafor 60%, David Mensah 40% <span class="src">source: Companies House</span></div></div>
+            <div class="kvrow"><div class="k">PEP result</div><div class="v">David Mensah flagged as PEP · enhanced checks raised</div></div>
+            <div class="rvbtns"><button class="btn pri">Sign off</button><button class="btn sec">Add a comment</button><button class="btn">Send back with a question</button></div>
+          </div>
+        </div>
+        <div class="rvside">
+          <div class="rvh"><b style="font-size:13px">Assistant</b><span class="roflag">READ ONLY</span></div>
+          <div style="font-size:11.5px;color:var(--muted)">Summarises what is in front of you. It cannot approve, edit or decide.</div>
+          <div class="assist"><b>Summary for this client</b><ul><li>Company data matches Companies House. No conflicts found.</li><li>One owner, David Mensah, is a PEP. Enhanced checks raised automatically.</li><li>Two items are still with the client and not yet started.</li><li>Nothing here changes risk or approval. That is your decision.</li></ul></div>
+          <div class="assist" style="border-color:#eed3a6;background:#fffdf8"><b style="color:var(--warn)">Needs your judgement</b><ul><li>PEP present, so the client cannot be approved on standard due diligence alone.</li></ul></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ 3. STATUS ============ -->
+    <div id="v-status" class="hide">
+      <div class="persona p-stat">
+        <div class="pic">ST</div>
+        <div><b>Status — where the case stands</b><span>The at a glance view an AMLCC user sees for a case. Progress, not the hundred steps behind it.</span></div>
+      </div>
+      <div class="statuswrap">
+        <div class="bigstate">
+          <div class="ring"><i>66%</i></div>
+          <div style="flex:1"><h3>Acme Trading Ltd — onboarding in progress</h3><p>Most of the work is done. We are waiting on one owner and on reviewer sign off. There is nothing outstanding on your side right now.</p><span class="pill">Next: reviewer sign off</span></div>
+        </div>
+        <div class="partgrid">
+          <div class="part">
+            <div class="parthd"><div class="pava">AC</div><div><div class="pn">The company</div><div class="pr">Acme Trading Ltd · 08842197</div></div></div>
+            <div class="stline"><span class="sn">Company details</span><span class="stg g-signed">Signed off</span></div>
+            <div class="stline"><span class="sn">Services &amp; engagement</span><span class="stg g-signed">Signed off</span></div>
+            <div class="stline"><span class="sn">Business risk questions</span><span class="stg g-review">In review</span></div>
+            <div class="stline"><span class="sn">Source of funds</span><span class="stg g-review">In review</span></div>
+          </div>
+          <div class="part">
+            <div class="parthd"><div class="pava">JO</div><div><div class="pn">Jane Okafor</div><div class="pr">Authorised representative · 60% owner</div></div></div>
+            <div class="stline"><span class="sn">Identity check</span><span class="stg g-review">In review</span></div>
+            <div class="stline"><span class="sn">Confirmed as owner</span><span class="stg g-conf">Confirmed</span></div>
+            <div class="stline"><span class="sn">PEP screening</span><span class="stg g-signed">Cleared</span></div>
+          </div>
+          <div class="part wait">
+            <div class="parthd"><div class="pava">DM</div><div><div class="pn">David Mensah</div><div class="pr">Beneficial owner · 40% · PEP</div></div></div>
+            <div class="stline"><span class="sn">Identity check</span><span class="stg g-wait">Not started</span></div>
+            <div class="stline"><span class="sn">Enhanced checks</span><span class="stg g-wait">Not started</span></div>
+            <div class="waitbanner">David has his own private link with only his two questions. He has not started yet. The operator can complete this with him if he cannot use the portal.</div>
+          </div>
+          <div class="part">
+            <div class="parthd"><div class="pava">✓</div><div><div class="pn">What happens next</div><div class="pr">Plain view of where this sits</div></div></div>
+            <div class="stline"><span class="sn">Client finishes their tasks</span><span class="stg g-wait">Waiting</span></div>
+            <div class="stline"><span class="sn">Operator completes the rest</span><span class="stg g-conf">In hand</span></div>
+            <div class="stline"><span class="sn">Reviewer signs off</span><span class="stg g-review">In progress</span></div>
+            <div class="stline"><span class="sn">Client approved</span><span class="stg g-wait">Not yet</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ 4. CLIENT PORTAL ============ -->
+    <div id="v-client" class="hide">
+      <div class="persona p-cli">
+        <div class="pic">CL</div>
+        <div><b>Client portal — what the end client sees</b><span>Pushed out by the operator. The end client (the company being checked) fills this in. Same design as the operator screen, just for their one business.</span></div>
+      </div>
+      <div class="strip">
+        <span class="lead">What you need to do today</span>
+        <div class="bar"><i id="cl-pbar"></i></div>
+        <span class="count"><b id="cl-pdone">3</b> of <b id="cl-ptot">9</b> done</span>
+      </div>
+      <div class="panes">
+        <div class="left">
+          <div class="lh"><h2>Your task queue</h2><span class="count" id="cl-remain">4 to go</span></div>
+          <div id="cl-todo"></div>
+          <div class="grouplbl" style="margin-top:16px">Waiting for the firm to review</div>
+          <div id="cl-review"></div>
+          <div class="grouplbl">Completed</div>
+          <div id="cl-done"></div>
+        </div>
+        <div class="right">
+          <div class="chat-head"><div class="ai-ava">AI</div><div><div class="ct">AMLCC Assistant</div><div class="cs" id="cl-chatctx">Pick a task on the left to start, or just say “what’s next”</div></div></div>
+          <div class="stream" id="cl-stream"></div>
+          <div class="composer">
+            <div class="chips" id="cl-chips"></div>
+            <div class="inputline"><div class="upload">📎 Upload</div><input placeholder="Type your answer…" readonly><button class="send">Send</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="flow">
+    <span class="step">1 · Operator works the case</span><span class="arr">→</span>
+    <span class="step">pushes items to the client</span><span class="arr">→</span>
+    <span class="step">4 · Client fills them in</span><span class="arr">→</span>
+    <span class="step">2 · Reviewer signs off</span><span class="arr">→</span>
+    <span class="step">3 · Status shows approved</span>
+  </div>
+
+  <div class="whoswho">
+    <b>One design, two users</b>
+    <p>The operator screen and the client portal are deliberately the same: pick the thing to work on, see what is left, and let the assistant walk you through it. The operator has several businesses to choose from; the client only ever has their own one. Neither user needs to be tech savvy, and because both screens share the same design, an improvement to one improves the other.</p>
+  </div>
+
+  <div class="notes">
+    <div class="note"><b>One thing at a time</b><p>Both screens use the same guided queue. One question, it drops off, the next appears. No hunting through menus.</p></div>
+    <div class="note"><b>Reuse what we hold</b><p>Companies House and earlier answers pre fill the questions. Some answers are suggested for the user to confirm, clearly labelled.</p></div>
+    <div class="note"><b>The queue is dynamic</b><p>A PEP answer adds the enhanced checks automatically. No extra screens to build for every branch.</p></div>
+    <div class="note"><b>Operator or client</b><p>The operator can complete anything in house, or push it to the client. Same questions, same record, either way.</p></div>
+    <div class="note"><b>Status is the point</b><p>The status view shows where things sit, not the hundred steps to get there. That is the screen people actually want.</p></div>
+    <div class="note"><b>Human still decides</b><p>Everything goes to a reviewer to sign off. The assistant is read only and never approves a client.</p></div>
+  </div>
+  <div class="legend">Interactive wireframe. Switch persona with the numbered tabs. On screens 1 and 4, click a task or a suggested reply to walk the flow. On screen 1, try switching business. Layout and copy are illustrative.</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const $=id=>document.getElementById(id);
+function toast(m){const t=$('toast');t.innerHTML=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3200);}
+const clone=o=>JSON.parse(JSON.stringify(o));
+
+/* ===== shared guided-queue engine (used by operator AND client) ===== */
+function render(c){
+  const todo=$(c.todo),review=$(c.review),done=$(c.done);
+  todo.innerHTML=review.innerHTML=done.innerHTML='';
+  c.tasks.forEach(t=>{
+    const el=document.createElement('div');
+    el.className='task '+(t.status==='review'?'review':c.current===t.id?'active':'');
+    let badge=t.status==='review'?'<span class="badge b-review">'+c.reviewBadge+'</span>':t.isNew?'<span class="badge b-new">Just added</span>':'<span class="badge b-todo">To do</span>';
+    el.innerHTML=`<div class="tick">${t.status==='review'?'✓':''}</div><div class="tbody"><div class="tt">${t.t}</div><div class="tm">${t.m}</div>${badge}</div>`;
+    el.onclick=()=>startTask(c,t.id);
+    (t.status==='review'?review:todo).appendChild(el);
+  });
+  (c.seed||[]).forEach(n=>{const el=document.createElement('div');el.className='task done';el.innerHTML=`<div class="tick">✓</div><div class="tbody"><div class="tt">${n}</div><div class="tm">Completed earlier</div><span class="badge b-done">Done</span></div>`;done.appendChild(el);});
+  const total=c.tasks.length+(c.seed?c.seed.length:0);
+  const complete=c.tasks.filter(t=>t.status==='review').length+(c.seed?c.seed.length:0);
+  $(c.ptot).textContent=total;$(c.pdone).textContent=complete;
+  $(c.pbar).style.width=(total?Math.round(complete/total*100):0)+'%';
+  $(c.remain).textContent=(total-complete)>0?(total-complete)+' to go':'all done';
+}
+function bubble(c,side,text,cls){const s=$(c.stream);const r=document.createElement('div');r.className='row '+side;r.innerHTML=`<div class="ava ${side==='ai'?'ai':'me'}">${side==='ai'?'AI':c.initials}</div><div class="bub ${cls||''}">${text}</div>`;s.appendChild(r);s.scrollTop=s.scrollHeight;}
+function savedChip(c,txt){const s=$(c.stream);const d=document.createElement('div');d.className='saved';d.textContent='Saved to record: '+txt;s.appendChild(d);s.scrollTop=s.scrollHeight;}
+function sugTag(c){const s=$(c.stream);const d=document.createElement('div');d.className='sugtag';d.textContent='Suggested from your records — you confirm it';s.appendChild(d);s.scrollTop=s.scrollHeight;}
+function setChips(c,list){const box=$(c.chips);box.innerHTML='';list.forEach(o=>{const b=document.createElement('div');b.className='chip'+(o.sug?' sug':'')+(o.ghost?' ghost':'');b.textContent=o.label;b.onclick=o.fn;box.appendChild(b);});}
+function startTask(c,id){const t=c.tasks.find(x=>x.id===id);if(!t||t.status==='review')return;c.current=id;c.stepIx=0;$(c.chatctx).textContent='Working on: '+t.t;render(c);askStep(c);}
+function askStep(c){
+  const t=c.tasks.find(x=>x.id===c.current);const step=t.steps[c.stepIx];
+  bubble(c,'ai',step.q);
+  if(step.suggest)sugTag(c);
+  const chips=step.chips.map((label,i)=>({label,sug:step.suggest&&i===0,ghost:/^(📎|Take|Use|Type)/.test(label),fn:()=>answer(c,label,step)}));
+  if(step.help)chips.push({label:'What’s this?',ghost:true,fn:()=>{bubble(c,'me','What’s this?');bubble(c,'ai',step.help,'help');}});
+  if(c.handoff)chips.push({label:'I’m not sure',ghost:true,fn:()=>{bubble(c,'me','I’m not sure');bubble(c,'ai','No problem. I can connect you with someone at the firm who will help. Shall I do that, or skip it for now and come back?','help');setChips(c,[{label:'Talk to the firm',ghost:true,fn:()=>{bubble(c,'me','Talk to the firm');bubble(c,'ai','Done. Someone will pick this up with you. I have passed on only the step name, nothing else.','help');setChips(c,[{label:'Carry on',fn:()=>askStep(c)}]);}},{label:'Skip for now',ghost:true,fn:()=>{bubble(c,'me','Skip for now');finishTask(c);}}]);}});
+  setChips(c,chips);
+}
+function answer(c,label,step){
+  bubble(c,'me',label);
+  if(step.assign){
+    if(/send/i.test(label)){
+      toast('<b>Sent</b> — the client has a private link to complete these');
+      bubble(c,'ai','Sent to the client. The answers will arrive back here and on the reviewer screen once they’re done. ✔');
+      finishTask(c);
+    } else {
+      bubble(c,'ai','No problem, we can do those together here now.');
+      finishTask(c);
+    }
+    return;
+  }
+  savedChip(c,shortSave(c.current,c.stepIx,label));
+  if(step.pepGate&&/yes/i.test(label)){
+    setTimeout(()=>{bubble(c,'ai','Understood. Because an owner is a PEP, I’ve added two enhanced due diligence tasks to the queue. We’ll go through them now.');const ix=c.tasks.findIndex(x=>x.id==='owners');c.tasks.splice(ix+1,0,...clone(CLIENT_EDD));render(c);toast('<b>+2 tasks</b> added (enhanced checks)');finishTask(c);},450);
+    return;
+  }
+  c.stepIx++;const t=c.tasks.find(x=>x.id===c.current);
+  if(c.stepIx<t.steps.length)setTimeout(()=>askStep(c),420);else setTimeout(()=>finishTask(c),420);
+}
+function finishTask(c){
+  const t=c.tasks.find(x=>x.id===c.current);t.status='review';render(c);
+  const remaining=c.tasks.filter(x=>x.status==='todo');
+  bubble(c,'ai','That’s '+t.t.toLowerCase()+' done and sent to '+c.reviewWord+'. ✔');
+  if(remaining.length){
+    setTimeout(()=>{bubble(c,'ai','You’ve got '+remaining.length+' left. Start the next one, '+remaining[0].t.toLowerCase()+'?');setChips(c,[{label:'Yes, next',fn:()=>startTask(c,remaining[0].id)},{label:'Save & come back',ghost:true,fn:()=>{bubble(c,'me','Save & come back');bubble(c,'ai','Saved. It’ll be here whenever you come back.');setChips(c,[]);c.current=null;render(c);}}]);},650);
+  } else { c.current=null; setTimeout(()=>c.onDone(c),650); }
+}
+function shortSave(id,ix,label){const m={company:['Registered details confirmed','Trading address recorded'],you:['ID document received','Liveness check passed'],owners:['Beneficial owners confirmed','PEP answer recorded'],source:['Source of funds confirmed'],'edd-src':['Source of wealth recorded'],'edd-doc':['Document received'],'op-risk':['Sector risk recorded','Cash threshold recorded']};return (m[id]&&m[id][ix])||'Answer recorded';}
+
+/* ===== tab switching ===== */
+const VIEWS=['operator','reviewer','status','client'];
+const WHO={operator:'<b>Priya Shah</b>AMLCC operator',reviewer:'<b>Daniel Cole</b>AMLCC reviewer',status:'<b>Priya Shah</b>AMLCC operator',client:'<b>Jane Okafor</b>End client · authorised rep'};
+const SUB={operator:'Your businesses',reviewer:'Case: Acme Trading Ltd',status:'Case: Acme Trading Ltd',client:'Case: Acme Trading Ltd'};
+document.querySelectorAll('.tab').forEach(t=>{t.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));t.classList.add('on');const v=t.dataset.v;VIEWS.forEach(id=>$('v-'+id).classList.toggle('hide',v!==id));$('who').innerHTML=WHO[v];$('topsub').textContent=SUB[v];};});
+
+/* ===== CLIENT portal data ===== */
+const CLIENT_EDD=[
+  {id:'edd-src',t:'Enhanced check: source of wealth',m:'Added because an owner is a PEP',status:'todo',isNew:true,steps:[{q:'Because David is a PEP, I need a little more detail. Please describe how David built his stake in the business.',chips:['Type a short answer']}]},
+  {id:'edd-doc',t:'Enhanced check: supporting evidence',m:'Added because an owner is a PEP',status:'todo',isNew:true,steps:[{q:'Please upload one document supporting that, for example accounts, a payslip, or a letter.',chips:['📎 Upload document']}]},
+];
+const CLIENT_TASKS=[
+  {id:'company',t:'Confirm company details',m:'Pulled from Companies House — check it’s right',status:'todo',steps:[
+    {q:'I’ve pulled Acme Trading Ltd from Companies House. Registered number 08842197, registered office 14 Prospect Road, Leeds. Is that still correct?',chips:['Yes, correct','No, something’s changed']},
+    {q:'Thanks. Is your trading address the same as the registered office?',chips:['Yes, same','No, different address']}]},
+  {id:'you',t:'Confirm your identity',m:'Photo ID + a selfie check',status:'todo',steps:[
+    {q:'Next, I need to confirm your identity. Please upload a photo of your passport or driving licence.',chips:['📎 Upload passport','Use driving licence instead']},
+    {q:'Got it. Now a quick liveness selfie so we can match it to the ID.',chips:['Take selfie']}]},
+  {id:'owners',t:'Confirm beneficial owners',m:'People owning or controlling 25%+',status:'todo',steps:[
+    {q:'Companies House lists two people with significant control: Jane Okafor (60%) and David Mensah (40%). Does that match who really owns or controls Acme Trading?',chips:['Yes, that’s right','No, that’s changed'],help:'A beneficial owner is anyone who owns or controls more than 25% of the business, or otherwise has significant control over it. We have to identify them by law.'},
+    {q:'One screening question for each owner. Is David Mensah, or a close family member, someone who holds a senior public or political position?',chips:['No','Yes — he’s a PEP'],pepGate:true}]},
+  {id:'source',t:'Source of funds',m:'Where the business money comes from',status:'todo',steps:[
+    {q:'Last one in the standard set. From the accounts you gave us, this looks like trading income. Can you confirm that is where Acme Trading’s money mainly comes from?',chips:['Yes, that’s right','No, it’s something else'],suggest:true}]},
+];
+const client={stream:'cl-stream',chips:'cl-chips',todo:'cl-todo',review:'cl-review',done:'cl-done',remain:'cl-remain',ptot:'cl-ptot',pdone:'cl-pdone',pbar:'cl-pbar',chatctx:'cl-chatctx',initials:'JO',reviewWord:'the firm',reviewBadge:'Awaiting review',handoff:true,current:null,stepIx:0,tasks:clone(CLIENT_TASKS),seed:['Services & engagement','Business risk questions','Contact details'],onDone:clientDone};
+function clientDone(c){
+  bubble(c,'ai','That’s everything on your side. Here’s a receipt of what you submitted today.');
+  const s=$(c.stream);const d=document.createElement('div');d.className='receipt';d.innerHTML=`<h4>Submitted to the firm</h4><div class="sub">Acme Trading Ltd · today</div><ul><li>Company details — confirmed</li><li>Identity check — ID and selfie received</li><li>Beneficial owners — confirmed, PEP screening answered</li><li>Source of funds — confirmed</li></ul><div class="sub" style="margin:9px 0 0">Status: with the firm for review. You’ll be told if anything else is needed.</div>`;s.appendChild(d);s.scrollTop=s.scrollHeight;
+  setTimeout(()=>{bubble(c,'ai','Nothing more for you to do right now.');setChips(c,[{label:'See where things stand',fn:()=>document.querySelector('.tab[data-v=status]').click()}]);},550);
+}
+
+/* ===== OPERATOR data (multiple businesses, same engine) ===== */
+const BIZ={
+  acme:{lead:'Acme Trading Ltd — what’s left',seed:['Company details','Services & engagement'],greet:'Morning Priya. Acme Trading has 3 items left. Shall I take you through them?',
+    tasks:[
+      {id:'op-risk',t:'Business risk questions',m:'Quick risk profile for the business',status:'todo',steps:[
+        {q:'Let’s do Acme Trading’s business risk questions. Does Acme operate in any higher risk sectors, such as crypto, gambling or arms?',chips:['No','Yes']},
+        {q:'Does Acme take cash payments over 10,000 euros?',chips:['No','Yes']}]},
+      {id:'op-assign',t:'Identity, owners & source of funds',m:'Usually quicker for the client',status:'todo',steps:[
+        {q:'The next items, identity, beneficial owners and source of funds, are usually quicker for the client to complete. Send them to Acme’s contact, or do them here on the phone?',chips:['Send to the client','I’ll do it now'],assign:true}]},
+    ]},
+  bright:{lead:'Brightwork Studios Ltd — not started',seed:[],greet:'Brightwork Studios is new. Nothing captured yet. Want me to pull the Companies House record and set the case up?',
+    tasks:[
+      {id:'op-start',t:'Start onboarding',m:'Nothing captured yet',status:'todo',steps:[
+        {q:'Shall I pull Brightwork Studios Ltd from Companies House and set up the onboarding case?',chips:['Yes, set it up','Not now']},
+        {q:'Done. Do you want to complete this one in house, or send it straight to Brightwork’s contact to fill in?',chips:['Send to the client','I’ll do it in house'],assign:true}]},
+    ]},
+  harbour:{lead:'Harbour Point LLP — with reviewer',seed:['Company details','Identity & owners','Source of funds','Business risk'],greet:'Harbour Point is all captured and sitting with the reviewer. Nothing for you to do here right now.',tasks:[]},
+};
+const operator={stream:'op-stream',chips:'op-chips',todo:'op-todo',review:'op-review',done:'op-done',remain:'op-remain',ptot:'op-ptot',pdone:'op-pdone',pbar:'op-pbar',chatctx:'op-chatctx',initials:'PS',reviewWord:'the reviewer',reviewBadge:'With reviewer',handoff:false,current:null,stepIx:0,tasks:[],seed:[],onDone:operatorDone};
+function operatorDone(c){
+  bubble(c,'ai','That’s this business up to date on your side. It’s now with the reviewer to sign off.');
+  setChips(c,[{label:'Open the reviewer view',fn:()=>document.querySelector('.tab[data-v=reviewer]').click()},{label:'Back to my businesses',ghost:true,fn:()=>{}}]);
+}
+function loadBiz(id){
+  const b=BIZ[id];
+  document.querySelectorAll('.biz').forEach(x=>x.classList.toggle('on',x.dataset.biz===id));
+  $('op-lead').textContent=b.lead;
+  operator.tasks=clone(b.tasks);operator.seed=b.seed.slice();operator.current=null;operator.stepIx=0;
+  $('op-stream').innerHTML='';render(operator);
+  bubble(operator,'ai',b.greet);
+  if(operator.tasks.length){
+    setChips(operator,[{label:'Yes, take me through',fn:()=>startTask(operator,operator.tasks[0].id)},{label:'What’s left?',ghost:true,fn:()=>{bubble(operator,'me','What’s left?');bubble(operator,'ai',operator.tasks.map(t=>t.t).join(', ')+'.');setChips(operator,[{label:'Start the first one',fn:()=>startTask(operator,operator.tasks[0].id)}]);}}]);
+  } else {
+    setChips(operator,[{label:'Open the reviewer view',fn:()=>document.querySelector('.tab[data-v=reviewer]').click()}]);
+  }
+}
+document.querySelectorAll('.biz').forEach(el=>el.onclick=()=>loadBiz(el.dataset.biz));
+
+/* ===== boot ===== */
+render(client);
+bubble(client,'ai','Good morning Jane. The firm has asked you to finish a short list for Acme Trading’s onboarding — I’ll walk you through it one question at a time. Ready to pick up where we left off?');
+setChips(client,[{label:'Yes, let’s go',fn:()=>{bubble(client,'me','Yes, let’s go');startTask(client,'company');}},{label:'What’s left?',ghost:true,fn:()=>{bubble(client,'me','What’s left?');bubble(client,'ai','Four things: company details, your identity, the beneficial owners, and the source of funds. Each is just a question or two.');setChips(client,[{label:'Start the first one',fn:()=>startTask(client,'company')}]);}}]);
+loadBiz('acme');
+</script>
+</body>
+</html>
