@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,400;0,600;0,700;1,600&family=Slabo+27px&display=swap" rel="stylesheet">
+  <style>
+    body{margin:0;-webkit-font-smoothing:antialiased}
+    *{box-sizing:border-box}
+    ::placeholder{color:#8A93A0}
+  </style>
+</helmet>
+
+<div style="background:#F4F6F8;min-height:100vh;font-family:'Open Sans',system-ui,Arial,sans-serif;color:#1F2429;position:relative">
+
+  <div style="position:sticky;top:0;z-index:50;background:#fff;border-bottom:1px solid #E3E6EA;display:flex;align-items:center;gap:8px;padding:8px 16px;overflow-x:auto">
+    <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#5B646E;margin-right:6px;white-space:nowrap">Preview</span>
+    <button onClick="{{ goToSignin }}" style="{{ pillStyleSignin }}">Sign in</button>
+    <button onClick="{{ goToForgot }}" style="{{ pillStyleForgot }}">Forgot password</button>
+    <button onClick="{{ goToReset }}" style="{{ pillStyleReset }}">Reset password</button>
+    <button onClick="{{ goToError }}" style="{{ pillStyleError }}">Sign-in error</button>
+    <button onClick="{{ goToHome }}" style="{{ pillStyleHome }}">Member home</button>
+    <button onClick="{{ goToDirectory }}" style="{{ pillStyleDirectory }}">Directory</button>
+  </div>
+
+  <sc-if value="{{ isAuthScreen }}" hint-placeholder-val="{{ true }}">
+    <div style="min-height:calc(100vh - 49px);display:grid;grid-template-columns:1fr 1fr">
+      <div style="background:linear-gradient(135deg,#0F4A70,#15608F);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 40px;text-align:center">
+        <img src="assets/logo-heart.png" alt="Heart of British Business" style="width:120px;filter:drop-shadow(0 8px 18px rgba(0,0,0,.35));margin-bottom:28px">
+        <h1 style="font-family:'Slabo 27px',Georgia,serif;font-weight:400;color:#fff;font-size:34px;margin:0 0 12px;line-height:1.25">Heart of British&nbsp;Business</h1>
+        <p style="color:#dbe8f1;font-family:'Open Sans',sans-serif;font-weight:600;font-size:16px;margin:0;max-width:360px">Where trusted local businesses meet, refer and grow together.</p>
+      </div>
+
+      <div style="display:flex;align-items:center;justify-content:center;padding:40px 24px;background:#F4F6F8">
+        <div style="width:100%;max-width:400px">
+
+          <sc-if value="{{ showSignin }}" hint-placeholder-val="{{ true }}">
+            <div>
+              <h2 style="font-family:'Slabo 27px',Georgia,serif;font-weight:400;font-size:28px;margin:0 0 6px">Sign in</h2>
+              <p style="color:#5B646E;font-size:14px;margin:0 0 28px">Welcome back. Enter your details to access your account.</p>
+
+              <sc-if value="{{ showError }}" hint-placeholder-val="{{ false }}">
+                <div style="background:#FDEBEC;border:1px solid #F3C2C5;border-radius:10px;padding:12px 14px;margin-bottom:20px;color:#B81C23;font-size:14px;font-weight:600">
+                  We couldn't sign you in. Check your email and password and try again.
+                </div>
+              </sc-if>
+
+              <div style="margin-bottom:18px">
+                <label style="display:block;font-weight:600;font-size:13px;margin:0 0 6px;color:#1F2429">Email address</label>
+                <input type="email" placeholder="you@yourbusiness.co.uk" value="{{ email }}" onChange="{{ onEmailChange }}" style="width:100%;padding:12px 14px;border:1.5px solid #E3E6EA;border-radius:10px;font-family:'Open Sans',sans-serif;font-size:15px;background:#fff;color:#1F2429" style-focus="border-color:#15608F;box-shadow:0 0 0 3px rgba(21,96,143,.15);outline:none">
+              </div>
+
+              <div style="margin-bottom:10px">
+                <label style="display:block;font-weight:600;font-size:13px;margin:0 0 6px;color:#1F2429">Password</label>
+                <input type="password" placeholder="••••••••" value="{{ password }}" onChange="{{ onPasswordChange }}" style="width:100%;padding:12px 14px;border:1.5px solid #E3E6EA;border-radius:10px;font-family:'Open Sans',sans-serif;font-size:15px;background:#fff;color:#1F2429" style-focus="border-color:#15608F;box-shadow:0 0 0 3px rgba(21,96,143,.15);outline:none">
+              </div>
+
+              <div style="text-align:right;margin-bottom:24px">
+                <a href="#" onClick="{{ goToForgot }}" style="color:#15608F;font-size:13px;font-weight:600;text-decoration:none">Forgotten your password?</a>
+              </div>
+
+              <button onClick="{{ goToHome }}" style="width:100%;background:#E1232B;color:#fff;border:none;border-radius:10px;padding:13px 20px;font-family:'Open Sans',sans-serif;font-weight:700;font-size:15px;cursor:pointer;box-shadow:0 1px 2px rgba(31,36,41,.06),0 6px 20px rgba(31,36,41,.08)" style-hover="background:#B81C23" style-focus="outline:none;box-shadow:0 0 0 3px rgba(225,35,43,.3)">Sign in</button>
+
+              <p style="text-align:center;color:#5B646E;font-size:13px;margin:24px 0 0">Not a member yet? <a href="#" style="color:#15608F;font-weight:600;text-decoration:none">Contact your regional director</a></p>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ showForgot }}" hint-placeholder-val="{{ false }}">
+            <div>
+              <a href="#" onClick="{{ goToSignin }}" style="color:#15608F;font-size:13px;font-weight:600;text-decoration:none">&larr; Back to sign in</a>
+              <h2 style="font-family:'Slabo 27px',Georgia,serif;font-weight:400;font-size:28px;margin:18px 0 6px">Forgot password</h2>
+              <p style="color:#5B646E;font-size:14px;margin:0 0 28px">Enter your email and we'll send you a link to reset your password.</p>
+
+              <div style="margin-bottom:24px">
+                <label style="display:block;font-weight:600;font-size:13px;margin:0 0 6px;color:#1F2429">Email address</label>
+                <input type="email" placeholder="you@yourbusiness.co.uk" value="{{ email }}" onChange="{{ onEmailChange }}" style="width:100%;padding:12px 14px;border:1.5px solid #E3E6EA;border-radius:10px;font-family:'Open Sans',sans-serif;font-size:15px;background:#fff;color:#1F2429" style-focus="border-color:#15608F;box-shadow:0 0 0 3px rgba(21,96,143,.15);outline:none">
+              </div>
+
+              <button onClick="{{ goToReset }}" style="width:100%;background:#E1232B;color:#fff;border:none;border-radius:10px;padding:13px 20px;font-family:'Open Sans',sans-serif;font-weight:700;font-size:15px;cursor:pointer;box-shadow:0 1px 2px rgba(31,36,41,.06),0 6px 20px rgba(31,36,41,.08)" style-hover="background:#B81C23" style-focus="outline:none;box-shadow:0 0 0 3px rgba(225,35,43,.3)">Send reset link</button>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ showReset }}" hint-placeholder-val="{{ false }}">
+            <div>
+              <h2 style="font-family:'Slabo 27px',Georgia,serif;font-weight:400;font-size:28px;margin:0 0 6px">Set a new password</h2>
+              <p style="color:#5B646E;font-size:14px;margin:0 0 28px">Choose a new password for your account.</p>
+
+              <div style="margin-bottom:18px">
+                <label style="display:block;font-weight:600;font-size:13px;margin:0 0 6px;color:#1F2429">New password</label>
+                <input type="password" placeholder="••••••••" style="width:100%;padding:12px 14px;border:1.5px solid #E3E6EA;border-radius:10px;font-family:'Open Sans',sans-serif;font-size:15px;background:#fff;color:#1F2429" style-focus="border-color:#15608F;box-shadow:0 0 0 3px rgba(21,96,143,.15);outline:none">
+              </div>
+
+              <div style="margin-bottom:24px">
+                <label style="display:block;font-weight:600;font-size:13px;margin:0 0 6px;color:#1F2429">Confirm new password</label>
+                <input type="password" placeholder="••••••••" style="width:100%;padding:12px 14px;border:1.5px solid #E3E6EA;border-radius:10px;font-family:'Open Sans',sans-serif;font-size:15px;background:#fff;color:#1F2429" style-focus="border-color:#15608F;box-shadow:0 0 0 3px rgba(21,96,143,.15);outline:none">
+              </div>
+
+              <button onClick="{{ goToSignin }}" style="width:100%;background:#E1232B;color:#fff;border:none;border-radius:10px;padding:13px 20px;font-family:'Open Sans',sans-serif;font-weight:700;font-size:15px;cursor:pointer;box-shadow:0 1px 2px rgba(31,36,41,.06),0 6px 20px rgba(31,36,41,.08)" style-hover="background:#B81C23" style-focus="outline:none;box-shadow:0 0 0 3px rgba(225,35,43,.3)">Update password</button>
+            </div>
+          </sc-if>
+
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ isAppScreen }}" hint-placeholder-val="{{ false }}">
+    <div>
+      <div style="background:#15608F;padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:68px">
+        <div style="display:flex;align-items:center;gap:36px">
+          <div style="display:flex;align-items:center;gap:10px">
+            <img src="assets/logo-heart.png" alt="HOBB" style="width:34px;filter:drop-shadow(0 2px 4px rgba(0,0,0,.3))">
+            <span style="font-family:'Slabo 27px',Georgia,serif;color:#fff;font-size:19px">Heart of British Business</span>
+          </div>
+          <nav style="display:flex;align-items:center;gap:28px">
+            <a href="#" onClick="{{ goToHome }}" style="{{ navLinkHome }}">Home</a>
+            <a href="#" onClick="{{ goToDirectory }}" style="{{ navLinkDirectory }}">Directory</a>
+            <a href="#" style="color:rgba(255,255,255,.55);text-decoration:none;font-weight:600;font-size:14px;cursor:default">Referrals</a>
+            <a href="#" style="color:rgba(255,255,255,.55);text-decoration:none;font-weight:600;font-size:14px;cursor:default">Events</a>
+          </nav>
+        </div>
+        <div style="display:flex;align-items:center;gap:16px">
+          <div style="width:36px;height:36px;border-radius:999px;background:#0F4A70;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;border:1.5px solid rgba(255,255,255,.4)">SW</div>
+          <span style="color:#fff;font-size:14px;font-weight:600">Sarah Whitfield</span>
+          <a href="#" onClick="{{ goToSignin }}" style="color:rgba(255,255,255,.75);text-decoration:none;font-size:13px;font-weight:600;border-left:1px solid rgba(255,255,255,.3);padding-left:16px">Sign out</a>
+        </div>
+      </div>
+
+      <sc-if value="{{ showHome }}" hint-placeholder-val="{{ true }}">
+        <div style="max-width:1160px;margin:0 auto;padding:36px 32px 64px">
+          <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:8px">
+            <div>
+              <h1 style="font-family:'Slabo 27px',Georgia,serif;font-weight:400;font-size:30px;margin:0 0 4px">Welcome back, Sarah</h1>
+              <p style="color:#5B646E;font-size:14px;margin:0">Newbury Chapter &middot; Thursday, 21 August 2026</p>
+            </div>
+            <span style="display:inline-block;padding:4px 12px;border-radius:999px;font-size:12px;font-weight:600;font-family:'Open Sans',sans-serif;background:#EAF1F6;color:#0F4A70">Newbury Chapter</span>
+          </div>
+
+          <div style="background:#FDEBEC;border:1px solid #F3C2C5;border-radius:12px;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:12px">
+            <span style="color:#B81C23;font-weight:700;font-size:14px">Annual Awards Dinner — reserve your table by 15 September</span>
+            <button style="background:#fff;color:#15608F;border:1.5px solid #15608F;border-radius:10px;padding:9px 16px;font-family:'Open Sans',sans-serif;font-weight:700;font-size:13px;cursor:pointer" style-hover="background:#EAF1F6">Book now</button>
+          </div>
+
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-bottom:32px">
+            <sc-for list="{{ stats }}" as="stat" hint-placeholder-count="4">
+              <div style="background:#fff;border:1px solid #E3E6EA;border-radius:12px;box-shadow:0 1px 2px rgba(31,36,41,.06),0 6px 20px rgba(31,36,41,.08);padding:20px">
+                <div style="font-family:'Slabo 27px',Georgia,serif;font-size:30px;color:{{ stat.color }};margin-bottom:4px">{{ stat.value }}</div>
+                <div style="color:#5B646E;font-size:13px;font-weight:600">{{ stat.label }}</div>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1.1fr 1fr;gap:24px">
+            <div style="background:#fff;border:1px solid #E3E6EA;border-radius:12px;box-shadow:0 1px 2px rgba(31,36,41,.06),0 6px 20px rgba(31,36,41,.08)">
+              <div style="padding:18px 22px;border-bottom:1px solid #E3E6EA;display:flex;align-items:center;justify-content:space-between">
+                <h3 style="font-family:'Slabo 27px',Georgia,serif;font-weight:400;font-size:19px;margin:0">Upcoming meetings</h3>
+                <a href="#" style="color:#15608F;font-size:13px;font-weight:600;text-decoration:none">View all</a>
+              </div>
+              <sc-for list="{{ meetings }}" as="meeting" hint-placeholder-count="3">
+                <div style="padding:16px 22px;border-bottom:1px solid #E3E6EA;display:flex;align-items:center;gap:16px">
+                  <div style="width:52px;height:52px;border-radius:10px;background:#EAF1F6;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0">
+                    <span style="font-size:11px;font-weight:700;color:#15608F;text-transform:uppercase">{{ meeting.month }}</span>
+                    <span style="font-size:17px;font-weight:700;color:#0F4A70">{{ meeting.day }}</span>
+                  </div>
+                  <div style="flex:1">
+                    <div style="font-weight:700;font-size:14px;margin-bottom:2px">{{ meeting.title }}</div>
+                    <div style="color:#5B646E;font-size:13px">{{ meeting.time }} &middot; {{ meeting.location }}</div>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+
+            <div style="background:#fff;border:1px solid #E3E6EA;border-radius:12px;box-shadow:0 1px 2px rgba(31,36,41,.06),0 6px 20px rgba(31,36,41,.08)">
+              <div style="padding:18px 22px;border-bottom:1px solid #E3E6EA">
+                <h3 style="font-family:'Slabo 27px',Georgia,serif;font-weight:400;font-size:19px;margin:0">Recent activity</h3>
+              </div>
+              <sc-for list="{{ activity }}" as="act" hint-placeholder-count="4">
+                <div style="padding:14px 22px;border-bottom:1px solid #E3E6EA;display:flex;gap:12px;align-items:flex-start">
+                  <div style="width:8px;height:8px;border-radius:999px;background:{{ act.dotColor }};margin-top:6px;flex-shrink:0"></div>
+                  <div>
+                    <div style="font-size:13.5px;color:#1F2429;line-height:1.4">{{ act.text }}</div>
+                    <div style="color:#5B646E;font-size:12px;margin-top:2px">{{ act.when }}</div>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ showDirectory }}" hint-placeholder-val="{{ false }}">
+        <div style="max-width:1160px;margin:0 auto;padding:36px 32px 64px">
+          <div style="margin-bottom:24px">
+            <h1 style="font-family:'Slabo 27px',Georgia,serif;font-weight:400;font-size:30px;margin:0 0 4px">Member directory</h1>
+            <p style="color:#5B646E;font-size:14px;margin:0">{{ resultsLabel }}</p>
+          </div>
+
+          <div style="background:#fff;border:1px solid #E3E6EA;border-radius:12px;box-shadow:0 1px 2px rgba(31,36,41,.06),0 6px 20px rgba(31,36,41,.08);padding:16px 20px;display:flex;gap:14px;margin-bottom:24px;flex-wrap:wrap">
+            <input type="text" placeholder="Search by name, company or sector" value="{{ search }}" onChange="{{ onSearchChange }}" style="flex:1;min-width:220px;padding:11px 14px;border:1.5px solid #E3E6EA;border-radius:10px;font-family:'Open Sans',sans-serif;font-size:14px;background:#fff;color:#1F2429" style-focus="border-color:#15608F;box-shadow:0 0 0 3px rgba(21,96,143,.15);outline:none">
+            <select value="{{ sector }}" onChange="{{ onSectorChange }}" style="padding:11px 14px;border:1.5px solid #E3E6EA;border-radius:10px;font-family:'Open Sans',sans-serif;font-size:14px;background:#fff;color:#1F2429;min-width:200px" style-focus="border-color:#15608F;box-shadow:0 0 0 3px rgba(21,96,143,.15);outline:none">
+              <sc-for list="{{ sectorOptions }}" as="opt" hint-placeholder-count="6">
+                <option value="{{ opt }}">{{ opt }}</option>
+              </sc-for>
+            </select>
+            <select value="{{ group }}" onChange="{{ onGroupChange }}" style="padding:11px 14px;border:1.5px solid #E3E6EA;border-radius:10px;font-family:'Open Sans',sans-serif;font-size:14px;background:#fff;color:#1F2429;min-width:180px" style-focus="border-color:#15608F;box-shadow:0 0 0 3px rgba(21,96,143,.15);outline:none">
+              <sc-for list="{{ groupOptions }}" as="opt2" hint-placeholder-count="4">
+                <option value="{{ opt2 }}">{{ opt2 }}</option>
+              </sc-for>
+            </select>
+          </div>
+
+          <sc-if value="{{ hasResults }}" hint-placeholder-val="{{ true }}">
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px">
+              <sc-for list="{{ filteredMembers }}" as="m" hint-placeholder-count="6">
+                <div style="background:#fff;border:1px solid #E3E6EA;border-radius:12px;box-shadow:0 1px 2px rgba(31,36,41,.06),0 6px 20px rgba(31,36,41,.08);padding:20px;display:flex;flex-direction:column;gap:14px">
+                  <div style="display:flex;align-items:center;gap:12px">
+                    <div style="width:44px;height:44px;border-radius:999px;background:{{ m.avatarBg }};color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0">{{ m.initials }}</div>
+                    <div style="min-width:0">
+                      <div style="font-weight:700;font-size:15px">{{ m.name }}</div>
+                      <div style="color:#5B646E;font-size:13px">{{ m.company }}</div>
+                    </div>
+                  </div>
+                  <div style="display:flex;gap:8px;flex-wrap:wrap">
+                    <span style="display:inline-block;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;font-family:'Open Sans',sans-serif;background:#EAF1F6;color:#0F4A70">{{ m.sector }}</span>
+                    <span style="display:inline-block;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;font-family:'Open Sans',sans-serif;background:#F4F6F8;color:#5B646E;border:1px solid #E3E6EA">{{ m.group }}</span>
+                  </div>
+                  <div style="border-top:1px solid #E3E6EA;padding-top:12px;display:flex;flex-direction:column;gap:6px;font-size:13px">
+                    <div style="display:flex;gap:8px"><span style="color:#5B646E;width:52px;flex-shrink:0">Phone</span><span>{{ m.phone }}</span></div>
+                    <div style="display:flex;gap:8px"><span style="color:#5B646E;width:52px;flex-shrink:0">Mobile</span><span>{{ m.mobile }}</span></div>
+                    <div style="display:flex;gap:8px"><span style="color:#5B646E;width:52px;flex-shrink:0">Email</span><a href="#" style="color:#15608F;text-decoration:none">{{ m.email }}</a></div>
+                    <div style="display:flex;gap:8px"><span style="color:#5B646E;width:52px;flex-shrink:0">Web</span><a href="#" style="color:#15608F;text-decoration:none">{{ m.website }}</a></div>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ hasNoResults }}" hint-placeholder-val="{{ false }}">
+            <div style="background:#fff;border:1px solid #E3E6EA;border-radius:12px;padding:60px 20px;text-align:center">
+              <div style="width:56px;height:56px;border-radius:12px;background:#F4F6F8;margin:0 auto 18px;border:1px solid #E3E6EA"></div>
+              <h3 style="font-family:'Slabo 27px',Georgia,serif;font-weight:400;font-size:19px;margin:0 0 6px">No members found</h3>
+              <p style="color:#5B646E;font-size:14px;margin:0 0 20px">Try a different search term, or reset your filters.</p>
+              <button onClick="{{ resetFilters }}" style="background:#fff;color:#15608F;border:1.5px solid #15608F;border-radius:10px;padding:11px 20px;font-family:'Open Sans',sans-serif;font-weight:700;font-size:14px;cursor:pointer" style-hover="background:#EAF1F6">Reset filters</button>
+            </div>
+          </sc-if>
+        </div>
+      </sc-if>
+    </div>
+  </sc-if>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const SECTORS = ['All sectors','Finance & Accounting','Legal','Marketing & Media','Construction & Trades','Technology','Health & Wellbeing','Property Services','Hospitality'];
+const GROUPS = ['All groups','Newbury Chapter','Basingstoke Chapter','Reading Chapter'];
+const AVATAR_COLORS = ['#15608F','#0F4A70','#B81C23','#5B646E'];
+
+const MEMBERS = [
+  {name:'Sarah Whitfield', company:'Whitfield & Co Accountants', sector:'Finance & Accounting', group:'Newbury Chapter', phone:'01635 552 010', mobile:'07700 900 111', email:'sarah@whitfieldaccounts.co.uk', website:'whitfieldaccounts.co.uk'},
+  {name:'Daniel Osei', company:'Osei Legal Partners', sector:'Legal', group:'Newbury Chapter', phone:'01635 552 022', mobile:'07700 900 122', email:'daniel@oseilegal.co.uk', website:'oseilegal.co.uk'},
+  {name:'Priya Anand', company:'Anand Marketing Studio', sector:'Marketing & Media', group:'Reading Chapter', phone:'0118 402 3310', mobile:'07700 900 133', email:'priya@anandstudio.co.uk', website:'anandstudio.co.uk'},
+  {name:'Tom Fletcher', company:'Fletcher Construction Group', sector:'Construction & Trades', group:'Basingstoke Chapter', phone:'01256 330 044', mobile:'07700 900 144', email:'tom@fletcherconstruction.co.uk', website:'fletcherconstruction.co.uk'},
+  {name:'Grace Lindqvist', company:'Lindqvist IT Solutions', sector:'Technology', group:'Newbury Chapter', phone:'01635 552 055', mobile:'07700 900 155', email:'grace@lindqvistit.co.uk', website:'lindqvistit.co.uk'},
+  {name:'Mark Ellison', company:'Ellison Wealth Management', sector:'Finance & Accounting', group:'Reading Chapter', phone:'0118 402 3366', mobile:'07700 900 166', email:'mark@ellisonwealth.co.uk', website:'ellisonwealth.co.uk'},
+  {name:'Nadia Hussain', company:'Hussain Physio & Wellbeing', sector:'Health & Wellbeing', group:'Basingstoke Chapter', phone:'01256 330 077', mobile:'07700 900 177', email:'nadia@hussainphysio.co.uk', website:'hussainphysio.co.uk'},
+  {name:'Chris Boateng', company:'Boateng Property Group', sector:'Property Services', group:'Newbury Chapter', phone:'01635 552 088', mobile:'07700 900 188', email:'chris@boatengproperty.co.uk', website:'boatengproperty.co.uk'},
+  {name:'Laura Kingsley', company:'Kingsley Hospitality Consulting', sector:'Hospitality', group:'Reading Chapter', phone:'0118 402 3399', mobile:'07700 900 199', email:'laura@kingsleyhospitality.co.uk', website:'kingsleyhospitality.co.uk'},
+];
+
+class Component extends DCLogic {
+  state = { screen: 'signin', email: '', password: '', search: '', sector: 'All sectors', group: 'All groups' };
+
+  initials(name) { return name.split(' ').map(p => p[0]).join('').slice(0,2).toUpperCase(); }
+
+  pill(active) {
+    return active
+      ? 'background:#15608F;color:#fff;border:none;border-radius:999px;padding:6px 14px;font-family:Open Sans,sans-serif;font-weight:700;font-size:12px;cursor:pointer;white-space:nowrap'
+      : 'background:#F4F6F8;color:#5B646E;border:1px solid #E3E6EA;border-radius:999px;padding:6px 14px;font-family:Open Sans,sans-serif;font-weight:600;font-size:12px;cursor:pointer;white-space:nowrap';
+  }
+
+  renderVals() {
+    const s = this.state.screen;
+    const filtered = MEMBERS.filter(m => {
+      const q = this.state.search.trim().toLowerCase();
+      const matchesQ = !q || m.name.toLowerCase().includes(q) || m.company.toLowerCase().includes(q) || m.sector.toLowerCase().includes(q);
+      const matchesSector = this.state.sector === 'All sectors' || m.sector === this.state.sector;
+      const matchesGroup = this.state.group === 'All groups' || m.group === this.state.group;
+      return matchesQ && matchesSector && matchesGroup;
+    }).map((m, i) => ({ ...m, initials: this.initials(m.name), avatarBg: AVATAR_COLORS[i % AVATAR_COLORS.length] }));
+
+    return {
+      isAuthScreen: ['signin','forgot','reset','error'].includes(s),
+      isAppScreen: ['home','directory'].includes(s),
+      showSignin: s === 'signin' || s === 'error',
+      showForgot: s === 'forgot',
+      showReset: s === 'reset',
+      showError: s === 'error',
+      showHome: s === 'home',
+      showDirectory: s === 'directory',
+
+      pillStyleSignin: this.pill(s === 'signin'),
+      pillStyleForgot: this.pill(s === 'forgot'),
+      pillStyleReset: this.pill(s === 'reset'),
+      pillStyleError: this.pill(s === 'error'),
+      pillStyleHome: this.pill(s === 'home'),
+      pillStyleDirectory: this.pill(s === 'directory'),
+
+      goToSignin: () => this.setState({ screen: 'signin' }),
+      goToForgot: () => this.setState({ screen: 'forgot' }),
+      goToReset: () => this.setState({ screen: 'reset' }),
+      goToError: () => this.setState({ screen: 'error' }),
+      goToHome: () => this.setState({ screen: 'home' }),
+      goToDirectory: () => this.setState({ screen: 'directory' }),
+
+      navLinkHome: s === 'home' ? 'color:#fff;text-decoration:none;font-weight:700;font-size:14px' : 'color:rgba(255,255,255,.85);text-decoration:none;font-weight:600;font-size:14px',
+      navLinkDirectory: s === 'directory' ? 'color:#fff;text-decoration:none;font-weight:700;font-size:14px' : 'color:rgba(255,255,255,.85);text-decoration:none;font-weight:600;font-size:14px',
+
+      email: this.state.email,
+      password: this.state.password,
+      onEmailChange: e => this.setState({ email: e.target.value }),
+      onPasswordChange: e => this.setState({ password: e.target.value }),
+
+      stats: [
+        { label: 'Referrals given', value: '14', color: '#1F2429' },
+        { label: 'Referrals received', value: '9', color: '#1F2429' },
+        { label: 'Referral value', value: '£42.5k', color: '#E1232B' },
+        { label: 'Member since', value: 'Mar 2022', color: '#1F2429' },
+      ],
+      meetings: [
+        { month: 'Aug', day: '27', title: 'Newbury Chapter — Weekly Meeting', time: '07:00', location: 'The Chequers Hotel' },
+        { month: 'Sep', day: '03', title: 'Newbury Chapter — Weekly Meeting', time: '07:00', location: 'The Chequers Hotel' },
+        { month: 'Sep', day: '10', title: 'Regional Networking Breakfast', time: '08:30', location: 'Vineyard Hotel, Newbury' },
+      ],
+      activity: [
+        { text: 'You received a referral from Daniel Osei', when: '2 hours ago', dotColor: '#E1232B' },
+        { text: 'Priya Anand joined Reading Chapter', when: 'Yesterday', dotColor: '#15608F' },
+        { text: 'Your membership renewal is due in 12 days', when: '2 days ago', dotColor: '#5B646E' },
+        { text: 'You passed a referral to Grace Lindqvist', when: '4 days ago', dotColor: '#E1232B' },
+      ],
+
+      search: this.state.search,
+      sector: this.state.sector,
+      group: this.state.group,
+      onSearchChange: e => this.setState({ search: e.target.value }),
+      onSectorChange: e => this.setState({ sector: e.target.value }),
+      onGroupChange: e => this.setState({ group: e.target.value }),
+      sectorOptions: SECTORS,
+      groupOptions: GROUPS,
+      resetFilters: () => this.setState({ search: '', sector: 'All sectors', group: 'All groups' }),
+
+      filteredMembers: filtered,
+      hasResults: filtered.length > 0,
+      hasNoResults: filtered.length === 0,
+      resultsLabel: filtered.length + ' of ' + MEMBERS.length + ' members shown',
+    };
+  }
+}
+
+</script>
+</body>
+</html>
