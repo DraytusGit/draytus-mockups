@@ -1,0 +1,459 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Friends of Ben Rinnes Website Walkthrough</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600&family=Zain:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --plum:#2e2834; --mauve:#806b72; --light:#dddbd9; --clay:#e2c0a7;
+  --ink:#1f1b24; --muted:#6b6470; --line:#e3e0e6; --bg:#f4f2f5; --card:#fff;
+  --ok:#2f7d54; --warn:#b0641c; --new:#c2410c;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.5}
+button{font:inherit;cursor:pointer}
+.top{background:var(--plum);color:#fff;padding:14px 20px;display:flex;flex-wrap:wrap;gap:8px 20px;align-items:center;justify-content:space-between}
+.top h1{margin:0;font-size:18px;font-weight:600}
+.top .sub{font-size:13px;color:var(--clay)}
+.prog{display:flex;align-items:center;gap:10px;font-size:13px}
+.bar{width:140px;height:8px;background:#ffffff30;border-radius:6px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--clay);width:0;transition:width .3s}
+.wrap{display:grid;grid-template-columns:260px 1fr;gap:20px;max-width:1280px;margin:0 auto;padding:20px}
+aside{position:sticky;top:12px;align-self:start;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:8px}
+aside button{display:flex;width:100%;text-align:left;gap:10px;align-items:flex-start;border:0;background:none;padding:9px 10px;border-radius:8px;font-size:14px;color:var(--ink)}
+aside button:hover{background:var(--bg)}
+aside button.on{background:var(--plum);color:#fff}
+aside .n{flex:none;width:22px;height:22px;border-radius:50%;background:var(--line);display:grid;place-items:center;font-size:12px;font-weight:600;color:var(--ink)}
+aside button.on .n{background:var(--clay);color:var(--plum)}
+aside .n.done{background:var(--ok);color:#fff}
+aside small{display:block;color:var(--muted);font-size:11px}
+aside button.on small{color:var(--clay)}
+main{min-width:0;display:flex;flex-direction:column}
+.browser,.panel{order:-1}
+.nav2{order:5}
+.note{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin-top:16px}
+.note h2{margin:0 0 4px;font-size:20px}
+.tag{display:inline-block;font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px;margin-right:6px;vertical-align:middle}
+.tag.agreed{background:#dff3e7;color:var(--ok)} .tag.extra{background:#fdebd5;color:var(--warn)} .tag.dep{background:#e6e3f5;color:#4b3fa0}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin-top:12px}
+.cols h4{margin:0 0 4px;font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.cols p,.cols ul{margin:0;font-size:14px;padding-left:0;list-style:none}
+.cols li{padding:2px 0 2px 16px;position:relative}
+.cols li:before{content:"";position:absolute;left:2px;top:10px;width:6px;height:6px;border-radius:50%;background:var(--mauve)}
+.decide{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
+.decide span{font-size:13px;color:var(--muted);margin-right:4px}
+.decide button{border:1px solid var(--line);background:#fff;border-radius:8px;padding:6px 12px;font-size:13px}
+.decide button.sel.a{background:var(--ok);border-color:var(--ok);color:#fff}
+.decide button.sel.c{background:var(--warn);border-color:var(--warn);color:#fff}
+.decide button.sel.d{background:#4b3fa0;border-color:#4b3fa0;color:#fff}
+.nav2{display:flex;justify-content:space-between;margin-top:16px}
+.nav2 button{border:0;background:var(--plum);color:#fff;border-radius:8px;padding:9px 16px;font-size:14px}
+.nav2 button.ghost{background:#fff;color:var(--ink);border:1px solid var(--line)}
+/* browser frame */
+.browser{border:1px solid #cfcad3;border-radius:12px;overflow:hidden;background:#fff;box-shadow:0 6px 24px #2e283418}
+.chrome{background:#ebe8ee;padding:8px 12px;display:flex;align-items:center;gap:10px}
+.dots{display:flex;gap:5px}.dots i{width:10px;height:10px;border-radius:50%;background:#c9c4cf}
+.url{flex:1;background:#fff;border-radius:6px;padding:4px 10px;font-size:12px;color:#555;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.site{background:var(--mauve);color:var(--light);font-family:"Barlow Condensed",sans-serif;font-size:18px}
+.site h1,.site h2,.site h3{font-family:Zain,sans-serif;font-weight:700;color:var(--light);margin:0 0 .4em}
+.sh{background:var(--plum);padding:12px 22px;display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;justify-content:space-between}
+.logo{display:flex;align-items:center;gap:8px;color:#fff;font-family:Zain,sans-serif;font-size:17px;line-height:1.05}
+.snav{display:flex;flex-wrap:wrap;gap:4px 16px;align-items:center}
+.snav a{color:var(--light);text-decoration:none;cursor:pointer;font-size:17px;position:relative}
+.snav a:hover{color:var(--clay)}
+.btn{display:inline-block;border:2px solid var(--clay);color:var(--clay);border-radius:30px;padding:5px 18px;background:none;font-family:inherit;font-size:17px;cursor:pointer;text-decoration:none}
+.btn.fill{background:var(--clay);color:var(--plum);font-weight:600}
+.btn:hover{filter:brightness(1.1)}
+.chg{outline:2px dashed #ff9d4d;outline-offset:4px;border-radius:30px;position:relative}
+.chg:after{content:"NEW";position:absolute;top:-14px;right:-6px;background:#ff9d4d;color:#2e2834;font:700 10px Inter,sans-serif;padding:1px 6px;border-radius:10px}
+.chgbox{outline:2px dashed #ff9d4d;outline-offset:6px;position:relative}
+.chgbox:before{content:"NEW";position:absolute;top:-16px;left:0;background:#ff9d4d;color:#2e2834;font:700 10px Inter,sans-serif;padding:1px 6px;border-radius:10px}
+.hero{height:230px;background:#9aa7bd center/cover;background-image:url("https://friendsofbenrinnes.co.uk/wp-content/uploads/2026/04/P16787-Ben-Rinnes-from-Meikle-Balloch-28-02-21-1024x768.jpg");display:flex;align-items:flex-end}
+.hero div{background:linear-gradient(transparent,#2e2834cc);width:100%;padding:30px 22px 14px}
+.sec{padding:26px 22px}
+.sec.light{background:var(--light);color:var(--plum)}
+.sec.light h2,.sec.light h3{color:var(--plum)}
+.sec p{margin:0 0 .7em;max-width:720px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+.card2{background:#ffffff14;border-radius:14px;overflow:hidden;border:1px solid #ffffff22}
+.sec.light .card2{background:#fff;border-color:#d5d0d6;color:var(--plum)}
+.card2 .im{height:110px;background:var(--mauve) center/cover}
+.card2 .b{padding:12px 14px}
+.card2 .b small{font-family:Inter,sans-serif;font-size:11px;opacity:.7}
+.sfoot{background:var(--plum);color:#9d94a3;padding:12px 22px;font:12px Inter,sans-serif;display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px}
+.frm{display:grid;gap:12px;max-width:640px;font-family:Inter,sans-serif;font-size:14px}
+.frm label{display:grid;gap:4px;font-weight:500}
+.frm input,.frm select,.frm textarea{padding:9px 10px;border-radius:8px;border:1px solid #cfc7d1;font:inherit;background:#fff;color:#222}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:2px solid var(--clay);background:none;color:var(--clay);border-radius:30px;padding:6px 16px;font:600 15px Inter,sans-serif}
+.chip.on{background:var(--clay);color:var(--plum)}
+.sec.light .chip{border-color:var(--plum);color:var(--plum)} .sec.light .chip.on{background:var(--plum);color:#fff}
+.gabox{background:#fff;color:#2b2430;border:2px solid var(--clay);border-radius:12px;padding:12px 14px;font:14px Inter,sans-serif}
+.gabox label{display:flex;gap:10px;align-items:flex-start;font-weight:600}
+.gabox .decl{margin:8px 0 0;font-size:12.5px;color:#4c4552}
+.gabox .up{margin-top:8px;color:var(--ok);font-weight:600}
+.stripe{background:#f6f5fa;border:1px dashed #9a92b5;border-radius:10px;padding:14px;color:#4b3fa0;font:13px Inter,sans-serif}
+.ok{background:#e9f7ef;color:#1f5f3f;border:1px solid #bfe3cf;border-radius:12px;padding:16px;font:15px Inter,sans-serif}
+.ok h3{color:#1f5f3f!important;font-family:Inter!important;font-size:18px}
+.tbl{width:100%;border-collapse:collapse;font:13px Inter,sans-serif;color:#222}
+.tbl th{text-align:left;background:#efecf2;padding:8px 10px;font-weight:600}
+.tbl td{padding:8px 10px;border-top:1px solid #e6e2ea}
+.admin{background:#f0f0f1;color:#1d2327;font:14px Inter,sans-serif;display:grid;grid-template-columns:150px 1fr;min-height:360px}
+.admin .side{background:#1d2327;color:#c3c4c7;padding:10px 0}
+.admin .side div{padding:8px 14px;font-size:13px}.admin .side .on{background:#2271b1;color:#fff}
+.admin .body{padding:16px}
+.admin h3{font:600 20px Inter,sans-serif!important;color:#1d2327!important;margin:0 0 12px}
+.tabs{display:flex;gap:4px;border-bottom:1px solid #c3c4c7;margin-bottom:12px;flex-wrap:wrap}
+.tabs button{border:1px solid #c3c4c7;border-bottom:0;background:#e5e5e5;padding:6px 12px;border-radius:6px 6px 0 0;font-size:13px}
+.tabs button.on{background:#fff;font-weight:600}
+.wpb{background:#2271b1;color:#fff;border:0;border-radius:4px;padding:6px 12px;font-size:13px}
+.panel{background:#fff;border:1px solid #dcdcde;padding:12px;overflow-x:auto;margin-top:16px}
+.flow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font:13px Inter,sans-serif;margin:12px 0}
+.flow div{background:#fff;color:#222;border:1px solid #d5d0d6;border-radius:10px;padding:8px 12px}
+.flow b{color:var(--clay)}
+.xcard{background:#fff;color:#222;border:1px solid #d5d0d6;border-radius:12px;padding:14px;font:14px Inter,sans-serif}
+.xcard h3{font:600 16px Inter,sans-serif!important;color:#222!important;margin:0 0 4px}
+.xcard .pick{display:flex;gap:6px;margin-top:10px}
+.xcard .pick button{flex:1;border:1px solid #d5d0d6;background:#fff;border-radius:8px;padding:6px;font-size:12px}
+.xcard .pick button.sel{background:var(--plum);color:#fff;border-color:var(--plum)}
+.qr{width:96px;height:96px;display:grid;grid-template-columns:repeat(12,1fr);gap:1px;background:#fff;padding:4px;border:1px solid #ccc}
+.qr i{background:#fff}.qr i.k{background:#111}
+.lock{display:grid;gap:8px;max-width:260px}
+.fine{font:12px Inter,sans-serif;color:var(--muted)}
+.sum td select{padding:4px;border-radius:6px;border:1px solid var(--line)}
+.sumwrap{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px}
+.sumwrap .tbl th{background:var(--bg)}
+.sumwrap textarea{width:100%;min-height:70px;border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit}
+.acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.acts button{border:0;background:var(--plum);color:#fff;border-radius:8px;padding:9px 14px;font-size:14px}
+.acts button.ghost{background:#fff;color:var(--ink);border:1px solid var(--line)}
+.demo{display:grid;gap:12px;font:14px Inter,sans-serif}
+.addr{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #cfc7d1;border-radius:20px;padding:8px 14px;color:#222;max-width:520px;transition:all .3s}
+.addr.go{border-color:var(--ok);background:#eef9f2}
+.addr em{font-style:normal;color:var(--muted);font-size:12px}
+@media(max-width:900px){
+  .wrap{grid-template-columns:1fr;padding:12px}
+  aside{position:static;display:flex;overflow-x:auto;gap:4px}
+  aside button{flex:none;width:auto;white-space:nowrap}
+  aside small{display:none}
+  .admin{grid-template-columns:1fr}.admin .side{display:none}
+  .row2{grid-template-columns:1fr}
+}
+@media print{
+  .top .prog,aside,.nav2,.acts,.decide{display:none}
+  .wrap{display:block}
+  body{background:#fff}
+}
+</style>
+</head>
+<body>
+<div class="top">
+  <div>
+    <h1>Friends of Ben Rinnes: website walkthrough</h1>
+    <div class="sub">Draytus prototype · sample content only · nothing here is live</div>
+  </div>
+  <div class="prog"><span id="pt">0 of 0 reviewed</span><div class="bar"><i id="pb"></i></div></div>
+</div>
+<div class="wrap">
+  <aside id="side"></aside>
+  <main id="main"></main>
+</div>
+
+<script>
+/* ---------- state (in memory only) ---------- */
+const CHARITY = "Friends of Ben Rinnes";
+const today = new Date();
+const fmt = d => d.toLocaleDateString("en-GB",{day:"numeric",month:"long",year:"numeric"});
+const addYear = d => { const x=new Date(d); x.setFullYear(x.getFullYear()+1); return x; };
+const money = n => "£"+Number(n).toFixed(2);
+const IMG = "https://friendsofbenrinnes.co.uk/wp-content/uploads/2026/04/";
+const state = {
+  step: 0,
+  decisions: {},           // stepId -> a|c|d
+  notes: "",
+  signName: "",
+  news: [
+    {t:"Sample news item 1", d:"Date to be set", b:"Your first update goes here. The committee can write and publish news without any technical help.", img:"P11415-Ben-Rinnes-25-08-19-1024x768.jpg"},
+    {t:"Sample news item 2", d:"Date to be set", b:"A second update. Each item has a title, a date, an optional photo and some text.", img:"P31421-Ben-Rinnes-27-02-24-1024x768.jpg"},
+    {t:"Sample news item 3", d:"Date to be set", b:"Events can be listed here too, for example volunteer days.", img:"P26198-Ben-Rinnes-19-06-23-1024x768.jpg"},
+    {t:"Sample news item 4", d:"Date to be set", b:"We will load your real items before launch.", img:"P24211-Ben-Rinnes-12-11-22-1024x768.jpg"}
+  ],
+  members: [
+    {name:"Sample Member One", email:"one@example.com", house:"1", postcode:"AB00 0AA", paid:"Sample", ga:true, amount:null},
+    {name:"Sample Member Two", email:"two@example.com", house:"2", postcode:"AB00 0BB", paid:"Sample", ga:false, amount:null}
+  ],
+  donations: [
+    {name:"Sample Donor One", house:"3", postcode:"AB00 0CC", amount:20, ga:true, date:"Sample", freq:"One off"}
+  ],
+  joinDone:null, donDone:null, tab:"members", amt:25, freq:"once", gaDon:true, gaJoin:true
+};
+
+/* ---------- step definitions ---------- */
+const STEPS = [
+ {id:"home", title:"Home page", sub:"Join and Donate in the main menu", tag:"agreed"},
+ {id:"news", title:"News and events", sub:"Committee can publish updates", tag:"agreed"},
+ {id:"join", title:"Join online", sub:"Annual membership through Stripe", tag:"agreed"},
+ {id:"donate", title:"Donate online", sub:"One off or monthly through Stripe", tag:"agreed"},
+ {id:"giftaid", title:"Gift Aid", sub:"Bespoke declaration and records", tag:"agreed"},
+ {id:"handover", title:"Launch and handover", sub:"Google, media, training", tag:"agreed"},
+ {id:"signoff", title:"Sign off", sub:"Summary of decisions", tag:"agreed"}
+];
+
+/* ---------- helpers ---------- */
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function setStep(i){ state.step=Math.max(0,Math.min(STEPS.length-1,i)); render(true); }
+function decide(id,v){ state.decisions[id]=v; render(); }
+function reviewed(){ return STEPS.filter(s=>s.id!=="signoff" && state.decisions[s.id]).length; }
+
+function side(){
+  $("#side").innerHTML = STEPS.map((s,i)=>`<button class="${i===state.step?"on":""}" onclick="setStep(${i})">
+    <span class="n ${state.decisions[s.id]==="a"?"done":""}">${state.decisions[s.id]==="a"?"✓":i+1}</span>
+    <span>${s.title}<small>${s.sub}</small></span></button>`).join("");
+  const total = STEPS.length-1, r = reviewed();
+  $("#pt").textContent = `${r} of ${total} reviewed`;
+  $("#pb").style.width = (r/total*100)+"%";
+}
+
+function noteBox(s, what, how, ask){
+  const d = state.decisions[s.id];
+  return `<div class="note">
+    <span class="tag ${s.tag}">${s.tag==="extra"?"Optional extra":"In scope"}</span>
+    <h2>${s.title}</h2>
+    <div class="cols">
+      <div><h4>What you will see</h4><p>${what}</p></div>
+      <div><h4>How it works</h4><ul>${how.map(x=>`<li>${x}</li>`).join("")}</ul></div>
+      <div><h4>Decision needed</h4><ul>${ask.map(x=>`<li>${x}</li>`).join("")}</ul></div>
+    </div>
+    <div class="decide"><span>Your view on this step:</span>
+      <button class="a ${d==="a"?"sel":""}" onclick="decide('${s.id}','a')">Approved</button>
+      <button class="c ${d==="c"?"sel":""}" onclick="decide('${s.id}','c')">Changes needed</button>
+      <button class="d ${d==="d"?"sel":""}" onclick="decide('${s.id}','d')">Discuss</button>
+    </div></div>`;
+}
+function navBtns(){
+  const i=state.step;
+  return `<div class="nav2"><button class="ghost" ${i===0?"disabled style='opacity:.4'":""} onclick="setStep(${i-1})">Back</button>
+  ${i<STEPS.length-1?`<button onclick="setStep(${i+1})">Next: ${STEPS[i+1].title}</button>`:"<span></span>"}</div>`;
+}
+
+/* ---------- mock site shell ---------- */
+function mountain(){return `<svg width="38" height="26" viewBox="0 0 38 26" fill="none" stroke="#fff" stroke-width="1.6"><path d="M1 24 L12 9 L17 15 L25 3 L37 24 Z"/><path d="M3 22 Q14 18 21 21 T35 22" stroke-opacity=".6"/></svg>`;}
+function site(url, inner, hl){
+  hl = hl||{};
+  return `<div class="browser"><div class="chrome"><div class="dots"><i></i><i></i><i></i></div><div class="url">${esc(url)}</div></div>
+  <div class="site">
+   <div class="sh">
+     <div class="logo">${mountain()}<span>Friends of<br>Ben Rinnes</span></div>
+     <div class="snav">
+       <a onclick="setStep(0)">About</a>
+       <a onclick="setStep(1)" class="${hl.news?"chgbox":""}">News &amp; Events</a>
+       <a onclick="setStep(0)">FAQs</a><a onclick="setStep(0)">Gallery</a><a onclick="setStep(0)">Contact</a>
+       <a class="btn fill ${hl.join?"chg":""}" onclick="setStep(2)">Become a member</a>
+       <a class="btn ${hl.donate?"chg":""}" onclick="setStep(3)">Donate</a>
+     </div>
+   </div>
+   ${inner}
+   <div class="sfoot"><span>© 2026 ${CHARITY}. Scottish Charity.</span><span>Prototype by Draytus</span></div>
+  </div></div>`;
+}
+
+/* ---------- Gift Aid component ---------- */
+function gaBlock(key, amt){
+  const on = state[key];
+  const up = on ? amt*0.25 : 0;
+  return `<div class="gabox">
+    <label><input type="checkbox" ${on?"checked":""} onchange="state.${key}=this.checked;render()"> Yes, I would like to Gift Aid my donation</label>
+    <div class="decl">I want to Gift Aid ${amt>0?"my donation of "+money(amt):"my membership payment"} and any donations I make in the future or have made in the past 4 years to ${CHARITY}. I am a UK taxpayer and understand that if I pay less Income Tax and/or Capital Gains Tax than the amount of Gift Aid claimed on all my donations in that tax year it is my responsibility to pay any difference.</div>
+    ${on?`${amt>0?`<div class="up">Adds ${money(up)} at no cost to you.</div>`:""}<div class="fine" style="margin-top:6px">We ask for your full name and home address below because HMRC requires them.</div>`:""}
+  </div>`;
+}
+
+/* ---------- step renderers ---------- */
+const R = {};
+
+R.home = s => {
+  const inner = `
+   <div class="hero"><div><h1 style="font-size:34px">Open Paths. Shared Summits.</h1></div></div>
+   <div class="sec">
+     <p><b>Ben Rinnes is one of the most recognisable landmarks in Moray.</b></p>
+     <p>A place shaped by weather, time, and the steady footsteps of those who return to it again and again.</p>
+     <p>We maintain the main path to the summit, protect the fragile upland environment, and support responsible access so that the hill can be enjoyed now and long into the future.</p>
+     <p style="margin-top:14px"><a class="btn fill chg" onclick="setStep(2)">Become a member</a> &nbsp; <a class="btn chg" onclick="setStep(3)">Donate</a></p>
+   </div>
+   <div class="sec light"><h2>What We Do</h2>
+     <div class="grid">
+       <div class="card2"><div class="b">Maintain and repair the main summit path.</div></div>
+       <div class="card2"><div class="b">Reduce erosion and protect the surrounding landscape.</div></div>
+       <div class="card2"><div class="b">Support safe, responsible access to the hill.</div></div>
+       <div class="card2"><div class="b">Coordinate volunteers and seasonal maintenance work.</div></div>
+     </div></div>`;
+  return noteBox(s,
+   "Your current home page with two changes: a clear Become a member button and a Donate button, both in the main menu and on the page itself.",
+   ["Today there is nowhere in the top menu that says how to become a member.","Both buttons stay visible on every page, including on a phone.","Everything else on the page stays as it is now."],
+   ["Is the wording \"Become a member\" right, or do you prefer \"Join us\"?","Should Donate sit beside it, or lower down?"])
+   + site("friendsofbenrinnes.co.uk/", inner, {join:1,donate:1,news:1}) + navBtns();
+};
+
+R.news = s => {
+  const cards = state.news.map(n=>`<div class="card2"><div class="im" style="background-image:url('${IMG}${n.img||""}')"></div><div class="b"><small>${esc(n.d)}</small><h3 style="font-size:20px">${esc(n.t)}</h3><div style="font-size:16px">${esc(n.b)}</div></div></div>`).join("");
+  const inner = `<div class="sec light"><h2>News &amp; Events</h2><div class="grid">${cards}</div></div>`;
+  const editor = `<div class="panel" style="margin-top:16px"><div class="fine" style="margin-bottom:8px"><b>Committee view:</b> adding a news item takes a minute. Try it.</div>
+    <div class="frm" style="max-width:100%"><div class="row2">
+      <label>Title<input id="nt" placeholder="For example: Volunteer day"></label>
+      <label>Date<input id="nd" placeholder="For example: 14 June"></label></div>
+      <label>Text<textarea id="nb" placeholder="Write the update here"></textarea></label>
+      <div><button class="wpb" onclick="addNews()">Publish</button></div></div></div>`;
+  return noteBox(s,
+   "A new News &amp; Events page in the menu. Clare was going to create it with four items on it; we do the same, using your real content.",
+   ["The committee adds items in WordPress with a title, date, text and optional photo.","Newest item shows first.","Roxanne will show Linda how in the training session."],
+   ["Who will supply the first four items, and by when?","Do you want events (with dates) shown separately from news?"])
+   + site("friendsofbenrinnes.co.uk/news-events/", inner, {news:1}) + editor + navBtns();
+};
+function addNews(){
+  const t=$("#nt").value.trim(), b=$("#nb").value.trim(), d=$("#nd").value.trim();
+  if(!t||!b) return;
+  state.news.unshift({t,b,d:d||fmt(today),img:""}); render();
+}
+
+R.join = s => {
+  let inner;
+  if(state.joinDone){
+    const j=state.joinDone;
+    inner = `<div class="sec"><div class="ok"><h3>Welcome, ${esc(j.name)}</h3>
+      <p>Your membership is confirmed. Your receipt is on its way to ${esc(j.email)}.</p>
+      <p><b>Renews on ${fmt(addYear(today))}</b>, one year from today. Stripe takes the payment and we email a reminder before then.</p>
+      ${j.ga?`<p>Gift Aid declaration recorded.</p>`:""}
+      </div><p style="margin-top:14px"><button class="btn" onclick="state.joinDone=null;render()">Start again</button></p></div>`;
+  } else {
+    inner = `<div class="sec"><h2>Become a member</h2>
+      <p>Membership runs for a year from the day you join. Annual fee: <b>£ to be confirmed</b>.</p>
+      <div class="frm">
+        <div class="row2"><label>Full name<input id="jn" placeholder="Your full name"></label><label>Email<input id="je" placeholder="you@example.com"></label></div>
+        <div class="row2"><label>House name or number<input id="jh"></label><label>Postcode<input id="jp"></label></div>
+        ${gaBlock("gaJoin", 0)}
+        <div class="stripe"><b>Secure payment by Stripe.</b> The card form appears here. We never see or store card details. Set up as a yearly subscription so it renews automatically.</div>
+        <div><button class="btn fill" onclick="doJoin()">Join and pay</button></div>
+      </div></div>`;
+  }
+  return noteBox(s,
+   "A Join page with a short form and a secure Stripe payment. The renewal date works itself out as one year from the day the person pays.",
+   ["Stripe handles the yearly renewal, card details and receipts.","The form replaces the manual spreadsheet: every new member lands in your committee list.","Gift Aid is offered at the same moment, if the fee qualifies."],
+   ["What is the annual fee, and is there more than one type (single, family)?","Fixed renewal date for everyone, or one year from joining? We recommend one year from joining.","Does your treasurer confirm membership fees can be Gift Aided?"])
+   + site("friendsofbenrinnes.co.uk/join/", inner, {join:1}) + navBtns();
+};
+function doJoin(){
+  const name=$("#jn").value.trim()||"New Member", email=$("#je").value.trim()||"member@example.com";
+  const h=$("#jh").value.trim()||"1", p=$("#jp").value.trim()||"AB00 0ZZ";
+  state.members.push({name,email,house:h,postcode:p,paid:fmt(today),ga:state.gaJoin,amount:null});
+  state.joinDone={name,email,ga:state.gaJoin}; render();
+}
+
+R.donate = s => {
+  let inner;
+  if(state.donDone){
+    const d=state.donDone;
+    inner = `<div class="sec"><div class="ok"><h3>Thank you</h3>
+      <p>Your ${d.freq==="monthly"?"monthly":"one off"} donation of ${money(d.amt)} is confirmed.</p>
+      ${d.ga?`<p>With Gift Aid, ${CHARITY} receives an extra ${money(d.amt*0.25)} from HMRC.</p>`:""}
+      </div><p style="margin-top:14px"><button class="btn" onclick="state.donDone=null;render()">Donate again</button></p></div>`;
+  } else {
+    inner = `<div class="sec light"><h2>Donate</h2>
+      <p>Every gift goes to looking after the path.</p>
+      <div class="frm">
+        <div class="chips">${[10,25,50].map(a=>`<button class="chip ${state.amt===a?"on":""}" onclick="state.amt=${a};render()">£${a}</button>`).join("")}
+          <input style="width:110px;padding:8px 12px;border-radius:30px;border:2px solid var(--plum)" placeholder="Other £" onchange="state.amt=Math.max(1,parseFloat(this.value)||25);render()"></div>
+        <div class="chips"><button class="chip ${state.freq==="once"?"on":""}" onclick="state.freq='once';render()">One off</button><button class="chip ${state.freq==="monthly"?"on":""}" onclick="state.freq='monthly';render()">Monthly</button></div>
+        <div class="fine">Amounts shown are examples, we will set yours.</div>
+        ${gaBlock("gaDon", state.amt)}
+        ${state.gaDon?`<div class="row2"><label>Full name<input id="dn"></label><label>House name or number<input id="dh"></label></div><div class="row2"><label>Postcode<input id="dp"></label><label>Email<input id="de"></label></div>`:""}
+        <div class="stripe"><b>Secure payment by Stripe.</b> Card form appears here.</div>
+        <div><button class="btn fill" style="background:var(--plum);color:#fff;border-color:var(--plum)" onclick="doDonate()">Donate ${money(state.amt)}${state.freq==="monthly"?" a month":""}</button></div>
+      </div></div>`;
+  }
+  return noteBox(s,
+   "A Donate page with preset amounts, one off or monthly giving, and the Gift Aid option built in. Try ticking Gift Aid to see the uplift.",
+   ["Payment goes into your own Stripe account, which Darren manages.","Draytus gets limited access to build it, not to the money.","Each donation is stored with its Gift Aid declaration."],
+   ["Which preset amounts do you want?","Do you want monthly giving as well as one off?"])
+   + site("friendsofbenrinnes.co.uk/donate/", inner, {donate:1}) + navBtns();
+};
+function doDonate(){
+  const amt=state.amt, ga=state.gaDon;
+  const g = id => { const e=$("#"+id); return e?e.value.trim():""; };
+  state.donations.push({name:ga?(g("dn")||"New Donor"):"Anonymous",house:g("dh"),postcode:g("dp"),amount:amt,ga,date:fmt(today),freq:state.freq==="monthly"?"Monthly":"One off"});
+  state.donDone={amt,ga,freq:state.freq}; render();
+}
+
+R.giftaid = s => {
+  const rec = `<table class="tbl"><tr><th>What is stored</th><th>Example</th></tr>
+    <tr><td>Donor full name</td><td>Sample Donor One</td></tr>
+    <tr><td>Home address and postcode</td><td>3, AB00 0CC</td></tr>
+    <tr><td>Declaration wording they agreed to</td><td>Version 1, saved word for word</td></tr>
+    <tr><td>Date and time they ticked</td><td>${fmt(today)}</td></tr>
+    <tr><td>Amount and payment reference</td><td>£20.00, Stripe reference</td></tr></table>`;
+  const inner = `<div class="sec light"><h2>How Gift Aid works on the site</h2>
+    <div class="flow"><div>1. Donor ticks Gift Aid</div><b>→</b><div>2. We take name, address, postcode</div><b>→</b><div>3. Record saved with the exact wording</div><b>→</b><div>4. Treasurer exports the claim list</div><b>→</b><div>5. Charity claims from HMRC</div></div>
+    <div class="card2" style="padding:12px;color:#222;background:#fff">${rec}</div>
+    <p class="fine" style="margin-top:10px;color:#4c4552">Declaration wording is based on HMRC's model wording and must be confirmed by your treasurer before launch.</p></div>`;
+  return noteBox(s,
+   "How the bespoke Gift Aid feature works behind the scenes. It is a tick box, the donor's details, and a clean record the treasurer can use.",
+   ["The charity makes the claim to HMRC. The site only collects the declaration and keeps the records.","No money moves to anyone else.","Records are kept and exported in the layout needed for the claim."],
+   ["Who is the person that will make the claim to HMRC?","Does the treasurer approve the declaration wording and the layout of the export?"])
+   + site("friendsofbenrinnes.co.uk/ (behind the scenes)", inner) + navBtns();
+};
+
+R.handover = s => {
+  const items = [
+    ["Search engines","The new site does not show on Google yet. We check the setting and make sure it can be found."],
+    ["Cairn Media film and photos","Linda forwards James's material; we agree what goes on the Gallery and home page."],
+    ["Stripe access","Darren gives Draytus a limited role. No access to the money."],
+    ["Test copy first","Everything goes on the test site for you to try before it goes live."],
+    ["WordPress training","Roxanne runs a one hour session for Linda on adding news and managing members."],
+    ["Support after launch","30 days of support from launch, as in Clare's original brief."]
+  ];
+  const inner = `<div class="sec light"><h2>Launch and handover</h2>
+    <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(250px,1fr))">${items.map(([t,d])=>`<div class="card2"><div class="b"><h3 style="font-size:20px">${t}</h3><div style="font-size:16px">${d}</div></div></div>`).join("")}</div></div>`;
+  return noteBox(s,
+   "The practical steps around the build so the site is found, looked after and understood by the committee.",
+   ["Work happens on the test site first.","You choose a launch date once everything is approved.","Linda and Darren each have one small task."],
+   ["Which dates suit for a review session and the training?","Do you want the optional monthly care plan after the 30 days?"])
+   + site("friendsofbenrinnes.co.uk/ (plan)", inner) + navBtns();
+};
+
+const LABEL = {a:"Approved",c:"Changes needed",d:"Discuss"};
+function summary(){
+  const lines=STEPS.filter(s=>s.id!=="signoff").map(s=>`${s.title}: ${LABEL[state.decisions[s.id]]||"Not reviewed"}`);
+  return `Friends of Ben Rinnes website walkthrough\nDate: ${fmt(today)}\n\n${lines.join("\n")}\n\nNotes: ${state.notes||"None"}\nSigned off by: ${state.signName||"(name)"}`;
+}
+function copySum(){
+  const t=summary();
+  try{ navigator.clipboard.writeText(t).then(()=>alert("Summary copied")); }catch(e){ prompt("Copy this summary", t); }
+}
+R.signoff = s => {
+  const rows = STEPS.filter(x=>x.id!=="signoff").map(x=>`<tr><td>${x.title}</td><td>${LABEL[state.decisions[x.id]]||"<span style='color:#b0641c'>Not reviewed</span>"}</td></tr>`).join("")
+   ;
+  return `<div class="note"><span class="tag agreed">Final step</span><h2>Sign off</h2>
+   <p style="margin:4px 0 0;font-size:14px">This is the record of what you have approved. Anything marked Changes needed or Discuss stays open until agreed.</p></div>
+   <div class="sumwrap"><table class="tbl"><tr><th>Item</th><th>Decision</th></tr>${rows}</table>
+    <h4 style="margin:16px 0 6px">Notes</h4><textarea oninput="state.notes=this.value" placeholder="Anything else you want us to know">${esc(state.notes)}</textarea>
+    <h4 style="margin:16px 0 6px">Signed off by</h4><input style="padding:9px 10px;border:1px solid var(--line);border-radius:8px;width:100%;max-width:320px" value="${esc(state.signName)}" oninput="state.signName=this.value" placeholder="Name">
+    <div class="acts"><button onclick="copySum()">Copy summary to send to Mark</button><button class="ghost" onclick="window.print()">Print or save as PDF</button></div>
+    <p class="fine" style="margin-top:10px">Prototype with sample content only. Final wording, prices and dates are agreed separately.</p></div>` + navBtns();
+};
+
+/* ---------- render ---------- */
+function render(newStep){
+  const y=window.scrollY;
+  const s=STEPS[state.step];
+  side();
+  $("#main").innerHTML = R[s.id](s);
+  window.scrollTo({top:newStep===true?0:y,behavior:"instant"});
+}
+render();
+</script>
+</body>
+</html>
